@@ -6,9 +6,9 @@ import Update.Pipeline exposing (..)
 import Url exposing (Url)
 
 
-withCalls : List c -> ( a, Cmd msg ) -> ( a, Cmd msg, List c )
+withCalls : List c -> ( a, Cmd msg ) -> ( ( a, List c ), Cmd msg )
 withCalls funs ( model, cmd ) =
-    ( model, cmd, funs )
+    ( ( model, funs ), cmd )
 
 
 type Msg
@@ -30,7 +30,7 @@ setRoute route router =
 
 
 type alias Run route model msg =
-    (Router route -> ( Router route, Cmd Msg, List (model -> ( model, Cmd msg )) ))
+    (Router route -> ( ( Router route, List (model -> ( model, Cmd msg )) ), Cmd Msg ))
     -> model
     -> ( model, Cmd msg )
 
@@ -42,7 +42,7 @@ runCustom :
     -> Run route model msg
 runCustom get set toMsg updater model =
     let
-        ( router, cmd, calls ) =
+        ( ( router, calls ), cmd ) =
             updater (get model)
     in
     set router model
@@ -84,7 +84,7 @@ initMap toMsg fromUrl basePath key =
         |> mapCmd toMsg
 
 
-redirect : String -> Router route -> ( Router route, Cmd Msg, List a )
+redirect : String -> Router route -> ( ( Router route, List a ), Cmd Msg )
 redirect href router =
     let
         { basePath, key } =
@@ -102,7 +102,7 @@ forceUrlChange :
     Url
     -> { onRouteChange : Url -> Maybe route -> a }
     -> Router route
-    -> ( Router route, Cmd Msg, List a )
+    -> ( ( Router route, List a ), Cmd Msg )
 forceUrlChange =
     update << UrlChange
 
@@ -121,7 +121,7 @@ update :
     Msg
     -> { onRouteChange : Url -> Maybe route -> a }
     -> Router route
-    -> ( Router route, Cmd Msg, List a )
+    -> ( ( Router route, List a ), Cmd Msg )
 update msg { onRouteChange } router =
     let
         { basePath, fromUrl, key } =

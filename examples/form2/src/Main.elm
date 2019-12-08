@@ -22,7 +22,13 @@ type Msg
 
 type alias Model =
     { form : RegistrationForm.Model
+    , data : Maybe RegistrationForm.Data
     }
+
+
+setData : Maybe RegistrationForm.Data -> Model -> ( Model, Cmd msg )
+setData maybeData model =
+    save { model | data = maybeData }
 
 
 inForm : Form.Run RegistrationForm.Model RegistrationForm.Msg Model Msg
@@ -34,6 +40,13 @@ init : Flags -> ( Model, Cmd Msg )
 init () =
     save Model
         |> andMap (mapCmd FormMsg RegistrationForm.init)
+        |> andMap (save Nothing)
+
+
+handleSubmit : RegistrationForm.Data -> Model -> ( Model, Cmd Msg )
+handleSubmit data model =
+    model
+        |> setData (Just data)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -41,7 +54,7 @@ update msg model =
     case msg of
         FormMsg formMsg ->
             model
-                |> inForm (Form.update formMsg { onSubmit = always save })
+                |> inForm (Form.update formMsg { onSubmit = handleSubmit })
 
 
 subscriptions : Model -> Sub Msg
@@ -50,11 +63,15 @@ subscriptions _ =
 
 
 view : Model -> Document Msg
-view _ =
+view { form, data } =
     { title = ""
     , body =
-        [ div [] []
-        , div [] []
+        [ case data of
+            Just { name } ->
+                p [] [ text ("Thanks for registering " ++ name) ]
+
+            Nothing ->
+                Html.map FormMsg (RegistrationForm.view form)
         ]
     }
 

@@ -1,12 +1,12 @@
 module Form.Register exposing (..)
 
-import Form.Error exposing (Error(..))
+import Form.Error as Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
 import Json.Encode as Encode
-import Update.Form as Form exposing (..)
+import Update.Form as Form exposing (Validate, checkbox, inputField)
 import Update.Form.Validate as Validate
 
 
@@ -89,6 +89,15 @@ validate =
 
 view : Model -> Html Msg
 view { fields, disabled, state } =
+    let
+        errorHelper field =
+            case Form.fieldError field of
+                Nothing ->
+                    text ""
+
+                Just error ->
+                    text (Error.toString error)
+    in
     Form.lookup6 fields
         Name
         Email
@@ -99,87 +108,48 @@ view { fields, disabled, state } =
         (\name email phoneNumber password passwordConfirmation agreeWithTerms ->
             [ fieldset
                 [ Html.Attributes.disabled disabled ]
-                [ div
-                    []
-                    [ label [] [ text "Name" ]
+                [ div []
+                    [ div [] [ label [] [ text "Name" ] ]
+                    , div [] [ input (Form.inputAttrs Name name) [] ]
+                    , div [] [ errorHelper name ]
+                    ]
+                , div []
+                    [ div [] [ label [] [ text "Email" ] ]
+                    , div [] [ input (Form.inputAttrs Email email) [] ]
+                    , div [] [ errorHelper email ]
+                    ]
+                , div []
+                    [ div [] [ label [] [ text "Phone number" ] ]
+                    , div [] [ input (Form.inputAttrs PhoneNumber phoneNumber) [] ]
+                    , div [] [ errorHelper phoneNumber ]
+                    ]
+                , div []
+                    [ div [] [ label [] [ text "Password" ] ]
+                    , div [] [ input (type_ "password" :: Form.inputAttrs Password password) [] ]
+                    , div [] [ errorHelper password ]
+                    ]
+                , div []
+                    [ div [] [ label [] [ text "Condfirm passwordConfirmation" ] ]
+                    , div [] [ input (type_ "password" :: Form.inputAttrs PasswordConfirmation passwordConfirmation) [] ]
+                    , div [] [ errorHelper passwordConfirmation ]
+                    ]
+                , div []
+                    [ div [] [ input (type_ "checkbox" :: Form.checkboxAttrs AgreeWithTerms agreeWithTerms) [] ]
+                    , div [] [ text "I agree with terms and conditions" ]
+                    , div [] [ errorHelper agreeWithTerms ]
+                    ]
+                , div []
+                    [ button []
+                        [ text
+                            (if disabled then
+                                "Please wait"
+
+                             else
+                                "Send"
+                            )
+                        ]
                     ]
                 ]
-
-            --                [ Bulma.Form.field []
-            --                    [ controlLabel [] [ text "Name" ]
-            --                    , Helpers.Form.controlInput Name name "Name"
-            --                    , Helpers.Form.controlErrorHelp name
-            --                    ]
-            --                , Bulma.Form.field []
-            --                    [ controlLabel [] [ text "Email" ]
-            --                    , Helpers.Form.controlInput Email email "Email"
-            --                    , Helpers.Form.controlErrorHelp email
-            --                    ]
-            --                , Bulma.Form.field []
-            --                    [ controlLabel [] [ text "Username" ]
-            --                    , Helpers.Form.control
-            --                        (if Unknown == state then
-            --                            [ class "is-loading" ]
-            --
-            --                         else
-            --                            []
-            --                        )
-            --                        (if IsAvailable True == state then
-            --                            [ class "is-success" ]
-            --
-            --                         else
-            --                            []
-            --                        )
-            --                        []
-            --                        controlInput
-            --                        Username
-            --                        username
-            --                        "Username"
-            --                    , Helpers.Form.controlErrorHelp username
-            --                    , if Form.Valid == username.status && IsAvailable True == state then
-            --                        controlHelp Success [] [ text "This username is available" ]
-            --
-            --                      else
-            --                        empty
-            --                    ]
-            --                , Bulma.Form.field []
-            --                    [ controlLabel [] [ text "Phone number" ]
-            --                    , Helpers.Form.controlInput PhoneNumber phoneNumber "Phone number"
-            --                    , Helpers.Form.controlErrorHelp phoneNumber
-            --                    ]
-            --                , Bulma.Form.field []
-            --                    [ controlLabel [] [ text "Password" ]
-            --                    , Helpers.Form.controlPassword Password password "Password"
-            --                    , Helpers.Form.controlErrorHelp password
-            --                    ]
-            --                , Bulma.Form.field []
-            --                    [ controlLabel [] [ text "Confirm password" ]
-            --                    , Helpers.Form.controlPassword PasswordConfirmation passwordConfirmation "Confirm password"
-            --                    , Helpers.Form.controlErrorHelp passwordConfirmation
-            --                    ]
-            --                , Bulma.Form.field []
-            --                    [ controlCheckBox False
-            --                        []
-            --                        (Form.checkboxAttrs AgreeWithTerms agreeWithTerms)
-            --                        []
-            --                        [ text "I agree with terms and conditions" ]
-            --                    , Helpers.Form.controlErrorHelp agreeWithTerms
-            --                    ]
-            --                , Bulma.Form.field []
-            --                    [ div [ class "control" ]
-            --                        [ button
-            --                            [ class "button is-primary" ]
-            --                            [ text
-            --                                (if disabled then
-            --                                    "Please wait"
-            --
-            --                                 else
-            --                                    "Send"
-            --                                )
-            --                            ]
-            --                        ]
-            --                    ]
-            --                ]
             ]
                 |> Html.form [ onSubmit Form.Submit ]
         )

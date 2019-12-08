@@ -1,7 +1,7 @@
 module Update.Form.Validate exposing (alphaNumeric, andThen, atLeastLength, checkbox, email, inputField, int, mustBeChecked, mustMatchField, record, stringNotEmpty, validate)
 
-import Update.Form exposing (FieldList, Status(..), Variant(..), asBool, asString, lookupField)
 import Regex exposing (Regex)
+import Update.Form exposing (FieldList, Status(..), Variant(..), asBool, asString, lookupField)
 
 
 stepValidate :
@@ -72,17 +72,17 @@ validate tag validator fields =
             case validator field.value fields of
                 Ok ok ->
                     ( [ ( tag, { field | status = Valid } ) ]
-                    , Just ok 
+                    , Just ok
                     )
 
                 Err error ->
                     ( [ ( tag, { field | status = Error error } ) ]
-                    , Nothing 
+                    , Nothing
                     )
 
         Nothing ->
             ( []
-            , Nothing 
+            , Nothing
             )
 
 

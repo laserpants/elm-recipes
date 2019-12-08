@@ -7,12 +7,22 @@ type Error
     | MustAgreeWithTerms
     | MustMatchPassword
     | PasswordTooShort
-    | InvalidChar
 
 
+toString : Error -> String
+toString error =
+    case error of
+        MustNotBeEmpty ->
+            "This field is required"
 
--- TODO
+        MustBeValidEmail ->
+            "Not a valid email address"
 
+        MustAgreeWithTerms ->
+            "You must agree with the terms of service to complete the registration"
 
-toString _ =
-    ""
+        MustMatchPassword ->
+            "Confirmation doesn’t match password"
+
+        PasswordTooShort ->
+            "The password must be at least eight characters long"
