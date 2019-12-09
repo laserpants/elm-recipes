@@ -58,7 +58,7 @@ init () url key =
             { router = router
             , page = HomePage
             }
-            |> inRouter (forceUrlChange url { onRouteChange = handleRouteChange }) 
+                |> inRouter (forceUrlChange url { onRouteChange = handleRouteChange })
     in
     ( model, Cmd.batch [ cmd, routerMsg ] )
 
@@ -80,9 +80,9 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RouterMsg routerMsg ->
-            let 
-                updateRouter = 
-                    Router.update routerMsg 
+            let
+                updateRouter =
+                    Router.update routerMsg
                         { onRouteChange = handleRouteChange }
             in
             inRouter updateRouter model
@@ -99,10 +99,10 @@ view { page } =
     , body =
         [ div []
             [ ul []
-                  [ li [] [ a [ href "/" ] [ text "Home" ] ] 
-                  , li [] [ a [ href "/about" ] [ text "About" ] ] 
-                  , li [] [ a [ href "/missing" ] [ text "Win a dinosaur" ] ] 
-                  ]
+                [ li [] [ a [ href "/" ] [ text "Home" ] ]
+                , li [] [ a [ href "/about" ] [ text "About" ] ]
+                , li [] [ a [ href "/missing" ] [ text "Win a dinosaur" ] ]
+                ]
             ]
         , div []
             [ case page of

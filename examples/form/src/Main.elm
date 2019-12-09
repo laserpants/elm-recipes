@@ -32,7 +32,7 @@ inForm =
 
 init : Flags -> ( Model, Cmd Msg )
 init () =
-    let 
+    let
         ( form, formMsg ) =
             RegistrationForm.init
     in
