@@ -1,7 +1,7 @@
 module Update.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
-import Update.Pipeline exposing (andAddCmd, save, sequence, using, mapCmd)
+import Update.Pipeline exposing (andAddCmd, mapCmd, save, sequence, using)
 
 
 withCalls : List c -> ( a, Cmd msg ) -> ( ( a, List c ), Cmd msg )
@@ -60,17 +60,17 @@ type alias RequestConfig resource =
     }
 
 
-type alias Run resource model msg =
-    (Model resource -> ( ( Model resource, List (model -> ( model, Cmd msg )) ), Cmd (Msg resource) ))
-    -> model
-    -> ( model, Cmd msg )
+type alias Bundle resource model msg =
+    Model resource -> ( ( Model resource, List (model -> ( model, Cmd msg )) ), Cmd (Msg resource) )
 
 
 runCustom :
     (model -> Model resource)
     -> (Model resource -> model -> model)
     -> (Msg resource -> msg)
-    -> Run resource model msg
+    -> Bundle resource model msg
+    -> model
+    -> ( model, Cmd msg )
 runCustom get set toMsg updater model =
     let
         ( ( api, calls ), cmd ) =
@@ -81,7 +81,11 @@ runCustom get set toMsg updater model =
         |> andAddCmd (Cmd.map toMsg cmd)
 
 
-run : (Msg resource -> msg) -> Run resource { a | api : Model resource } msg
+run :
+    (Msg resource -> msg)
+    -> Bundle resource { a | api : Model resource } msg
+    -> { a | api : Model resource }
+    -> ( { a | api : Model resource }, Cmd msg )
 run =
     let
         setApi api model =

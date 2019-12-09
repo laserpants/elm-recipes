@@ -44,7 +44,7 @@ type alias Model =
     }
 
 
-inRouter : Router.Run Route Model Msg
+inRouter : Router.Bundle Route Model Msg -> Model -> ( Model, Cmd Msg )
 inRouter =
     Router.run RouterMsg
 

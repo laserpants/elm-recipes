@@ -1,4 +1,4 @@
-module Update.Router exposing (Msg(..), Router, Run, forceUrlChange, handleUrlChange, handleUrlRequest, init, initMap, redirect, run, runCustom, update)
+module Update.Router exposing (Bundle, Msg(..), Router, forceUrlChange, handleUrlChange, handleUrlRequest, init, initMap, redirect, run, runCustom, update)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
@@ -29,17 +29,17 @@ setRoute route router =
     save { router | route = route }
 
 
-type alias Run route model msg =
-    (Router route -> ( ( Router route, List (model -> ( model, Cmd msg )) ), Cmd Msg ))
-    -> model
-    -> ( model, Cmd msg )
+type alias Bundle route model msg =
+    Router route -> ( ( Router route, List (model -> ( model, Cmd msg )) ), Cmd Msg )
 
 
 runCustom :
     (model -> Router route)
     -> (Router route -> model -> model)
     -> (Msg -> msg)
-    -> Run route model msg
+    -> Bundle route model msg
+    -> model
+    -> ( model, Cmd msg )
 runCustom get set toMsg updater model =
     let
         ( ( router, calls ), cmd ) =
@@ -50,7 +50,11 @@ runCustom get set toMsg updater model =
         |> andAddCmd (Cmd.map toMsg cmd)
 
 
-run : (Msg -> msg) -> Run route { a | router : Router route } msg
+run :
+    (Msg -> msg)
+    -> Bundle route { a | router : Router route } msg
+    -> { a | router : Router route }
+    -> ( { a | router : Router route }, Cmd msg )
 run =
     let
         setRouter router model =

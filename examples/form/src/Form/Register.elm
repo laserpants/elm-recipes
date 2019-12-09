@@ -129,7 +129,7 @@ view { fields, disabled, state } =
                     , div [] [ errorHelper password ]
                     ]
                 , div []
-                    [ div [] [ label [] [ text "Condfirm passwordConfirmation" ] ]
+                    [ div [] [ label [] [ text "Confirm password" ] ]
                     , div [] [ input (type_ "password" :: Form.inputAttrs PasswordConfirmation passwordConfirmation) [] ]
                     , div [] [ errorHelper passwordConfirmation ]
                     ]

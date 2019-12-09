@@ -1,7 +1,8 @@
 module Main exposing (..)
 
 import Browser exposing (Document, document)
-import Html exposing (a, button, div, h2, h3, li, p, text, ul)
+import Data.Book as Book exposing (Book)
+import Html exposing (a, button, div, h2, h3, i, li, p, table, td, text, tr, ul)
 import Html.Attributes exposing (href)
 import Html.Events exposing (..)
 import Json.Decode as Json
@@ -27,32 +28,19 @@ type Msg
     | BooksApiMsg (Api.Msg Books)
 
 
-type alias Book =
-    { id : Int
-    , title : String
-    , author : String
-    , synopsis : String
-    }
-
-
-bookDecoder : Json.Decoder Book
-bookDecoder =
-    Json.map4 Book
-        (Json.field "id" Json.int)
-        (Json.field "title" Json.string)
-        (Json.field "author" Json.string)
-        (Json.field "synopsis" Json.string)
-
-
 type Model
     = Blank
     | BookList (Api.Model Books)
     | BookInfo Book
 
 
-inApi : Api.Run Books (Api.Model Books) Msg
-inApi =
-    Api.runCustom identity always BooksApiMsg
+inBookList :
+    Api.Bundle Books (Api.Model Books) Msg
+    -> Api.Model Books
+    -> ( Model, Cmd Msg )
+inBookList fun =
+    Api.runCustom identity always BooksApiMsg fun
+        >> map BookList
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -68,7 +56,7 @@ update msg model =
                 request =
                     { endpoint = "/books"
                     , method = HttpGet
-                    , decoder = Json.field "books" (Json.list bookDecoder)
+                    , decoder = Json.field "books" (Json.list Book.decoder)
                     , headers = []
                     }
             in
@@ -82,8 +70,7 @@ update msg model =
 
         ( BooksApiMsg apiMsg, BookList apiModel ) ->
             apiModel
-                |> inApi (Api.update apiMsg apiDefaultHandlers)
-                |> map BookList
+                |> inBookList (Api.update apiMsg apiDefaultHandlers)
 
         _ ->
             save model
@@ -108,18 +95,21 @@ view model =
                 case resource of
                     Available books ->
                         let
-                            bookItem book =
-                                li
+                            bookItem ({ id, title, author } as book) =
+                                tr
                                     []
-                                    [ text book.title
-                                    , a
-                                        [ href "#"
-                                        , onClick (ShowBook book)
+                                    [ td [] [ text (String.fromInt id) ]
+                                    , td []
+                                        [ a
+                                            [ href "#"
+                                            , onClick (ShowBook book)
+                                            ]
+                                            [ text title ]
                                         ]
-                                        [ text "View" ]
+                                    , td [] [ text author ]
                                     ]
                         in
-                        ul [] (List.map bookItem books)
+                        table [] (List.map bookItem books)
 
                     Requested ->
                         text "Loading..."
@@ -132,7 +122,10 @@ view model =
                     []
                     [ div []
                         [ h3 [] [ text title ]
-                        , p [] [ text ("By: " ++ author) ]
+                        , p []
+                            [ text "By: "
+                            , i [] [ text author ]
+                            ]
                         , p [] [ text synopsis ]
                         ]
                     , div []

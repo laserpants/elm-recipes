@@ -25,7 +25,7 @@ type alias Model =
     }
 
 
-inForm : Form.Run RegistrationForm.Model RegistrationForm.Msg Model Msg
+inForm : Form.Bundle RegistrationForm.Model RegistrationForm.Msg Model Msg -> Model -> ( Model, Cmd Msg )
 inForm =
     Form.run FormMsg
 

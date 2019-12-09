@@ -212,17 +212,17 @@ setState state model =
     save { model | state = state }
 
 
-type alias Run form msg1 model msg =
-    (form -> ( ( form, List (model -> ( model, Cmd msg )) ), Cmd msg1 ))
-    -> model
-    -> ( model, Cmd msg )
+type alias Bundle form msg1 model msg =
+    form -> ( ( form, List (model -> ( model, Cmd msg )) ), Cmd msg1 )
 
 
 runCustom :
     (model -> ModelExtra field err data state)
     -> (ModelExtra field err data state -> model -> model)
     -> (Msg field -> msg)
-    -> Run (ModelExtra field err data state) (Msg field) model msg
+    -> Bundle (ModelExtra field err data state) (Msg field) model msg
+    -> model
+    -> ( model, Cmd msg )
 runCustom get set toMsg updater model =
     let
         ( ( form, calls ), cmd ) =
@@ -233,7 +233,11 @@ runCustom get set toMsg updater model =
         |> andAddCmd (Cmd.map toMsg cmd)
 
 
-run : (Msg field -> msg) -> Run (Model field err data) (Msg field) { a | form : Model field err data } msg
+run :
+    (Msg field -> msg)
+    -> Bundle (Model field err data) (Msg field) { a | form : Model field err data } msg
+    -> { a | form : Model field err data }
+    -> ( { a | form : Model field err data }, Cmd msg )
 run =
     let
         setForm form model =
@@ -323,26 +327,26 @@ update msg { onSubmit } =
             (case msg of
                 Submit ->
                     let
-                        fieldSubmitted field =
+                        fieldSetSubmitted field =
                             { field
                                 | dirty = True
                                 , submitted = True
                             }
                     in
                     fields
-                        |> List.map (Tuple.mapSecond fieldSubmitted)
+                        |> List.map (Tuple.mapSecond fieldSetSubmitted)
                         |> validate state Nothing
 
                 Input target value ->
                     let
-                        setFieldValue field =
+                        fieldSetValue field =
                             { field
                                 | value = value
                                 , dirty = True
                             }
                     in
                     fields
-                        |> applyToField target setFieldValue
+                        |> applyToField target fieldSetValue
                         |> validate state (Just target)
 
                 Blur target ->
