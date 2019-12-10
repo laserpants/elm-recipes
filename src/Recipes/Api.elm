@@ -1,12 +1,8 @@
-module Update.Api exposing (..)
+module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
+import Recipes.Helpers exposing (andCall, call)
 import Update.Pipeline exposing (andAddCmd, mapCmd, save, sequence, using)
-
-
-withCalls : List c -> ( a, Cmd msg ) -> ( ( a, List c ), Cmd msg )
-withCalls funs ( model, cmd ) =
-    ( ( model, funs ), cmd )
 
 
 type Msg resource
@@ -30,20 +26,9 @@ type alias Model resource =
     }
 
 
-setResource : Resource resource -> Model resource -> ( Model resource, Cmd (Msg resource) )
-setResource resource model =
-    save { model | resource = resource }
-
-
-updateResourceWith : (resource -> resource) -> Model resource -> ( Model resource, Cmd (Msg resource) )
-updateResourceWith updater model =
-    case model.resource of
-        Available available ->
-            model
-                |> setResource (Available (updater available))
-
-        _ ->
-            save model
+setResource : Resource resource -> ( Model resource, List a ) -> ( ( Model resource, List a ), Cmd (Msg resource) )
+setResource resource ( model, calls ) =
+    save ( { model | resource = resource }, calls )
 
 
 type HttpMethod
@@ -64,14 +49,14 @@ type alias Bundle resource model msg =
     Model resource -> ( ( Model resource, List (model -> ( model, Cmd msg )) ), Cmd (Msg resource) )
 
 
-runCustom :
+runBundle :
     (model -> Model resource)
     -> (Model resource -> model -> model)
     -> (Msg resource -> msg)
     -> Bundle resource model msg
     -> model
     -> ( model, Cmd msg )
-runCustom get set toMsg updater model =
+runBundle get set toMsg updater model =
     let
         ( ( api, calls ), cmd ) =
             updater (get model)
@@ -91,7 +76,7 @@ run =
         setApi api model =
             { model | api = api }
     in
-    runCustom .api setApi
+    runBundle .api setApi
 
 
 init : RequestConfig resource -> ( Model resource, Cmd msg )
@@ -122,11 +107,6 @@ init { endpoint, method, expect, headers } =
     save { resource = NotRequested, request = request }
 
 
-initMap : (Msg resource -> msg) -> RequestConfig resource -> ( Model resource, Cmd msg )
-initMap toMsg =
-    mapCmd toMsg << init
-
-
 toHeader : ( String, String ) -> Http.Header
 toHeader ( a, b ) =
     Http.header a b
@@ -136,21 +116,22 @@ sendRequest :
     String
     -> Maybe Http.Body
     -> Model resource
-    -> ( Model resource, Cmd (Msg resource) )
+    -> ( ( Model resource, List a ), Cmd (Msg resource) )
 sendRequest suffix maybeBody model =
-    model
+    ( model, [] )
         |> setResource Requested
         |> andAddCmd (model.request suffix maybeBody)
 
 
-sendSimpleRequest : Model resource -> ( Model resource, Cmd (Msg resource) )
+sendSimpleRequest : Model resource -> ( ( Model resource, List a ), Cmd (Msg resource) )
 sendSimpleRequest =
     sendRequest "" Nothing
 
 
-resetResource : Model resource -> ( Model resource, Cmd (Msg resource) )
-resetResource =
-    setResource NotRequested
+resetResource : Model resource -> ( ( Model resource, List a ), Cmd (Msg resource) )
+resetResource model =
+    ( model, [] )
+        |> setResource NotRequested
 
 
 apiDefaultHandlers :
@@ -168,12 +149,14 @@ update :
     -> { onSuccess : resource -> a, onError : Http.Error -> a }
     -> Model resource
     -> ( ( Model resource, List a ), Cmd (Msg resource) )
-update msg { onSuccess, onError } =
+update msg { onSuccess, onError } model =
     case msg of
         Response (Ok resource) ->
-            setResource (Available resource)
-                >> withCalls [ onSuccess resource ]
+            ( model, [] )
+                |> setResource (Available resource)
+                |> andCall (onSuccess resource)
 
         Response (Err error) ->
-            setResource (Error error)
-                >> withCalls [ onError error ]
+            ( model, [] )
+                |> setResource (Error error)
+                |> andCall (onError error)

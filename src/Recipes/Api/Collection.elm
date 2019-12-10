@@ -1,7 +1,7 @@
-module Update.Api.Collection exposing (..)
+module Recipes.Api.Collection exposing (..)
 
 import Http exposing (Expect)
-import Update.Api as Api exposing (Resource(..), apiDefaultHandlers)
+import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers)
 import Update.Pipeline exposing (andMap, andThen, mapCmd, save, using, with)
 
 

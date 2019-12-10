@@ -1,7 +1,7 @@
-module Update.Form.Validate exposing (alphaNumeric, andThen, atLeastLength, checkbox, email, inputField, int, mustBeChecked, mustMatchField, record, stringNotEmpty, validate)
+module Recipes.Form.Validate exposing (alphaNumeric, andThen, atLeastLength, checkbox, email, inputField, int, mustBeChecked, mustMatchField, record, stringNotEmpty, validate)
 
+import Recipes.Form exposing (FieldList, Status(..), Variant(..), asBool, asString, lookupField)
 import Regex exposing (Regex)
-import Update.Form exposing (FieldList, Status(..), Variant(..), asBool, asString, lookupField)
 
 
 stepValidate :

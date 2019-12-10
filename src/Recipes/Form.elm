@@ -1,15 +1,11 @@
-module Update.Form exposing (..)
+module Recipes.Form exposing (..)
 
-import Html exposing (..)
-import Html.Attributes as Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, text)
+import Html.Attributes as Attributes
+import Html.Events exposing (onBlur, onCheck, onFocus, onInput)
 import Maybe.Extra as Maybe
-import Update.Pipeline exposing (..)
-
-
-withCalls : List c -> ( a, Cmd msg ) -> ( ( a, List c ), Cmd msg )
-withCalls funs ( model, cmd ) =
-    ( ( model, funs ), cmd )
+import Recipes.Helpers exposing (andCall, call)
+import Update.Pipeline exposing (andAddCmd, andThen, save, sequence)
 
 
 type Variant
@@ -134,10 +130,10 @@ type alias Model field err data =
 
 setFields :
     FieldList field err
-    -> ModelExtra field err data state
-    -> ( ModelExtra field err data state, Cmd (Msg field) )
-setFields fields model =
-    save { model | fields = fields }
+    -> ( ModelExtra field err data state, List a )
+    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+setFields fields ( model, calls ) =
+    save ( { model | fields = fields }, calls )
 
 
 applyToField :
@@ -158,29 +154,20 @@ applyToField target fun =
         )
 
 
-withField :
-    field
-    -> (Field err -> Field err)
-    -> ModelExtra field err data state
-    -> ( ModelExtra field err data state, Cmd (Msg field) )
-withField target fun =
-    with .fields (setFields << applyToField target fun)
-
-
 setSubmitted :
     Bool
-    -> ModelExtra field err data state
-    -> ( ModelExtra field err data state, Cmd (Msg field) )
-setSubmitted submitted model =
-    save { model | submitted = submitted }
+    -> ( ModelExtra field err data state, List a )
+    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+setSubmitted submitted ( model, calls ) =
+    save ( { model | submitted = submitted }, calls )
 
 
 setDisabled :
     Bool
-    -> ModelExtra field err data state
-    -> ( ModelExtra field err data state, Cmd (Msg field) )
-setDisabled disabled model =
-    save { model | disabled = disabled }
+    -> ( ModelExtra field err data state, List a )
+    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+setDisabled disabled ( model, calls ) =
+    save ( { model | disabled = disabled }, calls )
 
 
 lookupField :
@@ -204,26 +191,42 @@ lookupField target fields =
     rec fields
 
 
-setState :
-    state
-    -> ModelExtra field err data state
-    -> ( ModelExtra field err data state, Cmd (Msg field) )
-setState state model =
-    save { model | state = state }
+withField :
+    field
+    -> (Field err -> Field err)
+    -> ( ModelExtra field err data state, List a )
+    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+withField target fun ( { fields } as model, calls ) =
+    ( model, calls )
+        |> setFields (applyToField target fun fields)
+
+
+validateField :
+    field
+    -> ( ModelExtra field err data state, List a )
+    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+validateField field ( { validate, state, fields } as model, calls ) =
+    let
+        updateFields ( newFields, _, _ ) =
+            setFields newFields ( model, calls )
+    in
+    fields
+        |> validate state (Just field)
+        |> updateFields
 
 
 type alias Bundle form msg1 model msg =
     form -> ( ( form, List (model -> ( model, Cmd msg )) ), Cmd msg1 )
 
 
-runCustom :
+runBundle :
     (model -> ModelExtra field err data state)
     -> (ModelExtra field err data state -> model -> model)
     -> (Msg field -> msg)
     -> Bundle (ModelExtra field err data state) (Msg field) model msg
     -> model
     -> ( model, Cmd msg )
-runCustom get set toMsg updater model =
+runBundle get set toMsg updater model =
     let
         ( ( form, calls ), cmd ) =
             updater (get model)
@@ -243,7 +246,7 @@ run =
         setForm form model =
             { model | form = form }
     in
-    runCustom .form setForm
+    runBundle .form setForm
 
 
 initExtra :
@@ -270,40 +273,36 @@ init validate fields =
     initExtra (always validate) fields ()
 
 
-reset : ModelExtra field err data state -> ( ModelExtra field err data state, Cmd (Msg field) )
+reset :
+    ModelExtra field err data state
+    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
 reset model =
     save
-        { model
+        ( { model
             | fields = model.initial
             , disabled = False
             , submitted = False
-        }
+          }
+        , []
+        )
 
 
-validateField :
-    field
+setState :
+    state
     -> ModelExtra field err data state
-    -> ( ModelExtra field err data state, Cmd (Msg field) )
-validateField field model =
-    let
-        { validate, state, fields } =
-            model
-
-        updateFields ( newFields, _, _ ) =
-            setFields newFields model
-    in
-    fields
-        |> validate state (Just field)
-        |> updateFields
+    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+setState state model =
+    save ( { model | state = state }, [] )
 
 
 setFieldDirty :
     field
     -> Bool
     -> ModelExtra field err data state
-    -> ( ModelExtra field err data state, Cmd (Msg field) )
-setFieldDirty tag dirty =
-    withField tag (\field -> { field | dirty = dirty })
+    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+setFieldDirty tag dirty model =
+    ( model, [] )
+        |> withField tag (\field -> { field | dirty = dirty })
 
 
 update :
@@ -311,64 +310,62 @@ update :
     -> { onSubmit : data -> a }
     -> ModelExtra field err data state
     -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
-update msg { onSubmit } =
-    using
-        (\{ fields, validate, state } ->
+update msg { onSubmit } ({ fields, validate, state } as model) =
+    let
+        handleSubmit maybeData =
+            case maybeData of
+                Just data ->
+                    setDisabled True
+                        >> andCall (onSubmit data)
+
+                Nothing ->
+                    save
+    in
+    (case msg of
+        Submit ->
             let
-                handleSubmit maybeData =
-                    case maybeData of
-                        Just data ->
-                            setDisabled True
-                                >> withCalls [ onSubmit data ]
-
-                        Nothing ->
-                            save >> withCalls []
+                fieldSetSubmitted field =
+                    { field
+                        | dirty = True
+                        , submitted = True
+                    }
             in
-            (case msg of
-                Submit ->
-                    let
-                        fieldSetSubmitted field =
-                            { field
-                                | dirty = True
-                                , submitted = True
-                            }
-                    in
-                    fields
-                        |> List.map (Tuple.mapSecond fieldSetSubmitted)
-                        |> validate state Nothing
+            fields
+                |> List.map (Tuple.mapSecond fieldSetSubmitted)
+                |> validate state Nothing
 
-                Input target value ->
-                    let
-                        fieldSetValue field =
-                            { field
-                                | value = value
-                                , dirty = True
-                            }
-                    in
-                    fields
-                        |> applyToField target fieldSetValue
-                        |> validate state (Just target)
+        Input target value ->
+            let
+                fieldSetValue field =
+                    { field
+                        | value = value
+                        , dirty = True
+                    }
+            in
+            fields
+                |> applyToField target fieldSetValue
+                |> validate state (Just target)
 
-                Blur target ->
-                    fields
-                        |> applyToField target (\field -> { field | dirty = False })
-                        |> validate state (Just target)
+        Blur target ->
+            fields
+                |> applyToField target (\field -> { field | dirty = False })
+                |> validate state (Just target)
 
-                Focus _ ->
-                    ( fields, Nothing, Nothing )
-            )
-                |> (\( newFields, maybeData, _ ) ->
-                        setFields newFields
-                            >> andThen
-                                (if Submit == msg then
-                                    setSubmitted True
-                                        >> andThen (handleSubmit maybeData)
+        Focus _ ->
+            ( fields, Nothing, Nothing )
+    )
+        |> (\( newFields, maybeData, _ ) ->
+                ( model, [] )
+                    |> setFields newFields
+                    |> andThen
+                        (if Submit == msg then
+                            setSubmitted True
+                                >> andThen (handleSubmit maybeData)
 
-                                 else
-                                    save >> withCalls []
-                                )
-                   )
-        )
+                         else
+                            save
+                        )
+           )
 
 
 lookup2 :

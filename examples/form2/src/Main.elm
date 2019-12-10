@@ -5,9 +5,8 @@ import Form.Register as RegistrationForm
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Update.Form as Form
+import Recipes.Form as Form
 import Update.Pipeline exposing (..)
-import Update.Router as Router exposing (Router, forceUrlChange, handleUrlChange, handleUrlRequest)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, parse)
 

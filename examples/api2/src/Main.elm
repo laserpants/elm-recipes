@@ -6,10 +6,9 @@ import Html exposing (a, button, div, h2, h3, i, li, p, table, td, text, tr, ul)
 import Html.Attributes exposing (href)
 import Html.Events exposing (..)
 import Json.Decode as Json
-import Update.Api as Api exposing (..)
-import Update.Api.Json as JsonApi exposing (..)
+import Recipes.Api as Api exposing (..)
+import Recipes.Api.Json as JsonApi exposing (..)
 import Update.Pipeline exposing (..)
-import Update.Router as Router exposing (Router, forceUrlChange, handleUrlChange, handleUrlRequest)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, parse)
 
@@ -39,13 +38,19 @@ inBookList :
     -> Api.Model Books
     -> ( Model, Cmd Msg )
 inBookList fun =
-    Api.runCustom identity always BooksApiMsg fun
+    Api.runBundle identity always BooksApiMsg fun
         >> map BookList
 
 
 init : Flags -> ( Model, Cmd Msg )
 init () =
     save Blank
+
+
+runRequest request _ =
+    JsonApi.init request
+        |> andThen Api.sendSimpleRequest
+        |> Debug.todo ""
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -60,10 +65,8 @@ update msg model =
                     , headers = []
                     }
             in
-            JsonApi.init request
-                |> andThen Api.sendSimpleRequest
-                |> map BookList
-                |> mapCmd BooksApiMsg
+            Debug.todo ""
+                |> inBookList (runRequest request)
 
         ( ShowBook book, _ ) ->
             save (BookInfo book)

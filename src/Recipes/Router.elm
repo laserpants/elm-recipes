@@ -1,14 +1,10 @@
-module Update.Router exposing (Bundle, Msg(..), Router, forceUrlChange, handleUrlChange, handleUrlRequest, init, initMap, redirect, run, runCustom, update)
+module Recipes.Router exposing (Bundle, Msg(..), Router, forceUrlChange, init, redirect, run, runBundle, update, urlChangeMsg, urlRequestMsg)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
+import Recipes.Helpers exposing (andCall, call)
 import Update.Pipeline exposing (..)
 import Url exposing (Url)
-
-
-withCalls : List c -> ( a, Cmd msg ) -> ( ( a, List c ), Cmd msg )
-withCalls funs ( model, cmd ) =
-    ( ( model, funs ), cmd )
 
 
 type Msg
@@ -24,23 +20,23 @@ type alias Router route =
     }
 
 
-setRoute : Maybe route -> Router route -> ( Router route, Cmd msg )
-setRoute route router =
-    save { router | route = route }
+setRoute : Maybe route -> ( Router route, List a ) -> ( ( Router route, List a ), Cmd msg )
+setRoute route ( router, calls ) =
+    save ( { router | route = route }, calls )
 
 
 type alias Bundle route model msg =
     Router route -> ( ( Router route, List (model -> ( model, Cmd msg )) ), Cmd Msg )
 
 
-runCustom :
+runBundle :
     (model -> Router route)
     -> (Router route -> model -> model)
     -> (Msg -> msg)
     -> Bundle route model msg
     -> model
     -> ( model, Cmd msg )
-runCustom get set toMsg updater model =
+runBundle get set toMsg updater model =
     let
         ( ( router, calls ), cmd ) =
             updater (get model)
@@ -60,7 +56,7 @@ run =
         setRouter router model =
             { model | router = router }
     in
-    runCustom .router setRouter
+    runBundle .router setRouter
 
 
 init :
@@ -77,17 +73,6 @@ init fromUrl basePath key =
         }
 
 
-initMap :
-    (Msg -> msg)
-    -> (Url -> Maybe route)
-    -> String
-    -> Navigation.Key
-    -> ( Router route, Cmd msg )
-initMap toMsg fromUrl basePath key =
-    init fromUrl basePath key
-        |> mapCmd toMsg
-
-
 redirect : String -> Router route -> ( ( Router route, List a ), Cmd Msg )
 redirect href router =
     let
@@ -97,9 +82,8 @@ redirect href router =
         redirectCmd =
             Navigation.replaceUrl key (basePath ++ href)
     in
-    router
+    ( router, [] )
         |> addCmd redirectCmd
-        |> withCalls []
 
 
 forceUrlChange :
@@ -111,26 +95,12 @@ forceUrlChange =
     update << UrlChange
 
 
-handleUrlChange : (Msg -> msg) -> Url -> msg
-handleUrlChange =
-    (>>) UrlChange
-
-
-handleUrlRequest : (Msg -> msg) -> UrlRequest -> msg
-handleUrlRequest =
-    (>>) UrlRequest
-
-
 update :
     Msg
     -> { onRouteChange : Url -> Maybe route -> a }
     -> Router route
     -> ( ( Router route, List a ), Cmd Msg )
-update msg { onRouteChange } router =
-    let
-        { basePath, fromUrl, key } =
-            router
-    in
+update msg { onRouteChange } ({ basePath, fromUrl, key } as router) =
     case msg of
         UrlChange url ->
             let
@@ -140,23 +110,32 @@ update msg { onRouteChange } router =
                 route =
                     fromUrl { url | path = path }
             in
-            router
+            ( router, [] )
                 |> setRoute route
-                |> withCalls [ onRouteChange url route ]
+                |> andCall (onRouteChange url route)
 
         UrlRequest (Browser.Internal url) ->
             let
                 urlStr =
                     Url.toString { url | path = basePath ++ url.path }
             in
-            router
+            ( router, [] )
                 |> addCmd (Navigation.pushUrl key urlStr)
-                |> withCalls []
 
         UrlRequest (Browser.External "") ->
-            withCalls [] (save router)
+            ( router, [] )
+                |> save
 
         UrlRequest (Browser.External href) ->
-            router
+            ( router, [] )
                 |> addCmd (Navigation.load href)
-                |> withCalls []
+
+
+urlChangeMsg : (Msg -> msg) -> Url -> msg
+urlChangeMsg =
+    (>>) UrlChange
+
+
+urlRequestMsg : (Msg -> msg) -> UrlRequest -> msg
+urlRequestMsg =
+    (>>) UrlRequest

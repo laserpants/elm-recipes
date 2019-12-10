@@ -6,8 +6,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
 import Json.Encode as Encode
-import Update.Form as Form exposing (Validate, checkbox, inputField)
-import Update.Form.Validate as Validate
+import Recipes.Form as Form exposing (Validate, checkbox, inputField)
+import Recipes.Form.Validate as Validate
 
 
 type Fields

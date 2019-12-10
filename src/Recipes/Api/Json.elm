@@ -1,8 +1,8 @@
-module Update.Api.Json exposing (..)
+module Recipes.Api.Json exposing (..)
 
 import Http
 import Json.Decode as Json
-import Update.Api as Api exposing (HttpMethod, Model, Msg(..))
+import Recipes.Api as Api exposing (HttpMethod, Model, Msg(..))
 import Update.Pipeline exposing (mapCmd)
 
 
@@ -10,7 +10,7 @@ sendJson :
     String
     -> Json.Value
     -> Model resource
-    -> ( Model resource, Cmd (Msg resource) )
+    -> ( ( Model resource, List a ), Cmd (Msg resource) )
 sendJson suffix =
     Http.jsonBody >> Just >> Api.sendRequest suffix
 
@@ -31,8 +31,3 @@ init { endpoint, method, decoder, headers } =
         , expect = Http.expectJson Response decoder
         , headers = headers
         }
-
-
-initMap : (Msg resource -> msg) -> JsonRequestConfig resource -> ( Model resource, Cmd msg )
-initMap toMsg =
-    mapCmd toMsg << init

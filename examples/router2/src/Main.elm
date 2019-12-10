@@ -5,8 +5,8 @@ import Browser.Navigation as Navigation
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Recipes.Router as Router exposing (Router, forceUrlChange)
 import Update.Pipeline exposing (..)
-import Update.Router as Router exposing (Router, forceUrlChange, handleUrlChange, handleUrlRequest)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, parse)
 
@@ -51,8 +51,12 @@ inRouter =
 
 init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
 init () url key =
+    let
+        router =
+            Router.init (parse routeParser) "" key
+    in
     save Model
-        |> andMap (Router.initMap RouterMsg (parse routeParser) "" key)
+        |> andMap (mapCmd RouterMsg router)
         |> andMap (save HomePage)
         |> andThen (inRouter (forceUrlChange url { onRouteChange = handleRouteChange }))
 
@@ -116,6 +120,6 @@ main =
         , update = update
         , subscriptions = subscriptions
         , view = view
-        , onUrlChange = handleUrlChange RouterMsg
-        , onUrlRequest = handleUrlRequest RouterMsg
+        , onUrlChange = Router.urlChangeMsg RouterMsg
+        , onUrlRequest = Router.urlRequestMsg RouterMsg
         }

@@ -1,9 +1,9 @@
-module Update.Api.Collection.Json exposing (..)
+module Recipes.Api.Collection.Json exposing (..)
 
 import Http
 import Json.Decode as Json
-import Update.Api exposing (Msg(..))
-import Update.Api.Collection as Collection exposing (Collection, Envelope, Msg)
+import Recipes.Api exposing (Msg(..))
+import Recipes.Api.Collection as Collection exposing (Collection, Envelope, Msg)
 import Update.Pipeline exposing (..)
 
 
