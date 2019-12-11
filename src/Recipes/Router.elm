@@ -1,9 +1,9 @@
-module Recipes.Router exposing (Bundle, Msg(..), Router, forceUrlChange, init, redirect, run, runBundle, update, urlChangeMsg, urlRequestMsg)
+module Recipes.Router exposing (Msg(..), Router, forceUrlChange, init, redirect, run, update, urlChangeMsg, urlRequestMsg)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
-import Recipes.Helpers exposing (andCall, call)
-import Update.Pipeline exposing (..)
+import Recipes.Helpers exposing (Bundle, andCall, call, runBundle)
+import Update.Pipeline exposing (save, addCmd)
 import Url exposing (Url)
 
 
@@ -25,30 +25,9 @@ setRoute route ( router, calls ) =
     save ( { router | route = route }, calls )
 
 
-type alias Bundle route model msg =
-    Router route -> ( ( Router route, List (model -> ( model, Cmd msg )) ), Cmd Msg )
-
-
-runBundle :
-    (model -> Router route)
-    -> (Router route -> model -> model)
-    -> (Msg -> msg)
-    -> Bundle route model msg
-    -> model
-    -> ( model, Cmd msg )
-runBundle get set toMsg updater model =
-    let
-        ( ( router, calls ), cmd ) =
-            updater (get model)
-    in
-    set router model
-        |> sequence calls
-        |> andAddCmd (Cmd.map toMsg cmd)
-
-
 run :
     (Msg -> msg)
-    -> Bundle route { a | router : Router route } msg
+    -> Bundle (Router route) Msg { a | router : Router route } msg
     -> { a | router : Router route }
     -> ( { a | router : Router route }, Cmd msg )
 run =

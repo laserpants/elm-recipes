@@ -8,6 +8,7 @@ import Html.Events exposing (..)
 import Json.Decode as Json
 import Recipes.Api as Api exposing (..)
 import Recipes.Api.Json as JsonApi exposing (..)
+import Recipes.Helpers exposing (..)
 import Update.Pipeline exposing (..)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, parse)
@@ -34,23 +35,17 @@ type Model
 
 
 inBookList :
-    Api.Bundle Books (Api.Model Books) Msg
+    Bundle (Api.Model Books) (Api.Msg Books) (Api.Model Books) Msg
     -> Api.Model Books
     -> ( Model, Cmd Msg )
 inBookList fun =
-    Api.runBundle identity always BooksApiMsg fun
+    runBundle identity always BooksApiMsg fun
         >> map BookList
 
 
 init : Flags -> ( Model, Cmd Msg )
 init () =
     save Blank
-
-
-runRequest request _ =
-    JsonApi.init request
-        |> andThen Api.sendSimpleRequest
-        |> Debug.todo ""
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -65,8 +60,9 @@ update msg model =
                     , headers = []
                     }
             in
-            Debug.todo ""
-                |> inBookList (runRequest request)
+            JsonApi.initRequest request
+                |> mapCmd BooksApiMsg
+                |> map BookList
 
         ( ShowBook book, _ ) ->
             save (BookInfo book)

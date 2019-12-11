@@ -1,8 +1,8 @@
 module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
-import Recipes.Helpers exposing (andCall, call)
-import Update.Pipeline exposing (andAddCmd, mapCmd, save, sequence, using)
+import Recipes.Helpers as Helpers exposing (..)
+import Update.Pipeline exposing (andAddCmd, andThen, mapCmd, save, sequence, using)
 
 
 type Msg resource
@@ -26,7 +26,10 @@ type alias Model resource =
     }
 
 
-setResource : Resource resource -> ( Model resource, List a ) -> ( ( Model resource, List a ), Cmd (Msg resource) )
+setResource :
+    Resource resource
+    -> ( Model resource, List a )
+    -> ( ( Model resource, List a ), Cmd (Msg resource) )
 setResource resource ( model, calls ) =
     save ( { model | resource = resource }, calls )
 
@@ -45,30 +48,9 @@ type alias RequestConfig resource =
     }
 
 
-type alias Bundle resource model msg =
-    Model resource -> ( ( Model resource, List (model -> ( model, Cmd msg )) ), Cmd (Msg resource) )
-
-
-runBundle :
-    (model -> Model resource)
-    -> (Model resource -> model -> model)
-    -> (Msg resource -> msg)
-    -> Bundle resource model msg
-    -> model
-    -> ( model, Cmd msg )
-runBundle get set toMsg updater model =
-    let
-        ( ( api, calls ), cmd ) =
-            updater (get model)
-    in
-    set api model
-        |> sequence calls
-        |> andAddCmd (Cmd.map toMsg cmd)
-
-
 run :
     (Msg resource -> msg)
-    -> Bundle resource { a | api : Model resource } msg
+    -> Bundle (Model resource) (Msg resource) { a | api : Model resource } msg
     -> { a | api : Model resource }
     -> ( { a | api : Model resource }, Cmd msg )
 run =
@@ -105,6 +87,15 @@ init { endpoint, method, expect, headers } =
                 }
     in
     save { resource = NotRequested, request = request }
+
+
+initRequest :
+    RequestConfig resource
+    -> ( Model resource, Cmd (Msg resource) )
+initRequest =
+    init
+        >> andThen sendSimpleRequest
+        >> sequenceCalls
 
 
 toHeader : ( String, String ) -> Http.Header

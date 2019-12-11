@@ -4,7 +4,7 @@ import Html exposing (Html, text)
 import Html.Attributes as Attributes
 import Html.Events exposing (onBlur, onCheck, onFocus, onInput)
 import Maybe.Extra as Maybe
-import Recipes.Helpers exposing (andCall, call)
+import Recipes.Helpers exposing (Bundle, andCall, call, runBundle)
 import Update.Pipeline exposing (andAddCmd, andThen, save, sequence)
 
 
@@ -213,27 +213,6 @@ validateField field ( { validate, state, fields } as model, calls ) =
     fields
         |> validate state (Just field)
         |> updateFields
-
-
-type alias Bundle form msg1 model msg =
-    form -> ( ( form, List (model -> ( model, Cmd msg )) ), Cmd msg1 )
-
-
-runBundle :
-    (model -> ModelExtra field err data state)
-    -> (ModelExtra field err data state -> model -> model)
-    -> (Msg field -> msg)
-    -> Bundle (ModelExtra field err data state) (Msg field) model msg
-    -> model
-    -> ( model, Cmd msg )
-runBundle get set toMsg updater model =
-    let
-        ( ( form, calls ), cmd ) =
-            updater (get model)
-    in
-    set form model
-        |> sequence calls
-        |> andAddCmd (Cmd.map toMsg cmd)
 
 
 run :

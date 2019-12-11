@@ -1,11 +1,12 @@
 module Main exposing (..)
 
 import Browser exposing (Document, document)
-import Form.Register as RegistrationForm
+import Form.Register as RegisterForm
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Recipes.Form as Form
+import Recipes.Helpers exposing (Bundle)
 import Update.Pipeline exposing (..)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, parse)
@@ -16,21 +17,24 @@ type alias Flags =
 
 
 type Msg
-    = FormMsg RegistrationForm.Msg
+    = FormMsg RegisterForm.Msg
 
 
 type alias Model =
-    { form : RegistrationForm.Model
-    , data : Maybe RegistrationForm.Data
+    { form : RegisterForm.Model
+    , data : Maybe RegisterForm.Data
     }
 
 
-setData : Maybe RegistrationForm.Data -> Model -> ( Model, Cmd msg )
+setData : Maybe RegisterForm.Data -> Model -> ( Model, Cmd msg )
 setData maybeData model =
     save { model | data = maybeData }
 
 
-inForm : Form.Bundle RegistrationForm.Model RegistrationForm.Msg Model Msg -> Model -> ( Model, Cmd Msg )
+inForm :
+    Bundle RegisterForm.Model RegisterForm.Msg Model Msg
+    -> Model
+    -> ( Model, Cmd Msg )
 inForm =
     Form.run FormMsg
 
@@ -38,11 +42,11 @@ inForm =
 init : Flags -> ( Model, Cmd Msg )
 init () =
     save Model
-        |> andMap (mapCmd FormMsg RegistrationForm.init)
+        |> andMap (mapCmd FormMsg RegisterForm.init)
         |> andMap (save Nothing)
 
 
-handleSubmit : RegistrationForm.Data -> Model -> ( Model, Cmd Msg )
+handleSubmit : RegisterForm.Data -> Model -> ( Model, Cmd Msg )
 handleSubmit data model =
     model
         |> setData (Just data)
@@ -70,7 +74,7 @@ view { form, data } =
                 p [] [ text ("Thanks for registering " ++ name) ]
 
             Nothing ->
-                Html.map FormMsg (RegistrationForm.view form)
+                Html.map FormMsg (RegisterForm.view form)
         ]
     }
 

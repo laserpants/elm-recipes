@@ -5,6 +5,7 @@ import Browser.Navigation as Navigation
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Recipes.Helpers exposing (Bundle)
 import Recipes.Router as Router exposing (Router, forceUrlChange)
 import Update.Pipeline exposing (..)
 import Url exposing (Url)
@@ -44,7 +45,7 @@ type alias Model =
     }
 
 
-inRouter : Router.Bundle Route Model Msg -> Model -> ( Model, Cmd Msg )
+inRouter : Bundle (Router Route) Router.Msg Model Msg -> Model -> ( Model, Cmd Msg )
 inRouter =
     Router.run RouterMsg
 

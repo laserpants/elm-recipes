@@ -1,4 +1,6 @@
-module Recipes.Helpers exposing (andCall, call)
+module Recipes.Helpers exposing (Bundle, andCall, call, runBundle, sequenceCalls)
+
+import Update.Pipeline exposing (andAddCmd, mapCmd, sequence)
 
 
 call : c -> ( a, List c ) -> ( ( a, List c ), Cmd msg )
@@ -9,3 +11,29 @@ call fun ( model, funs ) =
 andCall : c -> ( ( a, List c ), Cmd msg ) -> ( ( a, List c ), Cmd msg )
 andCall fun ( ( model, funs ), cmd ) =
     ( ( model, fun :: funs ), cmd )
+
+
+type alias Bundle model1 msg1 model msg =
+    model1 -> ( ( model1, List (model -> ( model, Cmd msg )) ), Cmd msg1 )
+
+
+sequenceCalls : ( ( a, List (a -> ( a, Cmd msg )) ), Cmd msg ) -> ( a, Cmd msg )
+sequenceCalls ( ( model, calls ), cmd ) =
+    model
+        |> sequence calls
+        |> andAddCmd cmd
+
+
+runBundle :
+    (model -> model1)
+    -> (model1 -> model -> model)
+    -> (msg1 -> msg)
+    -> Bundle model1 msg1 model msg
+    -> model
+    -> ( model, Cmd msg )
+runBundle get set toMsg updater model =
+    get model
+        |> updater
+        |> mapCmd toMsg
+        |> Tuple.mapFirst (Tuple.mapFirst (\m1 -> set m1 model))
+        |> sequenceCalls

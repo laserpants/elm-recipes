@@ -23,11 +23,20 @@ type alias JsonRequestConfig resource =
     }
 
 
+toRequest : JsonRequestConfig resource -> Api.RequestConfig resource
+toRequest { endpoint, method, decoder, headers } =
+    { endpoint = endpoint
+    , method = method
+    , expect = Http.expectJson Response decoder
+    , headers = headers
+    }
+
+
 init : JsonRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
-init { endpoint, method, decoder, headers } =
-    Api.init
-        { endpoint = endpoint
-        , method = method
-        , expect = Http.expectJson Response decoder
-        , headers = headers
-        }
+init =
+    Api.init << toRequest
+
+
+initRequest : JsonRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
+initRequest =
+    Api.initRequest << toRequest
