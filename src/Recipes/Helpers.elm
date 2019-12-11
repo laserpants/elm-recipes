@@ -1,6 +1,11 @@
-module Recipes.Helpers exposing (Bundle, andCall, call, runBundle, sequenceCalls)
+module Recipes.Helpers exposing (Bundle, andCall, call, lift, runBundle, sequenceCalls)
 
 import Update.Pipeline exposing (andAddCmd, mapCmd, sequence)
+
+
+lift : ( a, Cmd msg ) -> ( ( a, List c ), Cmd msg )
+lift ( model, cmd ) =
+    ( ( model, [] ), cmd )
 
 
 call : c -> ( a, List c ) -> ( ( a, List c ), Cmd msg )

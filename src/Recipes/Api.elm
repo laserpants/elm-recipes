@@ -1,7 +1,7 @@
 module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
-import Recipes.Helpers as Helpers exposing (..)
+import Recipes.Helpers exposing (Bundle, andCall, runBundle, sequenceCalls)
 import Update.Pipeline exposing (andAddCmd, andThen, mapCmd, save, sequence, using)
 
 

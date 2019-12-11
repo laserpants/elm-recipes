@@ -2,6 +2,7 @@ module Recipes.Api.Collection exposing (..)
 
 import Http exposing (Expect)
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers)
+import Recipes.Helpers exposing (Bundle, lift, runBundle, sequenceCalls)
 import Update.Pipeline exposing (andMap, andThen, mapCmd, save, using, with)
 
 
@@ -27,60 +28,59 @@ type alias Collection item =
     }
 
 
-insertAsApiIn :
-    Collection item
-    -> Api.Model (Envelope item)
-    -> ( Collection item, Cmd msg )
-insertAsApiIn state api =
-    save { state | api = api }
-
-
+inApi :
+    Bundle (Api.Model (Envelope item)) (Api.Msg (Envelope item)) (Collection item) (Msg item)
+    -> Collection item
+    -> ( Collection item, Cmd (Msg item) )
 inApi =
-    Debug.todo ""
+    Api.run ApiMsg
 
 
-setCurrent : Int -> Collection item -> ( Collection item, Cmd msg )
-setCurrent page state =
-    save { state | current = page }
+setCurrent : Int -> ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd msg )
+setCurrent page ( model, calls ) =
+    save ( { model | current = page }, calls )
 
 
-setPages : Int -> Collection item -> ( Collection item, Cmd msg )
-setPages pages state =
-    save { state | pages = pages }
+setPages : Int -> ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd msg )
+setPages pages ( model, calls ) =
+    save ( { model | pages = pages }, calls )
 
 
-setLimit : Int -> Collection item -> ( Collection item, Cmd msg )
-setLimit limit state =
-    save { state | limit = limit }
+setLimit : Int -> ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd msg )
+setLimit limit ( model, calls ) =
+    save ( { model | limit = limit }, calls )
 
 
-fetchPage : Collection item -> ( Collection item, Cmd (Msg item) )
-fetchPage state =
+fetchPage : ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd (Msg item) )
+fetchPage ( model, calls ) =
     let
         { limit, current, query } =
-            state
+            model
 
         offset =
             limit * (current - 1)
     in
-    state
+    model
         |> inApi (Api.sendRequest (query offset limit) Nothing)
+        |> lift
 
 
-goToPage : Int -> Collection item -> ( Collection item, Cmd (Msg item) )
+goToPage : Int -> ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd (Msg item) )
 goToPage page =
     setCurrent page
         >> andThen fetchPage
 
 
-nextPage : Collection item -> ( Collection item, Cmd (Msg item) )
-nextPage =
-    using (\{ current } -> goToPage (current + 1))
+nextPage : ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd (Msg item) )
+nextPage ( model, calls ) =
+    ( model, calls )
+        |> goToPage (model.current + 1)
 
 
-prevPage : Collection item -> ( Collection item, Cmd (Msg item) )
-prevPage =
-    using (\{ current } -> goToPage (max 1 (current - 1)))
+prevPage : ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd (Msg item) )
+prevPage ( model, calls ) =
+    ( model, calls )
+        |> goToPage (max 1 (model.current - 1))
 
 
 type alias RequestConfig item =
@@ -92,9 +92,22 @@ type alias RequestConfig item =
     }
 
 
-defaultQuery : Int -> Int -> String
-defaultQuery offset limit =
+defaultQueryFormat : Int -> Int -> String
+defaultQueryFormat offset limit =
     "?offset=" ++ String.fromInt offset ++ "&limit=" ++ String.fromInt limit
+
+
+run :
+    (Msg item -> msg)
+    -> Bundle (Collection item) (Msg item) { a | api : Collection item } msg
+    -> { a | api : Collection item }
+    -> ( { a | api : Collection item }, Cmd msg )
+run =
+    let
+        setApi api model =
+            { model | api = api }
+    in
+    runBundle .api setApi
 
 
 init : RequestConfig item -> ( Collection item, Cmd (Msg item) )
@@ -122,28 +135,42 @@ updateCurrentPage :
     -> ( Collection item, Cmd (Msg item) )
 updateCurrentPage { total } model =
     let
+        { limit } =
+            model
+
         pages =
-            (total + model.limit - 1) // model.limit
+            (total + limit - 1) // limit
     in
-    model
+    ( model, [] )
         |> setPages pages
-        |> andThen (with .current (setCurrent << clamp 1 pages))
+        |> andThen (with (.current << Tuple.first) (setCurrent << clamp 1 pages))
+        |> sequenceCalls
+
+
+sendSimpleRequest : Collection item -> ( ( Collection item, List a ), Cmd (Msg item) )
+sendSimpleRequest =
+    lift << inApi Api.sendSimpleRequest
 
 
 update :
     Msg item
     -> Collection item
-    -> ( Collection item, Cmd (Msg item) )
-update msg =
+    -> ( ( Collection item, List a ), Cmd (Msg item) )
+update msg model =
     case msg of
         ApiMsg apiMsg ->
-            inApi (Api.update apiMsg { apiDefaultHandlers | onSuccess = updateCurrentPage })
+            model
+                |> inApi (Api.update apiMsg { apiDefaultHandlers | onSuccess = updateCurrentPage })
+                |> lift
 
         NextPage ->
-            nextPage
+            ( model, [] )
+                |> nextPage
 
         PrevPage ->
-            prevPage
+            ( model, [] )
+                |> prevPage
 
         GoToPage page ->
-            goToPage page
+            ( model, [] )
+                |> goToPage page
