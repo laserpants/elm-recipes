@@ -1,9 +1,8 @@
-module Recipes.Api.Json exposing (..)
+module Recipes.Api.Json exposing (JsonRequestConfig, init, initRequest, sendJson)
 
 import Http
 import Json.Decode as Json
 import Recipes.Api as Api exposing (HttpMethod, Model, Msg(..))
-import Update.Pipeline exposing (mapCmd)
 
 
 sendJson :

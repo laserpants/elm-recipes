@@ -1,10 +1,9 @@
-module Recipes.Api.Collection.Json exposing (..)
+module Recipes.Api.Collection.Json exposing (JsonRequestConfig, envelopeDecoder, init)
 
 import Http
 import Json.Decode as Json
 import Recipes.Api exposing (Msg(..))
 import Recipes.Api.Collection as Collection exposing (Collection, Envelope, Msg)
-import Update.Pipeline exposing (..)
 
 
 type alias JsonRequestConfig item =

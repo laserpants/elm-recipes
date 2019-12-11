@@ -2,7 +2,7 @@ module Recipes.Router exposing (Msg(..), Router, forceUrlChange, init, redirect,
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
-import Recipes.Helpers exposing (Bundle, andCall, call, runBundle)
+import Recipes.Helpers exposing (Bundle, andCall, runBundle)
 import Update.Pipeline exposing (addCmd, save)
 import Url exposing (Url)
 
@@ -111,10 +111,10 @@ update msg { onRouteChange } ({ basePath, fromUrl, key } as router) =
 
 
 urlChangeMsg : (Msg -> msg) -> Url -> msg
-urlChangeMsg =
-    (>>) UrlChange
+urlChangeMsg toMsg =
+    toMsg << UrlChange
 
 
 urlRequestMsg : (Msg -> msg) -> UrlRequest -> msg
-urlRequestMsg =
-    (>>) UrlRequest
+urlRequestMsg toMsg =
+    toMsg << UrlRequest

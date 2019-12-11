@@ -1,8 +1,8 @@
-module Recipes.Api exposing (..)
+module Recipes.Api exposing (HttpMethod(..), Model, Msg(..), Resource(..), apiDefaultHandlers, init, initRequest, resetResource, run, sendRequest, sendSimpleRequest, update, withResource)
 
 import Http exposing (Expect, emptyBody)
 import Recipes.Helpers exposing (Bundle, andCall, runBundle, sequenceCalls)
-import Update.Pipeline exposing (andAddCmd, andThen, mapCmd, save, sequence, using)
+import Update.Pipeline exposing (andAddCmd, andThen, save)
 
 
 type Msg resource
@@ -123,6 +123,19 @@ resetResource : Model resource -> ( ( Model resource, List a ), Cmd (Msg resourc
 resetResource model =
     ( model, [] )
         |> setResource NotRequested
+
+
+withResource :
+    (resource -> resource)
+    -> ( Model resource, List a )
+    -> ( ( Model resource, List a ), Cmd msg )
+withResource fun ( { resource } as model, calls ) =
+    case resource of
+        Available res ->
+            save ( { model | resource = Available (fun res) }, calls )
+
+        _ ->
+            save ( model, calls )
 
 
 apiDefaultHandlers :

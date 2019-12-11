@@ -1,9 +1,9 @@
-module Recipes.Api.Collection exposing (..)
+module Recipes.Api.Collection exposing (Collection, Envelope, Msg(..), RequestConfig, defaultQueryFormat, inApi, init, run, sendRequest, sendSimpleRequest, setLimit, update, updateCurrentPage)
 
 import Http exposing (Expect)
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers)
 import Recipes.Helpers exposing (Bundle, lift, runBundle, sequenceCalls)
-import Update.Pipeline exposing (andMap, andThen, mapCmd, save, using, with)
+import Update.Pipeline exposing (andMap, andThen, save, with)
 
 
 type alias Envelope item =
@@ -46,13 +46,8 @@ setPages pages ( model, calls ) =
     save ( { model | pages = pages }, calls )
 
 
-setLimit : Int -> ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd msg )
-setLimit limit ( model, calls ) =
-    save ( { model | limit = limit }, calls )
-
-
 fetchPage : ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd (Msg item) )
-fetchPage ( model, calls ) =
+fetchPage ( model, _ ) =
     let
         { limit, current, query } =
             model
@@ -147,9 +142,23 @@ updateCurrentPage { total } model =
         |> sequenceCalls
 
 
+sendRequest :
+    String
+    -> Maybe Http.Body
+    -> Collection item
+    -> ( ( Collection item, List a ), Cmd (Msg item) )
+sendRequest suffix maybeBody =
+    lift << inApi (Api.sendRequest suffix maybeBody)
+
+
 sendSimpleRequest : Collection item -> ( ( Collection item, List a ), Cmd (Msg item) )
 sendSimpleRequest =
     lift << inApi Api.sendSimpleRequest
+
+
+setLimit : Int -> Collection item -> ( ( Collection item, List a ), Cmd msg )
+setLimit limit model =
+    save ( { model | limit = limit }, [] )
 
 
 update :

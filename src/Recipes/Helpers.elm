@@ -9,7 +9,7 @@ lift ( model, cmd ) =
 
 
 call : c -> ( a, List c ) -> ( ( a, List c ), Cmd msg )
-call fun ( model, funs ) =
+call fun ( model, _ ) =
     ( ( model, List.singleton fun ), Cmd.none )
 
 

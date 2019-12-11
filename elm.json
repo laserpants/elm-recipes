@@ -3,7 +3,7 @@
     "name": "laserpants/elm-recipes",
     "summary": "Reusable pieces of functionality for Elm projects.",
     "license": "BSD-3-Clause",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "exposed-modules": [
         "Recipes.Api",
         "Recipes.Api.Collection",
