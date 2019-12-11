@@ -1,12 +1,18 @@
 {
     "type": "package",
     "name": "laserpants/elm-recipes",
-    "summary": "",
+    "summary": "Reusable pieces of functionality for Elm projects.",
     "license": "BSD-3-Clause",
     "version": "0.0.0",
     "exposed-modules": [
-        "Update.Form",
-        "Update.Router"
+        "Recipes.Api",
+        "Recipes.Api.Collection",
+        "Recipes.Api.Collection.Json",
+        "Recipes.Api.Json",
+        "Recipes.Form",
+        "Recipes.Form.Validate",
+        "Recipes.Helpers",
+        "Recipes.Router"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {

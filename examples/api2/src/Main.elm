@@ -11,32 +11,31 @@ import Recipes.Api.Json as JsonApi exposing (..)
 import Recipes.Helpers exposing (..)
 import Update.Pipeline exposing (..)
 import Url exposing (Url)
-import Url.Parser as Parser exposing ((</>), Parser, parse)
 
 
 type alias Flags =
     ()
 
 
-type alias Books =
+type alias BookList =
     List Book
 
 
 type Msg
     = FetchBooks
     | ShowBook Book
-    | BooksApiMsg (Api.Msg Books)
+    | BooksApiMsg (Api.Msg BookList)
 
 
 type Model
     = Blank
-    | BookList (Api.Model Books)
+    | BookList (Api.Model BookList)
     | BookInfo Book
 
 
 inBookList :
-    Bundle (Api.Model Books) (Api.Msg Books) (Api.Model Books) Msg
-    -> Api.Model Books
+    Bundle (Api.Model BookList) (Api.Msg BookList) (Api.Model BookList) Msg
+    -> Api.Model BookList
     -> ( Model, Cmd Msg )
 inBookList fun =
     runBundle identity always BooksApiMsg fun
