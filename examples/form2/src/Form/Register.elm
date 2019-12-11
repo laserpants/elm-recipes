@@ -51,13 +51,14 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     let
-        fields field =
-            case field of 
-                AgreeWithTerms ->
-                    checkbox False
-
-                _ -> 
-                    inputField ""
+        fields =
+            [ ( Name, inputField "" )
+            , ( Email, inputField "" )
+            , ( PhoneNumber, inputField "" )
+            , ( Password, inputField "" )
+            , ( PasswordConfirmation, inputField "" )
+            , ( AgreeWithTerms, checkbox False )
+            ]
     in
     Form.init validate fields
 
@@ -87,7 +88,7 @@ validate =
 
 
 view : Model -> Html Msg
-view model =
+view { fields, disabled } =
     let
         errorHelper field =
             case Form.fieldError field of
@@ -97,7 +98,7 @@ view model =
                 Just error ->
                     text (Error.toString error)
     in
-    Form.lookup6 model
+    Form.lookup6 fields
         Name
         Email
         PhoneNumber
@@ -106,7 +107,7 @@ view model =
         AgreeWithTerms
         (\name email phoneNumber password passwordConfirmation agreeWithTerms ->
             [ fieldset
-                [ Html.Attributes.disabled model.disabled ]
+                [ Html.Attributes.disabled disabled ]
                 [ div []
                     [ div [] [ label [] [ text "Name" ] ]
                     , div [] [ input (Form.inputAttrs Name name) [] ]
@@ -140,7 +141,7 @@ view model =
                 , div []
                     [ button []
                         [ text
-                            (if model.disabled then
+                            (if disabled then
                                 "Please wait"
 
                              else
