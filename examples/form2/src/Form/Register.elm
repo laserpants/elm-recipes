@@ -1,11 +1,10 @@
 module Form.Register exposing (..)
 
+import Form.Data.Register exposing (Data)
 import Form.Error as Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Json.Decode as Json
-import Json.Encode as Encode
 import Recipes.Form as Form exposing (Validate, checkbox, inputField)
 import Recipes.Form.Validate as Validate
 
@@ -21,27 +20,6 @@ type Fields
 
 type alias Msg =
     Form.Msg Fields
-
-
-type alias Data =
-    { name : String
-    , email : String
-    , phoneNumber : String
-    , password : String
-    , passwordConfirmation : String
-    , agreeWithTerms : Bool
-    }
-
-
-toJson : Data -> Json.Value
-toJson { name, email, phoneNumber, password, agreeWithTerms } =
-    Encode.object
-        [ ( "name", Encode.string name )
-        , ( "email", Encode.string email )
-        , ( "phoneNumber", Encode.string phoneNumber )
-        , ( "password", Encode.string password )
-        , ( "agreeWithTerms", Encode.bool agreeWithTerms )
-        ]
 
 
 type alias Model =

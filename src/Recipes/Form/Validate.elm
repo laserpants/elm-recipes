@@ -1,6 +1,6 @@
 module Recipes.Form.Validate exposing (alphaNumeric, andThen, atLeastLength, checkbox, email, inputField, int, mustBeChecked, mustMatchField, record, stringNotEmpty)
 
-import AssocList as Dict exposing (Dict)
+import AssocList as Dict
 import Recipes.Form exposing (FieldDict, Status(..), Variant(..), asBool, asString, lookupField)
 import Regex exposing (Regex)
 

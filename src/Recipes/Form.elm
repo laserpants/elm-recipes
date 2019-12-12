@@ -1,11 +1,11 @@
 module Recipes.Form exposing (Field, FieldDict, Model, ModelEnhanced, Msg(..), Status(..), Validate, Variant(..), asBool, asString, checkbox, checkboxAttrs, fieldError, init, initEnhanced, inputAttrs, inputField, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, lookupField, reset, run, setFieldDirty, setState, update, validateField)
 
 import AssocList as Dict exposing (Dict)
-import Html exposing (Html, text)
+import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events exposing (onBlur, onCheck, onFocus, onInput)
 import Maybe.Extra as Maybe
-import Recipes.Helpers exposing (Bundle, andCall, runBundle)
+import Recipes.Helpers exposing (Bundle, andCall, runBundle, saveLifted)
 import Update.Pipeline exposing (andThen, save)
 
 
@@ -54,6 +54,20 @@ type alias Field err =
     , status : Status err
     , submitted : Bool
     }
+
+
+nullField : Field err
+nullField =
+    { value = Null
+    , status = Pristine
+    , dirty = False
+    , submitted = False
+    }
+
+
+withDefaultNullField : Maybe (Field err) -> Field err
+withDefaultNullField =
+    Maybe.withDefault nullField
 
 
 fieldError : Field err -> Maybe err
@@ -140,15 +154,7 @@ setFields fields ( model, calls ) =
 
 applyToField : f -> (Field e -> Field e) -> FieldDict f e -> FieldDict f e
 applyToField target fun =
-    let
-        default =
-            { value = Null
-            , status = Pristine
-            , dirty = False
-            , submitted = False
-            }
-    in
-    Dict.update target (Just << fun << Maybe.withDefault default)
+    Dict.update target (Just << fun << withDefaultNullField)
 
 
 setSubmitted :
@@ -168,17 +174,8 @@ setDisabled disabled ( model, calls ) =
 
 
 lookupField : field -> FieldDict field err -> Field err
-lookupField target fields =
-    case Dict.get target fields of
-        Just field ->
-            field
-
-        Nothing ->
-            { value = Null
-            , status = Pristine
-            , dirty = False
-            , submitted = False
-            }
+lookupField target =
+    withDefaultNullField << Dict.get target
 
 
 withField :
@@ -245,19 +242,17 @@ init validate fields =
 
 reset : ModelEnhanced f e d s -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 reset model =
-    save
-        ( { model
+    saveLifted
+        { model
             | fields = model.initial
             , disabled = False
             , submitted = False
-          }
-        , []
-        )
+        }
 
 
 setState : s -> ModelEnhanced f e d s -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 setState state model =
-    save ( { model | state = state }, [] )
+    saveLifted { model | state = state }
 
 
 setFieldDirty :
