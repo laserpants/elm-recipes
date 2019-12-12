@@ -1,4 +1,4 @@
-module Recipes.Api exposing (HttpMethod(..), Model, Msg(..), RequestConfig, Resource(..), apiDefaultHandlers, init, initRequest, resetResource, run, sendRequest, sendSimpleRequest, update, withResource)
+module Recipes.Api exposing (HttpMethod(..), Model, Msg(..), RequestConfig, Resource(..), apiDefaultHandlers, init, initAndRequest, resetResource, run, sendRequest, sendSimpleRequest, update, withResource)
 
 import Http exposing (Expect, emptyBody)
 import Recipes.Helpers exposing (Bundle, andCall, runBundle, sequenceCalls)
@@ -89,10 +89,10 @@ init { endpoint, method, expect, headers } =
     save { resource = NotRequested, request = request }
 
 
-initRequest :
+initAndRequest :
     RequestConfig resource
     -> ( Model resource, Cmd (Msg resource) )
-initRequest =
+initAndRequest =
     init
         >> andThen sendSimpleRequest
         >> sequenceCalls
