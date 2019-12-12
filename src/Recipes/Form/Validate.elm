@@ -67,21 +67,18 @@ validate :
     -> FieldList field err
     -> ( FieldList field err, Maybe a )
 validate tag validator fields =
-    case lookupField tag fields of
-        Just field ->
-            case validator field.value fields of
-                Ok ok ->
-                    ( [ ( tag, { field | status = Valid } ) ]
-                    , Just ok
-                    )
+    let 
+        field = 
+            lookupField tag fields
+    in
+    case validator field.value fields of
+        Ok ok ->
+            ( [ ( tag, { field | status = Valid } ) ]
+            , Just ok
+            )
 
-                Err error ->
-                    ( [ ( tag, { field | status = Error error } ) ]
-                    , Nothing
-                    )
-
-        Nothing ->
-            ( []
+        Err error ->
+            ( [ ( tag, { field | status = Error error } ) ]
             , Nothing
             )
 
@@ -161,13 +158,8 @@ mustBeChecked error checked _ =
 
 mustMatchField : tag -> err -> String -> FieldList tag err -> Result err String
 mustMatchField tag error str fields =
-    case lookupField tag fields of
-        Just field ->
-            if asString field.value == str then
-                Ok str
+    if asString (lookupField tag fields).value == str then
+        Ok str
 
-            else
-                Err error
-
-        _ ->
-            Err error
+    else
+        Err error

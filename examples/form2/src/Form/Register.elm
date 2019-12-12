@@ -50,17 +50,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    let
-        fields =
-            [ ( Name, inputField "" )
-            , ( Email, inputField "" )
-            , ( PhoneNumber, inputField "" )
-            , ( Password, inputField "" )
-            , ( PasswordConfirmation, inputField "" )
-            , ( AgreeWithTerms, checkbox False )
-            ]
-    in
-    Form.init validate fields
+    Form.init validate []
 
 
 validate : Validate Fields Error Data
@@ -106,7 +96,9 @@ view { fields, disabled } =
         PasswordConfirmation
         AgreeWithTerms
         (\name email phoneNumber password passwordConfirmation agreeWithTerms ->
-            [ fieldset
+            [ 
+              text (Debug.toString fields)
+            , fieldset
                 [ Html.Attributes.disabled disabled ]
                 [ div []
                     [ div [] [ label [] [ text "Name" ] ]

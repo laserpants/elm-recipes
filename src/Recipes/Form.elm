@@ -11,6 +11,7 @@ import Update.Pipeline exposing (andThen, save)
 type Variant
     = String String
     | Bool Bool
+    | Null
 
 
 asString : Variant -> String
@@ -173,17 +174,21 @@ setDisabled disabled ( model, calls ) =
 lookupField :
     field
     -> FieldList field err
-    -> Maybe (Field err)
+    -> Field err
 lookupField target fields =
     let
         rec list =
             case list of
                 [] ->
-                    Nothing
+                    { value = Null
+                    , status = Pristine
+                    , dirty = False
+                    , submitted = False 
+                    }
 
                 ( tag, field ) :: xs ->
                     if tag == target then
-                        Just field
+                        field
 
                     else
                         rec xs
@@ -354,11 +359,9 @@ lookup2 :
     -> (Field err -> Field err -> Html msg)
     -> Html msg
 lookup2 fields f1 f2 fun =
-    Maybe.withDefault (text "")
-        (Maybe.map2 fun
+        fun
             (lookupField f1 fields)
             (lookupField f2 fields)
-        )
 
 
 lookup3 :
@@ -369,12 +372,10 @@ lookup3 :
     -> (Field err -> Field err -> Field err -> Html msg)
     -> Html msg
 lookup3 fields f1 f2 f3 fun =
-    Maybe.withDefault (text "")
-        (Maybe.map3 fun
+        fun
             (lookupField f1 fields)
             (lookupField f2 fields)
             (lookupField f3 fields)
-        )
 
 
 lookup4 :
@@ -386,13 +387,11 @@ lookup4 :
     -> (Field err -> Field err -> Field err -> Field err -> Html msg)
     -> Html msg
 lookup4 fields f1 f2 f3 f4 fun =
-    Maybe.withDefault (text "")
-        (Maybe.map4 fun
+        fun
             (lookupField f1 fields)
             (lookupField f2 fields)
             (lookupField f3 fields)
             (lookupField f4 fields)
-        )
 
 
 lookup5 :
@@ -405,14 +404,12 @@ lookup5 :
     -> (Field err -> Field err -> Field err -> Field err -> Field err -> Html msg)
     -> Html msg
 lookup5 fields f1 f2 f3 f4 f5 fun =
-    Maybe.withDefault (text "")
-        (Maybe.map5 fun
+    fun
             (lookupField f1 fields)
             (lookupField f2 fields)
             (lookupField f3 fields)
             (lookupField f4 fields)
             (lookupField f5 fields)
-        )
 
 
 lookup6 :
@@ -426,15 +423,13 @@ lookup6 :
     -> (Field err -> Field err -> Field err -> Field err -> Field err -> Field err -> Html msg)
     -> Html msg
 lookup6 fields f1 f2 f3 f4 f5 f6 fun =
-    Maybe.withDefault (text "")
-        (Just fun
-            |> Maybe.andMap (lookupField f1 fields)
-            |> Maybe.andMap (lookupField f2 fields)
-            |> Maybe.andMap (lookupField f3 fields)
-            |> Maybe.andMap (lookupField f4 fields)
-            |> Maybe.andMap (lookupField f5 fields)
-            |> Maybe.andMap (lookupField f6 fields)
-        )
+    fun
+            (lookupField f1 fields)
+            (lookupField f2 fields)
+            (lookupField f3 fields)
+            (lookupField f4 fields)
+            (lookupField f5 fields)
+            (lookupField f6 fields)
 
 
 lookup7 :
@@ -449,13 +444,11 @@ lookup7 :
     -> (Field err -> Field err -> Field err -> Field err -> Field err -> Field err -> Field err -> Html msg)
     -> Html msg
 lookup7 fields f1 f2 f3 f4 f5 f6 f7 fun =
-    Maybe.withDefault (text "")
-        (Just fun
-            |> Maybe.andMap (lookupField f1 fields)
-            |> Maybe.andMap (lookupField f2 fields)
-            |> Maybe.andMap (lookupField f3 fields)
-            |> Maybe.andMap (lookupField f4 fields)
-            |> Maybe.andMap (lookupField f5 fields)
-            |> Maybe.andMap (lookupField f6 fields)
-            |> Maybe.andMap (lookupField f7 fields)
-        )
+    fun
+            (lookupField f1 fields)
+            (lookupField f2 fields)
+            (lookupField f3 fields)
+            (lookupField f4 fields)
+            (lookupField f5 fields)
+            (lookupField f6 fields)
+            (lookupField f7 fields)
