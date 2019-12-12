@@ -190,12 +190,12 @@ withField target fun ( { fields } as model, calls ) =
 
 validateField :
     f
-    -> ( ModelEnhanced f e d s, List a )
+    -> ModelEnhanced f e d s
     -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
-validateField field ( { validate, state, fields } as model, calls ) =
+validateField field ({ validate, state, fields } as model) =
     let
         updateFields ( newFields, _, _ ) =
-            setFields newFields ( model, calls )
+            setFields newFields ( model, [] )
     in
     fields
         |> validate state (Just field)

@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser exposing (Document, document)
 import Form.Data.Register as RegisterForm
-import Form.Register as RegisterForm
+import Form.Register as RegisterForm exposing (Fields(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -59,6 +59,14 @@ update msg model =
         FormMsg formMsg ->
             model
                 |> inForm (Form.update formMsg { onSubmit = handleSubmit })
+                |> andThen
+                    (case formMsg of
+                        Form.Input Password value ->
+                            inForm (Form.validateField PasswordConfirmation)
+
+                        _ ->
+                            save
+                    )
 
 
 subscriptions : Model -> Sub Msg
