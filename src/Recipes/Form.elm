@@ -1,5 +1,6 @@
-module Recipes.Form exposing (Field, FieldList, Model, ModelExtra, Msg(..), Status(..), Validate, Variant(..), asBool, asString, checkbox, checkboxAttrs, fieldError, init, initExtra, inputAttrs, inputField, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, lookupField, reset, run, setFieldDirty, setState, update, validateField)
+module Recipes.Form exposing (Field, FieldDict, Model, ModelEnhanced, Msg(..), Status(..), Validate, Variant(..), asBool, asString, checkbox, checkboxAttrs, fieldError, init, initEnhanced, inputAttrs, inputField, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, lookupField, reset, run, setFieldDirty, setState, update, validateField)
 
+import AssocList as Dict exposing (Dict)
 import Html exposing (Html, text)
 import Html.Attributes as Attributes
 import Html.Events exposing (onBlur, onCheck, onFocus, onInput)
@@ -105,111 +106,95 @@ checkbox bool =
     }
 
 
-type alias FieldList field err =
-    List ( field, Field err )
+type alias FieldDict f e =
+    Dict f (Field e)
 
 
-type alias Validate field err data =
-    Maybe field
-    -> FieldList field err
-    -> ( FieldList field err, Maybe data, Maybe field )
+type alias Validate f e d =
+    Maybe f
+    -> FieldDict f e
+    -> ( FieldDict f e, Maybe d, Maybe f )
 
 
-type alias ModelExtra field err data state =
-    { fields : FieldList field err
-    , initial : FieldList field err
-    , validate : state -> Validate field err data
+type alias ModelEnhanced f e d s =
+    { fields : FieldDict f e
+    , initial : FieldDict f e
+    , validate : s -> Validate f e d
     , disabled : Bool
     , submitted : Bool
-    , state : state
+    , state : s
     }
 
 
-type alias Model field err data =
-    ModelExtra field err data ()
+type alias Model f e d =
+    ModelEnhanced f e d ()
 
 
 setFields :
-    FieldList field err
-    -> ( ModelExtra field err data state, List a )
-    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+    FieldDict f e
+    -> ( ModelEnhanced f e d s, List a )
+    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 setFields fields ( model, calls ) =
     save ( { model | fields = fields }, calls )
 
 
-applyToField :
-    field
-    -> (Field err -> Field err)
-    -> FieldList field err
-    -> FieldList field err
+applyToField : f -> (Field e -> Field e) -> FieldDict f e -> FieldDict f e
 applyToField target fun =
-    List.map
-        (\( tag, field ) ->
-            ( tag
-            , if tag == target then
-                fun field
-
-              else
-                field
-            )
-        )
+    let
+        default =
+            { value = Null
+            , status = Pristine
+            , dirty = False
+            , submitted = False
+            }
+    in
+    Dict.update target (Just << fun << Maybe.withDefault default)
 
 
 setSubmitted :
     Bool
-    -> ( ModelExtra field err data state, List a )
-    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+    -> ( ModelEnhanced f e d s, List a )
+    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 setSubmitted submitted ( model, calls ) =
     save ( { model | submitted = submitted }, calls )
 
 
 setDisabled :
     Bool
-    -> ( ModelExtra field err data state, List a )
-    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+    -> ( ModelEnhanced f e d s, List a )
+    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 setDisabled disabled ( model, calls ) =
     save ( { model | disabled = disabled }, calls )
 
 
-lookupField :
-    field
-    -> FieldList field err
-    -> Field err
+lookupField : field -> FieldDict field err -> Field err
 lookupField target fields =
-    let
-        rec list =
-            case list of
-                [] ->
-                    { value = Null
-                    , status = Pristine
-                    , dirty = False
-                    , submitted = False 
-                    }
+    case Dict.get target fields of
+        Just field ->
+            field
 
-                ( tag, field ) :: xs ->
-                    if tag == target then
-                        field
-
-                    else
-                        rec xs
-    in
-    rec fields
+        Nothing ->
+            { value = Null
+            , status = Pristine
+            , dirty = False
+            , submitted = False
+            }
 
 
 withField :
-    field
-    -> (Field err -> Field err)
-    -> ( ModelExtra field err data state, List a )
-    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+    f
+    -> (Field e -> Field e)
+    -> ( ModelEnhanced f e d s, List a )
+    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 withField target fun ( { fields } as model, calls ) =
     ( model, calls )
         |> setFields (applyToField target fun fields)
 
 
 validateField :
-    field
-    -> ( ModelExtra field err data state, List a )
-    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+    f
+    -> ( ModelEnhanced f e d s, List a )
+    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 validateField field ( { validate, state, fields } as model, calls ) =
     let
         updateFields ( newFields, _, _ ) =
@@ -221,10 +206,10 @@ validateField field ( { validate, state, fields } as model, calls ) =
 
 
 run :
-    (Msg field -> msg)
-    -> Bundle (Model field err data) (Msg field) { a | form : Model field err data } msg
-    -> { a | form : Model field err data }
-    -> ( { a | form : Model field err data }, Cmd msg )
+    (Msg f -> msg)
+    -> Bundle (Model f e d) (Msg f) { a | form : Model f e d } msg
+    -> { a | form : Model f e d }
+    -> ( { a | form : Model f e d }, Cmd msg )
 run =
     let
         setForm form model =
@@ -233,15 +218,19 @@ run =
     runBundle .form setForm
 
 
-initExtra :
-    (state -> Validate field err data)
-    -> FieldList field err
-    -> state
-    -> ( ModelExtra field err data state, Cmd (Msg field) )
-initExtra validate fields state =
+initEnhanced :
+    (s -> Validate f e d)
+    -> List ( f, Field e )
+    -> s
+    -> ( ModelEnhanced f e d s, Cmd (Msg f) )
+initEnhanced validate fields state =
+    let
+        fieldsDict =
+            Dict.fromList fields
+    in
     save
-        { fields = fields
-        , initial = fields
+        { fields = fieldsDict
+        , initial = fieldsDict
         , validate = validate
         , disabled = False
         , submitted = False
@@ -249,17 +238,12 @@ initExtra validate fields state =
         }
 
 
-init :
-    Validate field err data
-    -> FieldList field err
-    -> ( Model field err data, Cmd (Msg field) )
+init : Validate f e d -> List ( f, Field e ) -> ( Model f e d, Cmd (Msg f) )
 init validate fields =
-    initExtra (always validate) fields ()
+    initEnhanced (always validate) fields ()
 
 
-reset :
-    ModelExtra field err data state
-    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+reset : ModelEnhanced f e d s -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 reset model =
     save
         ( { model
@@ -271,29 +255,26 @@ reset model =
         )
 
 
-setState :
-    state
-    -> ModelExtra field err data state
-    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+setState : s -> ModelEnhanced f e d s -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 setState state model =
     save ( { model | state = state }, [] )
 
 
 setFieldDirty :
-    field
+    f
     -> Bool
-    -> ModelExtra field err data state
-    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+    -> ModelEnhanced f e d s
+    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 setFieldDirty tag dirty model =
     ( model, [] )
         |> withField tag (\field -> { field | dirty = dirty })
 
 
 update :
-    Msg field
-    -> { onSubmit : data -> a }
-    -> ModelExtra field err data state
-    -> ( ( ModelExtra field err data state, List a ), Cmd (Msg field) )
+    Msg f
+    -> { onSubmit : d -> a }
+    -> ModelEnhanced f e d s
+    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
 update msg { onSubmit } ({ fields, validate, state } as model) =
     let
         handleSubmit maybeData =
@@ -308,14 +289,14 @@ update msg { onSubmit } ({ fields, validate, state } as model) =
     (case msg of
         Submit ->
             let
-                fieldSetSubmitted field =
+                fieldSetSubmitted _ field =
                     { field
                         | dirty = True
                         , submitted = True
                     }
             in
             fields
-                |> List.map (Tuple.mapSecond fieldSetSubmitted)
+                |> Dict.map fieldSetSubmitted
                 |> validate state Nothing
 
         Input target value ->
@@ -353,33 +334,33 @@ update msg { onSubmit } ({ fields, validate, state } as model) =
 
 
 lookup2 :
-    FieldList field err
+    FieldDict field err
     -> field
     -> field
     -> (Field err -> Field err -> Html msg)
     -> Html msg
 lookup2 fields f1 f2 fun =
-        fun
-            (lookupField f1 fields)
-            (lookupField f2 fields)
+    fun
+        (lookupField f1 fields)
+        (lookupField f2 fields)
 
 
 lookup3 :
-    FieldList field err
+    FieldDict field err
     -> field
     -> field
     -> field
     -> (Field err -> Field err -> Field err -> Html msg)
     -> Html msg
 lookup3 fields f1 f2 f3 fun =
-        fun
-            (lookupField f1 fields)
-            (lookupField f2 fields)
-            (lookupField f3 fields)
+    fun
+        (lookupField f1 fields)
+        (lookupField f2 fields)
+        (lookupField f3 fields)
 
 
 lookup4 :
-    FieldList field err
+    FieldDict field err
     -> field
     -> field
     -> field
@@ -387,15 +368,15 @@ lookup4 :
     -> (Field err -> Field err -> Field err -> Field err -> Html msg)
     -> Html msg
 lookup4 fields f1 f2 f3 f4 fun =
-        fun
-            (lookupField f1 fields)
-            (lookupField f2 fields)
-            (lookupField f3 fields)
-            (lookupField f4 fields)
+    fun
+        (lookupField f1 fields)
+        (lookupField f2 fields)
+        (lookupField f3 fields)
+        (lookupField f4 fields)
 
 
 lookup5 :
-    FieldList field err
+    FieldDict field err
     -> field
     -> field
     -> field
@@ -405,15 +386,15 @@ lookup5 :
     -> Html msg
 lookup5 fields f1 f2 f3 f4 f5 fun =
     fun
-            (lookupField f1 fields)
-            (lookupField f2 fields)
-            (lookupField f3 fields)
-            (lookupField f4 fields)
-            (lookupField f5 fields)
+        (lookupField f1 fields)
+        (lookupField f2 fields)
+        (lookupField f3 fields)
+        (lookupField f4 fields)
+        (lookupField f5 fields)
 
 
 lookup6 :
-    FieldList field err
+    FieldDict field err
     -> field
     -> field
     -> field
@@ -424,16 +405,16 @@ lookup6 :
     -> Html msg
 lookup6 fields f1 f2 f3 f4 f5 f6 fun =
     fun
-            (lookupField f1 fields)
-            (lookupField f2 fields)
-            (lookupField f3 fields)
-            (lookupField f4 fields)
-            (lookupField f5 fields)
-            (lookupField f6 fields)
+        (lookupField f1 fields)
+        (lookupField f2 fields)
+        (lookupField f3 fields)
+        (lookupField f4 fields)
+        (lookupField f5 fields)
+        (lookupField f6 fields)
 
 
 lookup7 :
-    FieldList field err
+    FieldDict field err
     -> field
     -> field
     -> field
@@ -445,10 +426,10 @@ lookup7 :
     -> Html msg
 lookup7 fields f1 f2 f3 f4 f5 f6 f7 fun =
     fun
-            (lookupField f1 fields)
-            (lookupField f2 fields)
-            (lookupField f3 fields)
-            (lookupField f4 fields)
-            (lookupField f5 fields)
-            (lookupField f6 fields)
-            (lookupField f7 fields)
+        (lookupField f1 fields)
+        (lookupField f2 fields)
+        (lookupField f3 fields)
+        (lookupField f4 fields)
+        (lookupField f5 fields)
+        (lookupField f6 fields)
+        (lookupField f7 fields)

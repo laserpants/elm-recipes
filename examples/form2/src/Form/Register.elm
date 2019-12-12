@@ -96,9 +96,7 @@ view { fields, disabled } =
         PasswordConfirmation
         AgreeWithTerms
         (\name email phoneNumber password passwordConfirmation agreeWithTerms ->
-            [ 
-              text (Debug.toString fields)
-            , fieldset
+            [ fieldset
                 [ Html.Attributes.disabled disabled ]
                 [ div []
                     [ div [] [ label [] [ text "Name" ] ]

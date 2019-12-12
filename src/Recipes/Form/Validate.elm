@@ -1,29 +1,42 @@
-module Recipes.Form.Validate exposing (alphaNumeric, andThen, atLeastLength, checkbox, email, inputField, int, mustBeChecked, mustMatchField, record, stringNotEmpty, validate)
+module Recipes.Form.Validate exposing (alphaNumeric, andThen, atLeastLength, checkbox, email, inputField, int, mustBeChecked, mustMatchField, record, stringNotEmpty)
 
-import Recipes.Form exposing (FieldList, Status(..), Variant(..), asBool, asString, lookupField)
+import AssocList as Dict exposing (Dict)
+import Recipes.Form exposing (FieldDict, Status(..), Variant(..), asBool, asString, lookupField)
 import Regex exposing (Regex)
 
 
 stepValidate :
     tag
-    -> (Variant -> FieldList tag err -> Result err a2)
-    -> (a -> b -> ( FieldList tag err, Maybe (a2 -> a1), Maybe tag ))
+    -> (Variant -> FieldDict tag err -> Result err a2)
+    -> (a -> b -> ( FieldDict tag err, Maybe (a2 -> a1), Maybe tag ))
     -> a
     -> b
-    -> ( FieldList tag err, Maybe a1, Maybe tag )
+    -> ( FieldDict tag err, Maybe a1, Maybe tag )
 stepValidate target validator fun a b =
     let
-        ( fields1, maybeFun, tag ) =
+        ( fields, maybeFun, tag ) =
             fun a b
 
-        ( fields2, maybeArg ) =
-            validate target validator fields1
+        field =
+            lookupField target fields
+
+        ( newField, maybeArg ) =
+            case validator field.value fields of
+                Ok ok ->
+                    ( { field | status = Valid }
+                    , Just ok
+                    )
+
+                Err error ->
+                    ( { field | status = Error error }
+                    , Nothing
+                    )
     in
     ( if Nothing == tag || Just target == tag then
-        fields2 ++ fields1
+        Dict.insert target newField fields
 
       else
-        fields1
+        fields
     , case ( maybeFun, maybeArg ) of
         ( Just f, Just arg ) ->
             Just (f arg)
@@ -36,22 +49,22 @@ stepValidate target validator fun a b =
 
 inputField :
     tag
-    -> (String -> FieldList tag err -> Result err a2)
-    -> (a -> b -> ( FieldList tag err, Maybe (a2 -> a1), Maybe tag ))
+    -> (String -> FieldDict tag err -> Result err a2)
+    -> (a -> b -> ( FieldDict tag err, Maybe (a2 -> a1), Maybe tag ))
     -> a
     -> b
-    -> ( FieldList tag err, Maybe a1, Maybe tag )
+    -> ( FieldDict tag err, Maybe a1, Maybe tag )
 inputField target validator =
     stepValidate target (validator << asString)
 
 
 checkbox :
     tag
-    -> (Bool -> FieldList tag err -> Result err a2)
-    -> (a -> b -> ( FieldList tag err, Maybe (a2 -> a1), Maybe tag ))
+    -> (Bool -> FieldDict tag err -> Result err a2)
+    -> (a -> b -> ( FieldDict tag err, Maybe (a2 -> a1), Maybe tag ))
     -> a
     -> b
-    -> ( FieldList tag err, Maybe a1, Maybe tag )
+    -> ( FieldDict tag err, Maybe a1, Maybe tag )
 checkbox target validator =
     stepValidate target (validator << asBool)
 
@@ -61,40 +74,18 @@ record a b c =
     ( c, Just a, b )
 
 
-validate :
-    field
-    -> (Variant -> FieldList field err -> Result err a)
-    -> FieldList field err
-    -> ( FieldList field err, Maybe a )
-validate tag validator fields =
-    let 
-        field = 
-            lookupField tag fields
-    in
-    case validator field.value fields of
-        Ok ok ->
-            ( [ ( tag, { field | status = Valid } ) ]
-            , Just ok
-            )
-
-        Err error ->
-            ( [ ( tag, { field | status = Error error } ) ]
-            , Nothing
-            )
-
-
 andThen :
-    (b -> FieldList tag err -> Result err c)
-    -> (a -> FieldList tag err -> Result err b)
+    (b -> FieldDict tag err -> Result err c)
+    -> (a -> FieldDict tag err -> Result err b)
     -> a
-    -> FieldList tag err
+    -> FieldDict tag err
     -> Result err c
 andThen next first a fields =
     first a fields
         |> Result.andThen (\b -> next b fields)
 
 
-int : err -> Variant -> FieldList tag err -> Result err Int
+int : err -> Variant -> FieldDict tag err -> Result err Int
 int error variant _ =
     case variant of
         String str ->
@@ -104,7 +95,7 @@ int error variant _ =
             Err error
 
 
-stringNotEmpty : err -> String -> FieldList tag err -> Result err String
+stringNotEmpty : err -> String -> FieldDict tag err -> Result err String
 stringNotEmpty error str _ =
     if String.isEmpty str then
         Err error
@@ -113,7 +104,7 @@ stringNotEmpty error str _ =
         Ok str
 
 
-atLeastLength : Int -> err -> String -> FieldList tag err -> Result err String
+atLeastLength : Int -> err -> String -> FieldDict tag err -> Result err String
 atLeastLength len error str _ =
     if String.length str < len then
         Err error
@@ -129,7 +120,7 @@ validEmailPattern =
         |> Maybe.withDefault Regex.never
 
 
-email : err -> String -> FieldList tag err -> Result err String
+email : err -> String -> FieldDict tag err -> Result err String
 email error str _ =
     if Regex.contains validEmailPattern str then
         Ok str
@@ -138,7 +129,7 @@ email error str _ =
         Err error
 
 
-alphaNumeric : err -> String -> FieldList tag err -> Result err String
+alphaNumeric : err -> String -> FieldDict tag err -> Result err String
 alphaNumeric error str _ =
     if String.all Char.isAlphaNum str then
         Ok str
@@ -147,7 +138,7 @@ alphaNumeric error str _ =
         Err error
 
 
-mustBeChecked : err -> Bool -> FieldList tag err -> Result err Bool
+mustBeChecked : err -> Bool -> FieldDict tag err -> Result err Bool
 mustBeChecked error checked _ =
     if True == checked then
         Ok True
@@ -156,7 +147,7 @@ mustBeChecked error checked _ =
         Err error
 
 
-mustMatchField : tag -> err -> String -> FieldList tag err -> Result err String
+mustMatchField : tag -> err -> String -> FieldDict tag err -> Result err String
 mustMatchField tag error str fields =
     if asString (lookupField tag fields).value == str then
         Ok str
