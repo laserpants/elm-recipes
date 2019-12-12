@@ -6,7 +6,7 @@ import Html.Attributes as Attributes
 import Html.Events exposing (onBlur, onCheck, onFocus, onInput)
 import Maybe.Extra as Maybe
 import Recipes.Helpers exposing (Bundle, andCall, runBundle, saveLifted)
-import Update.Pipeline exposing (andThen, save)
+import Update.Pipeline exposing (andThen, andThenIf, save)
 
 
 type Variant
@@ -317,14 +317,8 @@ update msg { onSubmit } ({ fields, validate, state } as model) =
         |> (\( newFields, maybeData, _ ) ->
                 ( model, [] )
                     |> setFields newFields
-                    |> andThen
-                        (if Submit == msg then
-                            setSubmitted True
-                                >> andThen (handleSubmit maybeData)
-
-                         else
-                            save
-                        )
+                    |> andThenIf (Submit == msg)
+                        (setSubmitted True >> andThen (handleSubmit maybeData))
            )
 
 

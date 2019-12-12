@@ -8,41 +8,27 @@ import Regex exposing (Regex)
 stepValidate :
     tag
     -> (Variant -> FieldDict tag err -> Result err a2)
-    -> (a -> b -> ( FieldDict tag err, Maybe (a2 -> a1), Maybe tag ))
-    -> a
-    -> b
+    -> ( FieldDict tag err, Maybe (a2 -> a1), Maybe tag )
     -> ( FieldDict tag err, Maybe a1, Maybe tag )
-stepValidate target validator fun a b =
+stepValidate target validator ( fields, maybeFun, tag ) =
     let
-        ( fields, maybeFun, tag ) =
-            fun a b
-
         field =
             lookupField target fields
 
         ( newField, maybeArg ) =
             case validator field.value fields of
-                Ok ok ->
-                    ( { field | status = Valid }
-                    , Just ok
-                    )
+                Ok result ->
+                    ( { field | status = Valid }, Just result )
 
                 Err error ->
-                    ( { field | status = Error error }
-                    , Nothing
-                    )
+                    ( { field | status = Error error }, Nothing )
     in
     ( if Nothing == tag || Just target == tag then
         Dict.insert target newField fields
 
       else
         fields
-    , case ( maybeFun, maybeArg ) of
-        ( Just f, Just arg ) ->
-            Just (f arg)
-
-        _ ->
-            Nothing
+    , Maybe.map2 (<|) maybeFun maybeArg
     , tag
     )
 
@@ -54,8 +40,8 @@ inputField :
     -> a
     -> b
     -> ( FieldDict tag err, Maybe a1, Maybe tag )
-inputField target validator =
-    stepValidate target (validator << asString)
+inputField target validator f a b =
+    stepValidate target (validator << asString) (f a b)
 
 
 checkbox :
@@ -65,8 +51,8 @@ checkbox :
     -> a
     -> b
     -> ( FieldDict tag err, Maybe a1, Maybe tag )
-checkbox target validator =
-    stepValidate target (validator << asBool)
+checkbox target validator f a b =
+    stepValidate target (validator << asBool) (f a b)
 
 
 record : a -> b -> c -> ( c, Maybe a, b )
@@ -81,7 +67,8 @@ andThen :
     -> FieldDict tag err
     -> Result err c
 andThen next first a fields =
-    first a fields
+    fields
+        |> first a
         |> Result.andThen (\b -> next b fields)
 
 
