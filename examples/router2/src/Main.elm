@@ -45,11 +45,6 @@ type alias Model =
     }
 
 
-inRouter : Bundle (Router Route) Router.Msg Model Msg -> Model -> ( Model, Cmd Msg )
-inRouter =
-    Router.run RouterMsg
-
-
 init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
 init () url key =
     let
@@ -59,7 +54,7 @@ init () url key =
     save Model
         |> andMap (mapCmd RouterMsg router)
         |> andMap (save HomePage)
-        |> andThen (inRouter (forceUrlChange url { onRouteChange = handleRouteChange }))
+        |> andThen (Router.run RouterMsg (forceUrlChange url { onRouteChange = handleRouteChange }))
 
 
 handleRouteChange : Url -> Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -80,7 +75,7 @@ update msg model =
     case msg of
         RouterMsg routerMsg ->
             model
-                |> inRouter (Router.update routerMsg { onRouteChange = handleRouteChange })
+                |> Router.run RouterMsg (Router.update routerMsg { onRouteChange = handleRouteChange })
 
 
 subscriptions : Model -> Sub Msg

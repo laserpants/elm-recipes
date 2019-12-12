@@ -40,7 +40,7 @@ init () =
     let
         collectionApi =
             JsonApi.init
-                { limit = 10
+                { limit = 2
                 , endpoint = "/books"
                 , decoder = Json.field "books" (JsonApi.envelopeDecoder "page" Book.decoder)
                 , headers = []
@@ -49,7 +49,7 @@ init () =
     in
     save Model
         |> andMap (mapCmd BookCollectionMsg collectionApi)
-        |> andThen (inApi sendSimpleRequest)
+        |> andThen (inApi fetchPage)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

@@ -36,20 +36,43 @@ var books =
 
 var delay = 450;
 
+function getPage(collection, key, request) {
+  var search = request.url.split('?')[1] || '',
+    params = new URLSearchParams(search),
+    offset = Number(params.get('offset') || 0),
+    limit = Number(params.get('limit') || 20),
+    data = { 
+      total: collection.length 
+    };
+  data[key] = collection.slice(offset, offset + limit);
+
+  console.log(offset, limit);
+  return data;
+}
+
 xhook.before(function(request, callback) {
-  if (request.url.endsWith('books') && 'GET' === request.method) {
+  if (/books/.test(request.url) && 'GET' === request.method) {
+    console.log(request);
     setTimeout(function() {
       callback({
         status: 200,
-        data: JSON.stringify(
-          { 
-            books: {
-              page: books.slice().reverse(),
-              total: 100
-            }
-          }),
+        data: JSON.stringify({
+          books: getPage(books, 'page', request)
+        }),
         headers: { 'Content-Type': 'application/json' }
       });
+
+      //callback({
+      //  status: 200,
+      //  data: JSON.stringify(
+      //    { 
+      //      books: {
+      //        page: books.slice().reverse(),
+      //        total: 100
+      //      }
+      //    }),
+      //  headers: { 'Content-Type': 'application/json' }
+      //});
     }, delay);
   } else {
     callback();
