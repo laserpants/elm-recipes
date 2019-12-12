@@ -26,26 +26,26 @@ type Msg
     | BookItemMsg (Api.Msg Book)
 
 
-type alias Model = 
+type alias Model =
     { bookList : Api.Model BookList
     , bookItem : Api.Model Book
     }
 
 
-inBookListApi : 
-    Bundle (Api.Model BookList) (Api.Msg BookList) Model Msg 
+inBookListApi :
+    Bundle (Api.Model BookList) (Api.Msg BookList) Model Msg
     -> Model
     -> ( Model, Cmd Msg )
 inBookListApi =
-    runBundle .bookList (\list model -> { model | bookList = list }) BookListMsg 
+    runBundle .bookList (\list model -> { model | bookList = list }) BookListMsg
 
 
 inBookItemApi :
-    Bundle (Api.Model Book) (Api.Msg Book) Model Msg 
+    Bundle (Api.Model Book) (Api.Msg Book) Model Msg
     -> Model
     -> ( Model, Cmd Msg )
 inBookItemApi =
-    runBundle .bookItem (\item model -> { model | bookItem = item }) BookItemMsg 
+    runBundle .bookItem (\item model -> { model | bookItem = item }) BookItemMsg
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -75,7 +75,7 @@ init () =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of 
+    case msg of
         BookListMsg apiMsg ->
             model
                 |> inBookListApi (Api.update apiMsg apiDefaultHandlers)
@@ -91,38 +91,39 @@ subscriptions _ =
 
 
 view : Model -> Document Msg
-view { bookList, bookItem } = 
-    let { resource } =
+view { bookList, bookItem } =
+    let
+        { resource } =
             bookList
     in
     { title = ""
     , body =
         [ case resource of
-              Available books ->
-                  let
-                      row ({ id, title, author } as book) =
-                          tr
-                              []
-                              [ td [] [ text (String.fromInt id) ]
-                              , td []
-                                  [ text title
-                                  ]
-                              , td [] [ text author ]
-                              ]
-                  in
-                  div 
-                      []
-                      [ table [] (List.map row books)
-                      , div [] [ hr [] [] ]
-                      , div [] [ input [] [] ]
-                      , div [] [ input [] [] ]
-                      ]
+            Available books ->
+                let
+                    row ({ id, title, author } as book) =
+                        tr
+                            []
+                            [ td [] [ text (String.fromInt id) ]
+                            , td []
+                                [ text title
+                                ]
+                            , td [] [ text author ]
+                            ]
+                in
+                div
+                    []
+                    [ table [] (List.map row books)
+                    , div [] [ hr [] [] ]
+                    , div [] [ input [] [] ]
+                    , div [] [ input [] [] ]
+                    ]
 
-              Requested ->
-                  text "Loading..."
+            Requested ->
+                text "Loading..."
 
-              _ ->
-                  text ""
+            _ ->
+                text ""
         ]
     }
 

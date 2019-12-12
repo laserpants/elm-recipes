@@ -22,17 +22,17 @@ type Msg
     = BookCollectionMsg (Api.Msg Book)
 
 
-type alias Model = 
-    { api : Api.Collection Book 
+type alias Model =
+    { api : Api.Collection Book
     }
 
 
 inApi :
-    Bundle (Api.Collection Book) (Api.Msg Book) Model Msg 
+    Bundle (Api.Collection Book) (Api.Msg Book) Model Msg
     -> Model
     -> ( Model, Cmd Msg )
 inApi =
-    Api.run BookCollectionMsg 
+    Api.run BookCollectionMsg
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -49,12 +49,12 @@ init () =
     in
     save Model
         |> andMap (mapCmd BookCollectionMsg collectionApi)
-        |> andThen (inApi fetchPage)
+        |> andThen (inApi Api.fetchPage)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of 
+    case msg of
         BookCollectionMsg apiMsg ->
             model
                 |> inApi (Api.update apiMsg)
@@ -66,35 +66,35 @@ subscriptions _ =
 
 
 view : Model -> Document Msg
-view { api } = 
+view { api } =
     { title = ""
     , body =
         [ case api.api.resource of
-              Available books ->
-                  let
-                      row ({ id, title, author } as book) =
-                          tr
-                              []
-                              [ td [] [ text (String.fromInt id) ]
-                              , td []
-                                  [ text title
-                                  ]
-                              , td [] [ text author ]
-                              ]
-                  in
-                  div 
-                      []
-                      [ table [] (List.map row books.page)
-                      ]
+            Available books ->
+                let
+                    row ({ id, title, author } as book) =
+                        tr
+                            []
+                            [ td [] [ text (String.fromInt id) ]
+                            , td []
+                                [ text title
+                                ]
+                            , td [] [ text author ]
+                            ]
+                in
+                div
+                    []
+                    [ table [] (List.map row books.page)
+                    ]
 
-              Requested ->
-                  text "Loading..."
+            Requested ->
+                text "Loading..."
 
-              Error err ->
-                  text "Something went wrong. Check the code!"
+            Error err ->
+                text "Something went wrong. Check the code!"
 
-              _ ->
-                  text ""
+            _ ->
+                text ""
         ]
     }
 

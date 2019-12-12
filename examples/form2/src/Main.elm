@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser exposing (Document, document)
-import Form.Data.Register as RegisterForm 
+import Form.Data.Register as RegisterForm
 import Form.Register as RegisterForm
 import Html exposing (..)
 import Html.Attributes exposing (..)

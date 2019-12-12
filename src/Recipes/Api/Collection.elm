@@ -1,9 +1,9 @@
-module Recipes.Api.Collection exposing (Collection, Envelope, Msg(..), RequestConfig, defaultQueryFormat, inApi, init, run, sendRequest, sendSimpleRequest, setLimit, update, updateCurrentPage)
+module Recipes.Api.Collection exposing (Collection, Envelope, Msg(..), RequestConfig, defaultQueryFormat, fetchPage, init, run, setLimit, update, updateCurrentPage)
 
 import Http exposing (Expect)
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers)
-import Recipes.Helpers exposing (Bundle, lift, runBundle, sequenceCalls)
-import Update.Pipeline exposing (andMap, andThen, save, with)
+import Recipes.Helpers exposing (Bundle, lift, runBundle, saveLifted, sequenceCalls)
+import Update.Pipeline exposing (andMap, andThen, save, using, with)
 
 
 type alias Envelope item =
@@ -28,14 +28,6 @@ type alias Collection item =
     }
 
 
-inApi :
-    Bundle (Api.Model (Envelope item)) (Api.Msg (Envelope item)) (Collection item) (Msg item)
-    -> Collection item
-    -> ( Collection item, Cmd (Msg item) )
-inApi =
-    Api.run ApiMsg
-
-
 setCurrent : Int -> ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd msg )
 setCurrent page ( model, calls ) =
     save ( { model | current = page }, calls )
@@ -46,8 +38,8 @@ setPages pages ( model, calls ) =
     save ( { model | pages = pages }, calls )
 
 
-fetchPage : ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd (Msg item) )
-fetchPage ( model, _ ) =
+fetchPage : Collection item -> ( ( Collection item, List a ), Cmd (Msg item) )
+fetchPage model =
     let
         { limit, current, query } =
             model
@@ -56,26 +48,23 @@ fetchPage ( model, _ ) =
             limit * (current - 1)
     in
     model
-        |> inApi (Api.sendRequest (query offset limit) Nothing)
+        |> Api.run ApiMsg (Api.sendRequest (query offset limit) Nothing)
         |> lift
 
 
-goToPage : Int -> ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd (Msg item) )
-goToPage page =
-    setCurrent page
-        >> andThen fetchPage
+goToPage : Int -> Collection item -> ( ( Collection item, List a ), Cmd (Msg item) )
+goToPage page model =
+    fetchPage { model | current = page }
 
 
-nextPage : ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd (Msg item) )
-nextPage ( model, calls ) =
-    ( model, calls )
-        |> goToPage (model.current + 1)
+nextPage : Collection item -> ( ( Collection item, List a ), Cmd (Msg item) )
+nextPage =
+    using (\{ current } -> goToPage (current + 1))
 
 
-prevPage : ( Collection item, List a ) -> ( ( Collection item, List a ), Cmd (Msg item) )
-prevPage ( model, calls ) =
-    ( model, calls )
-        |> goToPage (max 1 (model.current - 1))
+prevPage : Collection item -> ( ( Collection item, List a ), Cmd (Msg item) )
+prevPage =
+    using (\{ current } -> goToPage (max 1 (current - 1)))
 
 
 type alias RequestConfig item =
@@ -136,50 +125,33 @@ updateCurrentPage { total } model =
         pages =
             (total + limit - 1) // limit
     in
-    ( model, [] )
-        |> setPages pages
+    model
+        |> saveLifted
+        |> andThen (setPages pages)
         |> andThen (with (.current << Tuple.first) (setCurrent << clamp 1 pages))
         |> sequenceCalls
 
 
-sendRequest :
-    String
-    -> Maybe Http.Body
-    -> Collection item
-    -> ( ( Collection item, List a ), Cmd (Msg item) )
-sendRequest suffix maybeBody =
-    lift << inApi (Api.sendRequest suffix maybeBody)
-
-
-sendSimpleRequest : Collection item -> ( ( Collection item, List a ), Cmd (Msg item) )
-sendSimpleRequest =
-    lift << inApi Api.sendSimpleRequest
-
-
 setLimit : Int -> Collection item -> ( ( Collection item, List a ), Cmd msg )
 setLimit limit model =
-    save ( { model | limit = limit }, [] )
+    saveLifted { model | limit = limit }
 
 
 update :
     Msg item
     -> Collection item
     -> ( ( Collection item, List a ), Cmd (Msg item) )
-update msg model =
+update msg =
     case msg of
         ApiMsg apiMsg ->
-            model
-                |> inApi (Api.update apiMsg { apiDefaultHandlers | onSuccess = updateCurrentPage })
-                |> lift
+            Api.run ApiMsg (Api.update apiMsg { apiDefaultHandlers | onSuccess = updateCurrentPage })
+                >> lift
 
         NextPage ->
-            ( model, [] )
-                |> nextPage
+            nextPage
 
         PrevPage ->
-            ( model, [] )
-                |> prevPage
+            prevPage
 
         GoToPage page ->
-            ( model, [] )
-                |> goToPage page
+            goToPage page

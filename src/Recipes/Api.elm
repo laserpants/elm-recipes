@@ -1,4 +1,4 @@
-module Recipes.Api exposing (HttpMethod(..), Model, Msg(..), Resource(..), RequestConfig, apiDefaultHandlers, init, initRequest, resetResource, run, sendRequest, sendSimpleRequest, update, withResource)
+module Recipes.Api exposing (HttpMethod(..), Model, Msg(..), RequestConfig, Resource(..), apiDefaultHandlers, init, initRequest, resetResource, run, sendRequest, sendSimpleRequest, update, withResource)
 
 import Http exposing (Expect, emptyBody)
 import Recipes.Helpers exposing (Bundle, andCall, runBundle, sequenceCalls)
