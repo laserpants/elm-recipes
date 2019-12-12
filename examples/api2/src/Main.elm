@@ -38,7 +38,9 @@ inBookList :
     -> Api.Model BookList
     -> ( Model, Cmd Msg )
 inBookList fun =
-    runBundle identity always BooksApiMsg fun
+    fun
+        >> mapCmd BooksApiMsg
+        >> sequenceCalls
         >> map BookList
 
 
