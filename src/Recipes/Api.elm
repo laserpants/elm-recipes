@@ -103,6 +103,16 @@ toHeader ( a, b ) =
     Http.header a b
 
 
+apiDefaultHandlers :
+    { onError : Http.Error -> a1 -> ( a1, Cmd msg1 )
+    , onSuccess : resource -> a -> ( a, Cmd msg )
+    }
+apiDefaultHandlers =
+    { onSuccess = always save
+    , onError = always save
+    }
+
+
 sendRequest :
     String
     -> Maybe Http.Body
@@ -127,25 +137,15 @@ resetResource model =
 
 withResource :
     (resource -> resource)
-    -> ( Model resource, List a )
+    -> Model resource
     -> ( ( Model resource, List a ), Cmd msg )
-withResource fun ( { resource } as model, calls ) =
+withResource fun ({ resource } as model) =
     case resource of
         Available res ->
-            save ( { model | resource = Available (fun res) }, calls )
+            save ( { model | resource = Available (fun res) }, [] )
 
         _ ->
-            save ( model, calls )
-
-
-apiDefaultHandlers :
-    { onError : Http.Error -> a1 -> ( a1, Cmd msg1 )
-    , onSuccess : resource -> a -> ( a, Cmd msg )
-    }
-apiDefaultHandlers =
-    { onSuccess = always save
-    , onError = always save
-    }
+            save ( model, [] )
 
 
 update :
