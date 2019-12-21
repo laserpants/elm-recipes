@@ -1,4 +1,4 @@
-module Recipes.Api exposing (HttpMethod(..), Model, Msg(..), RequestConfig, Resource(..), apiDefaultHandlers, init, initAndRequest, resetResource, run, sendRequest, sendSimpleRequest, update, withResource)
+module Recipes.Api exposing (HttpMethod(..), Model, Msg(..), RequestConfig, Resource(..), apiDefaultHandlers, init, initAndRequest, resetResource, run, sendRequest, sendEmptyRequest, update, withResource)
 
 import Http exposing (Expect, emptyBody)
 import Recipes.Helpers exposing (Bundle, andCall, runBundle, sequenceCalls)
@@ -94,7 +94,7 @@ initAndRequest :
     -> ( Model resource, Cmd (Msg resource) )
 initAndRequest =
     init
-        >> andThen sendSimpleRequest
+        >> andThen sendEmptyRequest
         >> sequenceCalls
 
 
@@ -124,8 +124,8 @@ sendRequest suffix maybeBody model =
         |> andAddCmd (model.request suffix maybeBody)
 
 
-sendSimpleRequest : Model resource -> ( ( Model resource, List a ), Cmd (Msg resource) )
-sendSimpleRequest =
+sendEmptyRequest : Model resource -> ( ( Model resource, List a ), Cmd (Msg resource) )
+sendEmptyRequest =
     sendRequest "" Nothing
 
 
