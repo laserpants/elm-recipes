@@ -2,9 +2,8 @@ module Recipes.Router exposing (..)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
---import Recipes exposing (Extended, Stack, andCall, lift, runStack)
 import Update.Pipeline exposing (addCmd, andThen, mapCmd, save)
-import Update.Pipeline.Extended exposing (..)
+import Update.Pipeline.Extended exposing (Extended, Stack, andCall, lift, runStack)
 import Url exposing (Url)
 
 
@@ -19,15 +18,6 @@ type alias Router route =
     , fromUrl : Url -> Maybe route
     , basePath : String
     }
-
-
-run :
-    (Msg -> msg)
-    -> Stack { a | router : m } m msg Msg c
-    -> { a | router : m }
-    -> ( { a | router : m }, Cmd msg )
-run =
-    runStack .router (\model router -> save { model | router = router })
 
 
 setRoute :
@@ -52,10 +42,14 @@ init fromUrl basePath key =
         }
 
 
+type alias ExtendedRouter route a =
+    Extended (Router route) a
+
+
 redirect :
     String
-    -> Extended (Router route) a
-    -> ( Extended (Router route) a, Cmd Msg )
+    -> ExtendedRouter route a
+    -> ( ExtendedRouter route a, Cmd Msg )
 redirect href (( { basePath, key }, _ ) as router) =
     let
         cmd =
@@ -68,8 +62,8 @@ redirect href (( { basePath, key }, _ ) as router) =
 update :
     Msg
     -> { onRouteChange : Url -> Maybe route -> a }
-    -> Extended (Router route) a
-    -> ( Extended (Router route) a, Cmd Msg )
+    -> ExtendedRouter route a
+    -> ( ExtendedRouter route a, Cmd Msg )
 update msg { onRouteChange } (( { basePath, fromUrl, key }, _ ) as router) =
     case msg of
         UrlChange url ->
@@ -99,6 +93,15 @@ update msg { onRouteChange } (( { basePath, fromUrl, key }, _ ) as router) =
         UrlRequest (Browser.External href) ->
             router
                 |> addCmd (Navigation.load href)
+
+
+run :
+    (Msg -> msg)
+    -> Stack { a | router : m } m msg Msg c
+    -> { a | router : m }
+    -> ( { a | router : m }, Cmd msg )
+run =
+    runStack .router (\model router -> save { model | router = router })
 
 
 runUpdate :
