@@ -32,8 +32,8 @@ setData maybeData model =
     save { model | data = maybeData }
 
 
-inForm :
-    Bundle RegisterForm.Model RegisterForm.Msg Model Msg
+inForm 
+  : Bundle Model RegisterForm.Model Msg (Form.Msg Fields)
     -> Model
     -> ( Model, Cmd Msg )
 inForm =

@@ -8,7 +8,7 @@ import Recipes.Api as Api exposing (HttpMethod, Model, Msg(..))
 sendJson :
     String
     -> Json.Value
-    -> Model resource
+    -> ( Model resource, List a )
     -> ( ( Model resource, List a ), Cmd (Msg resource) )
 sendJson suffix =
     Http.jsonBody >> Just >> Api.sendRequest suffix

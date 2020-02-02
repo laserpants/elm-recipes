@@ -33,15 +33,15 @@ type Model
     | BookInfo Book
 
 
-inBookList :
-    Bundle (Api.Model BookList) (Api.Msg BookList) (Api.Model BookList) Msg
+inBookList
+    : Bundle (Api.Model BookList) (Api.Model BookList) Msg (Api.Msg BookList)
     -> Api.Model BookList
     -> ( Model, Cmd Msg )
-inBookList fun =
-    fun
-        >> mapCmd BooksApiMsg
-        >> sequenceCalls
-        >> map BookList
+inBookList bundle model =
+    bundle ( model, [] )
+        |> mapCmd BooksApiMsg
+        |> sequenceCalls
+        |> map BookList
 
 
 init : Flags -> ( Model, Cmd Msg )

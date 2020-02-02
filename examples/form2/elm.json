@@ -14,6 +14,7 @@
             "elm/regex": "1.0.0",
             "elm/url": "1.0.0",
             "elm-community/maybe-extra": "5.1.0",
+            "laserpants/elm-update-pipeline": "1.0.1",
             "pzp1997/assoc-list": "1.0.0"
         },
         "indirect": {

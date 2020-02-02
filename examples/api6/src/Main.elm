@@ -28,7 +28,7 @@ type alias Model =
 
 
 inApi :
-    Bundle (Api.Collection Book) (Api.Msg Book) Model Msg
+    Bundle Model (Api.Collection Book) Msg (Api.Msg Book) 
     -> Model
     -> ( Model, Cmd Msg )
 inApi =
@@ -72,7 +72,7 @@ view { api } =
         [ case api.api.resource of
             Available books ->
                 let
-                    row ({ id, title, author } as book) =
+                    row { id, title, author } =
                         tr
                             []
                             [ td [] [ text (String.fromInt id) ]

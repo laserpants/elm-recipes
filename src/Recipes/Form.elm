@@ -1,11 +1,11 @@
-module Recipes.Form exposing (Field, FieldDict, Model, ModelEnhanced, Msg(..), Status(..), Validate, Variant(..), asBool, asString, checkbox, checkboxAttrs, fieldError, init, initEnhanced, inputAttrs, inputField, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, lookupField, reset, run, setFieldDirty, setState, update, validateField)
+module Recipes.Form exposing (Field, FieldDict, Model, ModelExtra, Msg(..), Status(..), Validate, Variant(..), asBool, asString, checkbox, checkboxAttrs, fieldError, init, initExtra, inputAttrs, inputField, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, lookupField, reset, run, setFieldDirty, setState, update, validateField)
 
 import AssocList as Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events exposing (onBlur, onCheck, onFocus, onInput)
 import Maybe.Extra as Maybe
-import Recipes.Helpers exposing (Bundle, andCall, runBundle, saveLifted)
+import Recipes.Helpers exposing (Bundle, Extended, andCall, runBundle)
 import Update.Pipeline exposing (andThen, andThenIf, save)
 
 
@@ -130,7 +130,7 @@ type alias Validate f e d =
     -> ( FieldDict f e, Maybe d, Maybe f )
 
 
-type alias ModelEnhanced f e d s =
+type alias ModelExtra f e d s =
     { fields : FieldDict f e
     , initial : FieldDict f e
     , validate : s -> Validate f e d
@@ -141,13 +141,13 @@ type alias ModelEnhanced f e d s =
 
 
 type alias Model f e d =
-    ModelEnhanced f e d ()
+    ModelExtra f e d ()
 
 
 setFields :
     FieldDict f e
-    -> ( ModelEnhanced f e d s, List a )
-    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
+    -> Extended (ModelExtra f e d s) a
+    -> ( Extended (ModelExtra f e d s) a, Cmd (Msg f) )
 setFields fields ( model, calls ) =
     save ( { model | fields = fields }, calls )
 
@@ -159,16 +159,16 @@ applyToField target fun =
 
 setSubmitted :
     Bool
-    -> ( ModelEnhanced f e d s, List a )
-    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
+    -> Extended (ModelExtra f e d s) a
+    -> ( Extended (ModelExtra f e d s) a, Cmd (Msg f) )
 setSubmitted submitted ( model, calls ) =
     save ( { model | submitted = submitted }, calls )
 
 
 setDisabled :
     Bool
-    -> ( ModelEnhanced f e d s, List a )
-    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
+    -> Extended (ModelExtra f e d s) a
+    -> ( Extended (ModelExtra f e d s) a, Cmd (Msg f) )
 setDisabled disabled ( model, calls ) =
     save ( { model | disabled = disabled }, calls )
 
@@ -181,21 +181,28 @@ lookupField target =
 withField :
     f
     -> (Field e -> Field e)
-    -> ( ModelEnhanced f e d s, List a )
-    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
-withField target fun ( { fields } as model, calls ) =
-    ( model, calls )
+    -> Extended (ModelExtra f e d s) a
+    -> ( Extended (ModelExtra f e d s) a, Cmd (Msg f) )
+withField target fun model =
+    let
+        ( { fields }, _ ) =
+            model
+    in
+    model
         |> setFields (applyToField target fun fields)
 
 
 validateField :
     f
-    -> ModelEnhanced f e d s
-    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
-validateField field ({ validate, state, fields } as model) =
+    -> Extended (ModelExtra f e d s) a
+    -> ( Extended (ModelExtra f e d s) a, Cmd (Msg f) )
+validateField field model =
     let
+        ( { validate, state, fields }, _ ) =
+            model
+
         updateFields ( newFields, _, _ ) =
-            setFields newFields ( model, [] )
+            setFields newFields model
     in
     fields
         |> validate state (Just field)
@@ -204,23 +211,21 @@ validateField field ({ validate, state, fields } as model) =
 
 run :
     (Msg f -> msg)
-    -> Bundle (Model f e d) (Msg f) { a | form : Model f e d } msg
+    -> Bundle { a | form : Model f e d } (Model f e d) msg (Msg f)
     -> { a | form : Model f e d }
     -> ( { a | form : Model f e d }, Cmd msg )
 run =
-    let
-        setForm form model =
-            { model | form = form }
-    in
-    runBundle .form setForm
+    runBundle
+        (\model -> ( model.form, [] ))
+        (\form model -> { model | form = form })
 
 
-initEnhanced :
+initExtra :
     (s -> Validate f e d)
     -> List ( f, Field e )
     -> s
-    -> ( ModelEnhanced f e d s, Cmd (Msg f) )
-initEnhanced validate fields state =
+    -> ( ModelExtra f e d s, Cmd (Msg f) )
+initExtra validate fields state =
     let
         fieldsDict =
             Dict.fromList fields
@@ -237,41 +242,50 @@ initEnhanced validate fields state =
 
 init : Validate f e d -> List ( f, Field e ) -> ( Model f e d, Cmd (Msg f) )
 init validate fields =
-    initEnhanced (always validate) fields ()
+    initExtra (always validate) fields ()
 
 
-reset : ModelEnhanced f e d s -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
-reset model =
-    saveLifted
-        { model
+reset :
+    Extended (ModelExtra f e d s) a
+    -> ( Extended (ModelExtra f e d s) a, Cmd (Msg f) )
+reset ( model, calls ) =
+    save
+        ( { model
             | fields = model.initial
             , disabled = False
             , submitted = False
-        }
+          }
+        , calls
+        )
 
 
-setState : s -> ModelEnhanced f e d s -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
-setState state model =
-    saveLifted { model | state = state }
+setState :
+    s
+    -> Extended (ModelExtra f e d s) a
+    -> ( Extended (ModelExtra f e d s) a, Cmd (Msg f) )
+setState state ( model, calls ) =
+    save ( { model | state = state }, calls )
 
 
 setFieldDirty :
     f
     -> Bool
-    -> ModelEnhanced f e d s
-    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
-setFieldDirty tag dirty model =
-    ( model, [] )
-        |> withField tag (\field -> { field | dirty = dirty })
+    -> Extended (ModelExtra f e d s) a
+    -> ( Extended (ModelExtra f e d s) a, Cmd (Msg f) )
+setFieldDirty tag dirty =
+    withField tag (\field -> { field | dirty = dirty })
 
 
 update :
     Msg f
     -> { onSubmit : d -> a }
-    -> ModelEnhanced f e d s
-    -> ( ( ModelEnhanced f e d s, List a ), Cmd (Msg f) )
-update msg { onSubmit } ({ fields, validate, state } as model) =
+    -> Extended (ModelExtra f e d s) a
+    -> ( Extended (ModelExtra f e d s) a, Cmd (Msg f) )
+update msg { onSubmit } model =
     let
+        ( { fields, validate, state }, _ ) =
+            model
+
         handleSubmit maybeData =
             case maybeData of
                 Just data ->
@@ -315,7 +329,7 @@ update msg { onSubmit } ({ fields, validate, state } as model) =
             ( fields, Nothing, Nothing )
     )
         |> (\( newFields, maybeData, _ ) ->
-                ( model, [] )
+                model
                     |> setFields newFields
                     |> andThenIf (Submit == msg)
                         (setSubmitted True >> andThen (handleSubmit maybeData))

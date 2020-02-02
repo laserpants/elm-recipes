@@ -1,33 +1,40 @@
-module Recipes.Helpers exposing (Bundle, andCall, call, lift, runBundle, saveLifted, sequenceCalls)
+module Recipes.Helpers exposing (Bundle, Extended, andCall, call, runBundle, sequenceCalls, mapExtended, lift)
 
-import Update.Pipeline exposing (andAddCmd, mapCmd, save, sequence)
-
-
-lift : ( a, Cmd msg ) -> ( ( a, List c ), Cmd msg )
-lift ( model, cmd ) =
-    ( ( model, [] ), cmd )
+import Update.Pipeline exposing (save, andAddCmd, mapCmd, sequence)
 
 
-saveLifted : a -> ( ( a, List c ), Cmd msg )
-saveLifted =
-    lift << save
+type alias Extended model a =
+    ( model, List a )
 
 
-call : c -> ( a, List c ) -> ( ( a, List c ), Cmd msg )
+mapExtended : (model -> model1) -> Extended model a -> Extended model1 a
+mapExtended fun ( model, calls ) =
+    ( fun model, calls )
+
+
+lift : (m -> ( m, Cmd msg )) -> Extended m a -> ( Extended m a, Cmd msg )
+lift fun model = 
+    let 
+        ( ( model1, cmd ), calls ) = mapExtended fun model
+    in
+    ( ( model1, calls ), cmd )
+
+
+call : c -> Extended a c -> ( Extended a c, Cmd msg )
 call fun ( model, _ ) =
     ( ( model, List.singleton fun ), Cmd.none )
 
 
-andCall : c -> ( ( a, List c ), Cmd msg ) -> ( ( a, List c ), Cmd msg )
+andCall : c -> ( Extended a c, Cmd msg ) -> ( Extended a c, Cmd msg )
 andCall fun ( ( model, funs ), cmd ) =
     ( ( model, fun :: funs ), cmd )
 
 
-type alias Bundle model1 msg1 model msg =
-    model1 -> ( ( model1, List (model -> ( model, Cmd msg )) ), Cmd msg1 )
+type alias Bundle a a1 msg msg1 =
+    Extended a1 (a -> ( a, Cmd msg )) -> ( Extended a1 (a -> ( a, Cmd msg )), Cmd msg1 )
 
 
-sequenceCalls : ( ( a, List (a -> ( a, Cmd msg )) ), Cmd msg ) -> ( a, Cmd msg )
+sequenceCalls : ( Extended a (a -> ( a, Cmd msg )), Cmd msg ) -> ( a, Cmd msg )
 sequenceCalls ( ( model, calls ), cmd ) =
     model
         |> sequence calls
@@ -35,15 +42,15 @@ sequenceCalls ( ( model, calls ), cmd ) =
 
 
 runBundle :
-    (model -> model1)
-    -> (model1 -> model -> model)
+    (b -> a1)
+    -> (a -> b -> model)
     -> (msg1 -> msg)
-    -> Bundle model1 msg1 model msg
-    -> model
+    -> (a1 -> ( Extended a (model -> ( model, Cmd msg )), Cmd msg1 ))
+    -> b
     -> ( model, Cmd msg )
-runBundle get set toMsg updater model =
+runBundle get set toMsg recipe model =
     get model
-        |> updater
+        |> recipe
         |> mapCmd toMsg
         |> Tuple.mapFirst (Tuple.mapFirst (\m1 -> set m1 model))
         |> sequenceCalls

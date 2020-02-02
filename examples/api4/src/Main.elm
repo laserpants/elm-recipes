@@ -32,20 +32,22 @@ type alias Model =
     }
 
 
-inBookListApi :
-    Bundle (Api.Model BookList) (Api.Msg BookList) Model Msg
-    -> Model
-    -> ( Model, Cmd Msg )
+--inBookListApi :
+--    Bundle (Api.Model BookList) (Api.Msg BookList) Model Msg
+--    -> Model
+--    -> ( Model, Cmd Msg )
 inBookListApi =
-    runBundle .bookList (\list model -> { model | bookList = list }) BookListMsg
+    Debug.todo ""
+--    runBundle .bookList (\list model -> { model | bookList = list }) BookListMsg
 
 
-inBookItemApi :
-    Bundle (Api.Model Book) (Api.Msg Book) Model Msg
-    -> Model
-    -> ( Model, Cmd Msg )
+--inBookItemApi :
+--    Bundle (Api.Model Book) (Api.Msg Book) Model Msg
+--    -> Model
+--    -> ( Model, Cmd Msg )
 inBookItemApi =
-    runBundle .bookItem (\item model -> { model | bookItem = item }) BookItemMsg
+    Debug.todo ""
+--    runBundle .bookItem (\item model -> { model | bookItem = item }) BookItemMsg
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -70,7 +72,7 @@ init () =
     save Model
         |> andMap (mapCmd BookListMsg listApi)
         |> andMap (mapCmd BookItemMsg itemApi)
-        |> andThen (inBookListApi sendSimpleRequest)
+        |> andThen (Debug.todo "") -- (inBookListApi sendEmptyRequest)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

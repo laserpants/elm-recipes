@@ -2,7 +2,7 @@ module Recipes.Router exposing (Msg(..), Router, forceUrlChange, init, redirect,
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
-import Recipes.Helpers exposing (Bundle, andCall, runBundle)
+import Recipes.Helpers exposing (Bundle, Extended, andCall, runBundle, mapExtended)
 import Update.Pipeline exposing (addCmd, save)
 import Url exposing (Url)
 
@@ -20,22 +20,23 @@ type alias Router route =
     }
 
 
-setRoute : Maybe route -> ( Router route, List a ) -> ( ( Router route, List a ), Cmd msg )
-setRoute route ( router, calls ) =
-    save ( { router | route = route }, calls )
+setRoute :
+    Maybe route
+    -> Extended (Router route) a
+    -> ( Extended (Router route) a, Cmd msg )
+setRoute route =
+    save << mapExtended (\router -> { router | route = route })
 
 
 run :
-    (Msg -> msg)
-    -> Bundle (Router route) Msg { a | router : Router route } msg
-    -> { a | router : Router route }
-    -> ( { a | router : Router route }, Cmd msg )
+    (msg1 -> msg)
+    -> Bundle { c | router : a } a msg msg1
+    -> { c | router : a }
+    -> ( { c | router : a }, Cmd msg )
 run =
-    let
-        setRouter router model =
-            { model | router = router }
-    in
-    runBundle .router setRouter
+    runBundle
+        (\model -> ( model.router, [] ))
+        (\router model -> { model | router = router })
 
 
 init :
@@ -52,34 +53,41 @@ init fromUrl basePath key =
         }
 
 
-redirect : String -> Router route -> ( ( Router route, List a ), Cmd Msg )
+redirect : 
+    String 
+    -> Extended (Router route) a 
+    -> ( Extended (Router route) a, Cmd Msg )
 redirect href router =
     let
-        { basePath, key } =
+        ( { basePath, key }, _ ) =
             router
 
         redirectCmd =
             Navigation.replaceUrl key (basePath ++ href)
     in
-    ( router, [] )
+    router
         |> addCmd redirectCmd
 
 
 forceUrlChange :
     Url
-    -> { onRouteChange : Url -> Maybe route -> a }
-    -> Router route
-    -> ( ( Router route, List a ), Cmd Msg )
-forceUrlChange =
-    update << UrlChange
+    -> (Url -> Maybe route -> a)
+    -> Extended (Router route) a
+    -> ( Extended (Router route) a, Cmd Msg )
+forceUrlChange url handleUrlChange =
+    update (UrlChange url) { onRouteChange = handleUrlChange }
 
 
 update :
     Msg
     -> { onRouteChange : Url -> Maybe route -> a }
-    -> Router route
-    -> ( ( Router route, List a ), Cmd Msg )
-update msg { onRouteChange } ({ basePath, fromUrl, key } as router) =
+    -> Extended (Router route) a
+    -> ( Extended (Router route) a, Cmd msg )
+update msg { onRouteChange } router =
+    let
+        ( { basePath, fromUrl, key }, _ ) =
+            router
+    in
     case msg of
         UrlChange url ->
             let
@@ -89,7 +97,7 @@ update msg { onRouteChange } ({ basePath, fromUrl, key } as router) =
                 route =
                     fromUrl { url | path = path }
             in
-            ( router, [] )
+            router
                 |> setRoute route
                 |> andCall (onRouteChange url route)
 
@@ -98,15 +106,15 @@ update msg { onRouteChange } ({ basePath, fromUrl, key } as router) =
                 urlStr =
                     Url.toString { url | path = basePath ++ url.path }
             in
-            ( router, [] )
+            router
                 |> addCmd (Navigation.pushUrl key urlStr)
 
         UrlRequest (Browser.External "") ->
-            ( router, [] )
+            router
                 |> save
 
         UrlRequest (Browser.External href) ->
-            ( router, [] )
+            router
                 |> addCmd (Navigation.load href)
 
 

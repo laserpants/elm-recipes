@@ -5,7 +5,7 @@ import Browser.Navigation as Navigation
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Recipes.Helpers exposing (Bundle)
+import Recipes.Helpers 
 import Recipes.Router as Router exposing (Router, forceUrlChange)
 import Update.Pipeline exposing (..)
 import Url exposing (Url)
@@ -54,11 +54,11 @@ init () url key =
     save Model
         |> andMap (mapCmd RouterMsg router)
         |> andMap (save HomePage)
-        |> andThen (Router.run RouterMsg (forceUrlChange url { onRouteChange = handleRouteChange }))
+        |> andThen (Router.run RouterMsg (forceUrlChange url handleRouteChange))
 
 
 handleRouteChange : Url -> Maybe Route -> Model -> ( Model, Cmd Msg )
-handleRouteChange url maybeRoute model =
+handleRouteChange _ maybeRoute model =
     case maybeRoute of
         Nothing ->
             save { model | page = NotFoundPage }
