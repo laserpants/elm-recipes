@@ -45,6 +45,22 @@ xhook.before(function(request, callback) {
         headers: { 'Content-Type': 'application/json' }
       });
     }, delay);
+  } else if (request.url.endsWith('books') && 'POST' === request.method) {
+    setTimeout(function() {
+      var params = JSON.parse(request.body);
+      var book = {
+        id: books.length + 1,
+        title: params.title,
+        author: params.author,
+        synopsis: params.synopsis
+      };
+      books.push(book);
+      callback({
+        status: 200,
+        data: JSON.stringify({ book: book }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }, delay);
   } else {
     callback();
   }

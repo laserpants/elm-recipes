@@ -1,7 +1,7 @@
 module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
-import Update.Pipeline exposing (andAddCmd, save)
+import Update.Pipeline exposing (andAddCmd, save, using)
 import Update.Pipeline.Extended exposing (Extended, Stack, andCall, lift, runStack)
 
 
@@ -118,6 +118,22 @@ sendEmptyRequest :
     -> ( Extended (Model resource) a, Cmd (Msg resource) )
 sendEmptyRequest =
     sendRequest "" Nothing
+
+
+withResource :
+    (resource -> resource)
+    -> Extended (Model resource) a
+    -> ( Extended (Model resource) a, Cmd (Msg resource) )
+withResource fun =
+    using
+        (\( { resource }, _ ) ->
+            case resource of
+                Available item ->
+                    lift (setResource (Available (fun item)))
+
+                _ ->
+                    save
+        )
 
 
 update :
