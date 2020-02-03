@@ -12,29 +12,25 @@ extend model =
     ( model, [] )
 
 
-
--- Extended (Update a msg) -> Update (Extended a) msg
-
-
-inject : Extended ( a, Cmd msg ) c -> ( Extended a c, Cmd msg )
-inject ( ( model, cmd ), calls ) =
+sequence1 : Extended ( a, Cmd msg ) c -> ( Extended a c, Cmd msg )
+sequence1 ( ( model, cmd ), calls ) =
     ( ( model, calls ), cmd )
 
 
-lift :
+mapM :
     (a -> ( b, Cmd msg ))
     -> Extended a c
     -> ( Extended b c, Cmd msg )
-lift fun =
-    inject << Tuple.mapFirst fun
+mapM fun =
+    sequence1 << Tuple.mapFirst fun
 
 
-andLift :
+andMapM :
     (a -> ( b, Cmd msg ))
     -> ( Extended a c, Cmd msg )
     -> ( Extended b c, Cmd msg )
-andLift =
-    andThen << lift
+andMapM =
+    andThen << mapM
 
 
 call : c -> Extended a c -> ( Extended a c, Cmd msg )
@@ -63,5 +59,5 @@ runStack get set toMsg stack model =
         |> extend
         |> stack
         |> mapCmd toMsg
-        |> andLift (set model)
+        |> andMapM (set model)
         |> andThen (\( model1, calls ) -> sequence calls model1)

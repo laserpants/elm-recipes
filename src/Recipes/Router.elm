@@ -3,7 +3,7 @@ module Recipes.Router exposing (..)
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
 import Update.Pipeline exposing (addCmd, andThen, mapCmd, save)
-import Update.Pipeline.Extended exposing (Extended, Stack, andCall, lift, runStack)
+import Update.Pipeline.Extended exposing (Extended, Stack, andCall, mapM, runStack)
 import Url exposing (Url)
 
 
@@ -75,7 +75,7 @@ update msg { onRouteChange } (( { basePath, fromUrl, key }, _ ) as router) =
                     fromUrl { url | path = path }
             in
             router
-                |> lift (setRoute route)
+                |> mapM (setRoute route)
                 |> andCall (onRouteChange url route)
 
         UrlRequest (Browser.Internal url) ->

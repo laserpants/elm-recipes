@@ -2,7 +2,7 @@ module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
 import Update.Pipeline exposing (andAddCmd, save, using)
-import Update.Pipeline.Extended exposing (Extended, Stack, andCall, lift, runStack)
+import Update.Pipeline.Extended exposing (Extended, Stack, andCall, mapM, runStack)
 
 
 type Msg resource
@@ -109,7 +109,7 @@ sendRequest suffix maybeBody model =
             model
     in
     model
-        |> lift (setResource Requested)
+        |> mapM (setResource Requested)
         |> andAddCmd (request suffix maybeBody)
 
 
@@ -129,7 +129,7 @@ withResource fun =
         (\( { resource }, _ ) ->
             case resource of
                 Available item ->
-                    lift (setResource (Available (fun item)))
+                    mapM (setResource (Available (fun item)))
 
                 _ ->
                     save
@@ -145,12 +145,12 @@ update msg { onSuccess, onError } model =
     case msg of
         Response (Ok resource) ->
             model
-                |> lift (setResource (Available resource))
+                |> mapM (setResource (Available resource))
                 |> andCall (onSuccess resource)
 
         Response (Err error) ->
             model
-                |> lift (setResource (Error error))
+                |> mapM (setResource (Error error))
                 |> andCall (onError error)
 
 
