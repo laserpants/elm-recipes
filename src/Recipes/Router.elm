@@ -95,11 +95,15 @@ update msg { onRouteChange } (( { basePath, fromUrl, key }, _ ) as router) =
                 |> addCmd (Navigation.load href)
 
 
-run :
-    (Msg -> msg)
-    -> Stack { a | router : m } m msg Msg c
-    -> { a | router : m }
-    -> ( { a | router : m }, Cmd msg )
+type alias Run model route msg c =
+    Stack model (Router route) msg Msg c -> model -> ( model, Cmd msg )
+
+
+type alias Parent a route =
+    { a | router : Router route }
+
+
+run : (Msg -> msg) -> Run (Parent a route) route msg c
 run =
     runStack .router (\model router -> save { model | router = router })
 
@@ -107,17 +111,12 @@ run =
 runUpdate :
     (Msg -> msg)
     -> Msg
-    ->
-        { onRouteChange :
-            Url
-            -> Maybe route
-            -> { a | router : Router route }
-            -> ( { a | router : Router route }, Cmd msg )
-        }
-    -> { a | router : Router route }
-    -> ( { a | router : Router route }, Cmd msg )
+    -> { onRouteChange : Url -> Maybe route -> Parent a route -> ( Parent a route, Cmd msg ) }
+    -> Parent a route
+    -> ( Parent a route, Cmd msg )
 runUpdate toMsg msg handlers =
-    run toMsg (update msg handlers)
+    update msg handlers
+        |> run toMsg
 
 
 onUrlChange : (Msg -> msg) -> Url -> msg

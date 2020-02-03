@@ -1,40 +1,44 @@
 module Update.Pipeline.Extended exposing (..)
 
-import Update.Pipeline exposing (save, andThen, andAddCmd, sequence, mapCmd)
+import Update.Pipeline exposing (andAddCmd, andThen, mapCmd, save, sequence)
 
 
 type alias Extended m a =
     ( m, List a )
-    
+
 
 extend : a -> Extended a c
-extend model = 
+extend model =
     ( model, [] )
 
 
+
+-- Extended (Update a msg) -> Update (Extended a) msg
+
+
 inject : Extended ( a, Cmd msg ) c -> ( Extended a c, Cmd msg )
-inject ( ( model, cmd ), calls ) = 
+inject ( ( model, cmd ), calls ) =
     ( ( model, calls ), cmd )
 
 
-lift : 
-    (a -> ( b, Cmd msg )) 
-    -> Extended a c 
+lift :
+    (a -> ( b, Cmd msg ))
+    -> Extended a c
     -> ( Extended b c, Cmd msg )
-lift fun = 
+lift fun =
     inject << Tuple.mapFirst fun
 
 
-andLift : 
+andLift :
     (a -> ( b, Cmd msg ))
     -> ( Extended a c, Cmd msg )
     -> ( Extended b c, Cmd msg )
-andLift = 
+andLift =
     andThen << lift
 
 
 call : c -> Extended a c -> ( Extended a c, Cmd msg )
-call fun ( model, calls ) = 
+call fun ( model, calls ) =
     save ( model, fun :: calls )
 
 
@@ -47,23 +51,17 @@ type alias Stack s t a c k =
     Extended t k -> ( Extended t (s -> ( s, Cmd a )), Cmd c )
 
 
-sequenceCalls : ( a, List (a -> ( a, Cmd msg )) ) -> ( a, Cmd msg )
-sequenceCalls ( model, calls ) = 
-    model
-        |> sequence calls 
-
-
-runStack : 
+runStack :
     (a -> m1)
     -> (a -> m1 -> ( m, Cmd msg ))
     -> (msg1 -> msg)
     -> Stack m m1 msg msg1 c
     -> a
     -> ( m, Cmd msg )
-runStack get set toMsg stack model = 
+runStack get set toMsg stack model =
     get model
-        |> extend 
+        |> extend
         |> stack
         |> mapCmd toMsg
         |> andLift (set model)
-        |> andThen sequenceCalls
+        |> andThen (\( model1, calls ) -> sequence calls model1)
