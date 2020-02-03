@@ -59,4 +59,4 @@ runStack get set toMsg stack model =
         |> stack
         |> mapCmd toMsg
         |> andMapM (set model)
-        |> andThen (\( model1, calls ) -> sequence calls model1)
+        |> andThen (\( newModel, calls ) -> sequence calls newModel)

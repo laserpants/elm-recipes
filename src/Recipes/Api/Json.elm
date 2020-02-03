@@ -3,16 +3,16 @@ module Recipes.Api.Json exposing (..)
 import Http
 import Json.Decode as Json
 import Recipes.Api as Api exposing (HttpMethod, Model, Msg(..))
+import Update.Pipeline.Extended exposing (Extended)
 
 
-
---sendJson :
---    String
---    -> Json.Value
---    -> ( Model resource, List a )
---    -> ( ( Model resource, List a ), Cmd (Msg resource) )
---sendJson suffix =
---    Http.jsonBody >> Just >> Api.sendRequest suffix
+sendJson :
+    String
+    -> Json.Value
+    -> Extended (Model resource) a
+    -> ( Extended (Model resource) a, Cmd (Msg resource) )
+sendJson suffix =
+    Http.jsonBody >> Just >> Api.sendRequest suffix
 
 
 type alias JsonRequestConfig resource =
@@ -35,7 +35,6 @@ requestConfig { endpoint, method, decoder, headers } =
 init : JsonRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
 init =
     Api.init << requestConfig
-
 
 
 --initAndRequest : JsonRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
