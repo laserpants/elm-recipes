@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Recipes.Router as Router exposing (Router)
-import Update.Pipeline exposing (save, andThen, andMap, mapCmd)
+import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, parse)
 

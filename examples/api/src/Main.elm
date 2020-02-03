@@ -149,7 +149,7 @@ update msg model =
                     { id = Nothing
                     , title = bookTitle
                     , author = bookAuthor
-                    , synopsis = ""         -- Not used in this example
+                    , synopsis = "" -- Not used in this example
                     }
 
                 json =
@@ -213,13 +213,13 @@ newBookForm { resource } { bookTitle, bookAuthor } =
 
         _ ->
             let
-                formItem = 
+                formItem =
                     style "padding" "0.2rem 0"
             in
             div []
                 [ div
                     []
-                    [ h3 [] [ text "Add a new book" ] 
+                    [ h3 [] [ text "Add a new book" ]
                     ]
                 , div
                     []
@@ -249,11 +249,11 @@ newBookForm { resource } { bookTitle, bookAuthor } =
                     ]
                 , div
                     [ formItem ]
-                    [ button 
-                          [ onClick AddBook 
-                          , disabled (bookTitle == "" || bookAuthor == "")
-                          ] 
-                          [ text "Save" ]
+                    [ button
+                        [ onClick AddBook
+                        , disabled (bookTitle == "" || bookAuthor == "")
+                        ]
+                        [ text "Save" ]
                     ]
                 ]
 
