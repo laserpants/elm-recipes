@@ -12,8 +12,8 @@ extend model =
     ( model, [] )
 
 
-sequence1 : Extended ( a, Cmd msg ) c -> ( Extended a c, Cmd msg )
-sequence1 ( ( model, cmd ), calls ) =
+shuffle : Extended ( a, Cmd msg ) c -> ( Extended a c, Cmd msg )
+shuffle ( ( model, cmd ), calls ) =
     ( ( model, calls ), cmd )
 
 
@@ -22,7 +22,7 @@ mapM :
     -> Extended a c
     -> ( Extended b c, Cmd msg )
 mapM fun =
-    sequence1 << Tuple.mapFirst fun
+    shuffle << Tuple.mapFirst fun
 
 
 andMapM :
@@ -55,8 +55,7 @@ runStack :
     -> a
     -> ( m, Cmd msg )
 runStack get set toMsg stack model =
-    get model
-        |> extend
+    ( get model, [] )
         |> stack
         |> mapCmd toMsg
         |> andMapM (set model)
