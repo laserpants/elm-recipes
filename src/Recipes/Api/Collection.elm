@@ -3,7 +3,7 @@ module Recipes.Api.Collection exposing (..)
 import Http exposing (Expect)
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers)
 import Update.Pipeline exposing (andMap, andThen, join, map, mapCmd, save, sequence, using, with)
-import Update.Pipeline.Extended exposing (Extended, Run, andLift, lift, lift2, runStackE)
+import Update.Pipeline.Extended exposing (Extended, Run, andLift, lift, lift2, runStack, runStackE)
 import Url.Builder as Builder
 
 
@@ -165,3 +165,30 @@ update msg =
 
         GotoPage page ->
             goToPage page
+
+
+type alias HasCollection item a =
+    { a | api : Collection item }
+
+
+insertCollectionAsApiIn :
+    HasCollection item a
+    -> Collection item
+    -> ( HasCollection item a, Cmd msg )
+insertCollectionAsApiIn model api =
+    save { model | api = api }
+
+
+run : (msg1 -> msg) -> Run (HasCollection item a) (Collection item) msg msg1 b
+run =
+    runStack .api insertCollectionAsApiIn
+
+
+runUpdate :
+    (Msg item -> msg)
+    -> Msg item
+    -> HasCollection item a
+    -> ( HasCollection item a, Cmd msg )
+runUpdate toMsg msg =
+    update msg
+        |> run toMsg

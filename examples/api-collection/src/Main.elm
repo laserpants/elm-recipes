@@ -35,7 +35,7 @@ insertAsApiIn model api =
 
 inApi : Run Model (Api.Collection Book) Msg (Api.Msg Book) a
 inApi =
-    runStack .api insertAsApiIn BookCollectionMsg
+    Api.run BookCollectionMsg
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -56,19 +56,16 @@ init () =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg =
     case msg of
         BookCollectionMsg apiMsg ->
-            model
-                |> inApi (Api.update apiMsg)
+            inApi (Api.update apiMsg)
 
         GotoPrev ->
-            model
-                |> inApi Api.prevPage
+            inApi Api.prevPage
 
         GotoNext ->
-            model
-                |> inApi Api.nextPage
+            inApi Api.nextPage
 
 
 subscriptions : Model -> Sub Msg
@@ -100,7 +97,7 @@ view { api } =
             else
                 []
     in
-    { title = ""
+    { title = "Api collection recipe example"
     , body =
         [ case api.api.resource of
             Available books ->
