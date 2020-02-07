@@ -1,7 +1,6 @@
 module Update.Pipeline.Extended exposing (..)
 
-import Tuple exposing (first, second)
-import Update.Pipeline exposing (andAddCmd, andThen, map, mapCmd, save, sequence)
+import Update.Pipeline exposing (andThen, mapCmd, save, sequence)
 
 
 type alias Extended m a =
