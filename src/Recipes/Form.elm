@@ -6,7 +6,7 @@ import Html.Attributes as Attributes
 import Html.Events exposing (onBlur, onCheck, onFocus, onInput)
 import Maybe.Extra as Maybe
 import Update.Pipeline exposing (andThen, andThenIf, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, runStack, lift)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack)
 
 
 type Variant
@@ -159,10 +159,10 @@ resetFields model =
     save { model | fields = model.initial }
 
 
-applyToField : 
-    f 
-    -> (Field e -> Field e) 
-    -> FieldDict f e 
+applyToField :
+    f
+    -> (Field e -> Field e)
+    -> FieldDict f e
     -> FieldDict f e
 applyToField target fun =
     Dict.update target (Just << fun << withDefaultNullField)

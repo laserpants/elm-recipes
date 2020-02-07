@@ -2,8 +2,8 @@ module Recipes.Api.Collection exposing (..)
 
 import Http exposing (Expect)
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers)
-import Update.Pipeline exposing (andMap, andThen, join, map, mapCmd, save, sequence, using, with)
-import Update.Pipeline.Extended exposing (Extended, Run, andLift, lift, lift2, runStack, runStackE)
+import Update.Pipeline exposing (andMap, andThen, save, using, with)
+import Update.Pipeline.Extended exposing (Extended, Run, andLift, lift, runStack, runStackE)
 import Url.Builder as Builder
 
 
@@ -134,7 +134,7 @@ updateCurrentPage :
     Envelope item
     -> Extended (Collection item) a
     -> ( Extended (Collection item) a, Cmd (Msg item) )
-updateCurrentPage { page, total } (( { limit }, _ ) as model) =
+updateCurrentPage { total } (( { limit }, _ ) as model) =
     let
         pages =
             (total + limit - 1) // limit

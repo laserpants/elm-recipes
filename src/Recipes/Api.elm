@@ -1,7 +1,7 @@
 module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
-import Update.Pipeline exposing (andAddCmd, andThen, mapCmd, save, using)
+import Update.Pipeline exposing (andAddCmd, save, using)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack)
 
 

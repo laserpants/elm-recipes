@@ -2,7 +2,7 @@ module Recipes.Router exposing (..)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
-import Update.Pipeline exposing (addCmd, andThen, mapCmd, save)
+import Update.Pipeline exposing (addCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack)
 import Url exposing (Url)
 
