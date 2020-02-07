@@ -6,7 +6,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
+import Recipes.Api exposing (HttpMethod(..), Resource(..))
 import Recipes.Api.Collection as Api exposing (..)
+import Recipes.Api.Collection.Json as JsonApi exposing (..)
+import Update.Pipeline exposing (..)
+import Update.Pipeline.Extended exposing (..)
 
 
 type alias Flags =
@@ -22,14 +26,39 @@ type alias Model =
     }
 
 
+insertAsApiIn : Model -> Api.Collection Book -> ( Model, Cmd msg )
+insertAsApiIn model api =
+    save { model | api = api }
+
+
+inApi : Run Model (Api.Collection Book) Msg (Api.Msg Book) a
+inApi =
+    runStack .api insertAsApiIn BookCollectionMsg
+
+
 init : Flags -> ( Model, Cmd Msg )
 init () =
-    Debug.todo ""
+    let
+        collectionApi =
+            JsonApi.init
+                { limit = 2
+                , endpoint = "/books"
+                , decoder = Json.field "books" (JsonApi.envelopeDecoder "page" Book.decoder)
+                , headers = []
+                , queryString = Api.defaultQueryFormat
+                }
+    in
+    save Model
+        |> andMap (mapCmd BookCollectionMsg collectionApi)
+        |> andThen (inApi Api.fetchPage)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    Debug.todo ""
+    case msg of
+        BookCollectionMsg apiMsg ->
+            model
+                |> inApi (Api.update apiMsg)
 
 
 subscriptions : Model -> Sub Msg
@@ -39,7 +68,39 @@ subscriptions _ =
 
 view : Model -> Document Msg
 view { api } =
-    Debug.todo ""
+    { title = ""
+    , body =
+        [ case api.api.resource of
+            Available books ->
+                let
+                    showId =
+                        Maybe.withDefault "-" << Maybe.map String.fromInt
+
+                    row { id, title, author } =
+                        tr
+                            []
+                            [ td [] [ text (showId id) ]
+                            , td []
+                                [ text title
+                                ]
+                            , td [] [ text author ]
+                            ]
+                in
+                div
+                    []
+                    [ table [] (List.map row books.page)
+                    ]
+
+            Requested ->
+                text "Loading..."
+
+            Error err ->
+                text "Something went wrong. Check the code!"
+
+            _ ->
+                text ""
+        ]
+    }
 
 
 main : Program Flags Model Msg

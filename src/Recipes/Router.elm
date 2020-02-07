@@ -3,7 +3,7 @@ module Recipes.Router exposing (..)
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
 import Update.Pipeline exposing (addCmd, andThen, mapCmd, save)
-import Update.Pipeline.Extended exposing (Extended, Stack, andCall, mapM, runStack)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack)
 import Url exposing (Url)
 
 
@@ -42,14 +42,10 @@ init fromUrl basePath key =
         }
 
 
-type alias ExtendedRouter route a =
-    Extended (Router route) a
-
-
 redirect :
     String
-    -> ExtendedRouter route a
-    -> ( ExtendedRouter route a, Cmd Msg )
+    -> Extended (Router route) a
+    -> ( Extended (Router route) a, Cmd Msg )
 redirect href (( { basePath, key }, _ ) as router) =
     let
         cmd =
@@ -62,8 +58,8 @@ redirect href (( { basePath, key }, _ ) as router) =
 update :
     Msg
     -> { onRouteChange : Url -> Maybe route -> a }
-    -> ExtendedRouter route a
-    -> ( ExtendedRouter route a, Cmd Msg )
+    -> Extended (Router route) a
+    -> ( Extended (Router route) a, Cmd Msg )
 update msg { onRouteChange } (( { basePath, fromUrl, key }, _ ) as router) =
     case msg of
         UrlChange url ->
@@ -75,7 +71,7 @@ update msg { onRouteChange } (( { basePath, fromUrl, key }, _ ) as router) =
                     fromUrl { url | path = path }
             in
             router
-                |> mapM (setRoute route)
+                |> lift (setRoute route)
                 |> andCall (onRouteChange url route)
 
         UrlRequest (Browser.Internal url) ->
@@ -95,25 +91,31 @@ update msg { onRouteChange } (( { basePath, fromUrl, key }, _ ) as router) =
                 |> addCmd (Navigation.load href)
 
 
-type alias Run model route msg c =
-    Stack model (Router route) msg Msg c -> model -> ( model, Cmd msg )
-
-
-type alias Parent a route =
+type alias HasRouter route a =
     { a | router : Router route }
 
 
-run : (Msg -> msg) -> Run (Parent a route) route msg c
+insertAsRouterIn :
+    HasRouter route a
+    -> Router route
+    -> ( HasRouter route a, Cmd msg )
+insertAsRouterIn model router =
+    save { model | router = router }
+
+
+run :
+    (Msg -> msg)
+    -> Run (HasRouter route a) (Router route) msg Msg b
 run =
-    runStack .router (\model router -> save { model | router = router })
+    runStack .router insertAsRouterIn
 
 
 runUpdate :
     (Msg -> msg)
     -> Msg
-    -> { onRouteChange : Url -> Maybe route -> Parent a route -> ( Parent a route, Cmd msg ) }
-    -> Parent a route
-    -> ( Parent a route, Cmd msg )
+    -> { onRouteChange : Url -> Maybe route -> HasRouter route a -> ( HasRouter route a, Cmd msg ) }
+    -> HasRouter route a
+    -> ( HasRouter route a, Cmd msg )
 runUpdate toMsg msg handlers =
     update msg handlers
         |> run toMsg

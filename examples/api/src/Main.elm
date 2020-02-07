@@ -10,7 +10,7 @@ import Json.Decode as Json
 import Recipes.Api as Api exposing (..)
 import Recipes.Api.Json as JsonApi
 import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
-import Update.Pipeline.Extended exposing (runStack)
+import Update.Pipeline.Extended exposing (Run, runStack)
 
 
 type alias Flags =
@@ -42,18 +42,18 @@ type alias Model =
     }
 
 
-setBookList : Model -> Api.Model BookList -> ( Model, Cmd msg )
-setBookList model bookList =
+insertAsBookListIn : Model -> Api.Model BookList -> ( Model, Cmd msg )
+insertAsBookListIn model bookList =
     save { model | bookList = bookList }
 
 
-setBook : Model -> Api.Model Book -> ( Model, Cmd msg )
-setBook model book =
+insertAsBookIn : Model -> Api.Model Book -> ( Model, Cmd msg )
+insertAsBookIn model book =
     save { model | book = book }
 
 
-asFieldsIn : Model -> Fields -> ( Model, Cmd msg )
-asFieldsIn model fields =
+insertAsFieldsIn : Model -> Fields -> ( Model, Cmd msg )
+insertAsFieldsIn model fields =
     save { model | fields = fields }
 
 
@@ -62,7 +62,7 @@ clearFields model =
     model.fields
         |> setBookTitle ""
         |> setBookAuthor ""
-        |> asFieldsIn model
+        |> insertAsFieldsIn model
 
 
 setBookTitle : String -> Fields -> Fields
@@ -75,14 +75,14 @@ setBookAuthor author fields =
     { fields | bookAuthor = author }
 
 
-inBookListApi : Run Model BookList Msg a
+inBookListApi : Run Model (Api.Model BookList) Msg (Api.Msg BookList) a
 inBookListApi =
-    runStack .bookList setBookList BookListMsg
+    runStack .bookList insertAsBookListIn BookListMsg
 
 
-inBookApi : Run Model Book Msg a
+inBookApi : Run Model (Api.Model Book) Msg (Api.Msg Book) a
 inBookApi =
-    runStack .book setBook BookMsg
+    runStack .book insertAsBookIn BookMsg
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -161,12 +161,12 @@ update msg model =
         TitleInput title ->
             model.fields
                 |> setBookTitle title
-                |> asFieldsIn model
+                |> insertAsFieldsIn model
 
         AuthorInput author ->
             model.fields
                 |> setBookAuthor author
-                |> asFieldsIn model
+                |> insertAsFieldsIn model
 
 
 subscriptions : Model -> Sub Msg

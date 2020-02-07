@@ -1,8 +1,8 @@
 module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
-import Update.Pipeline exposing (andAddCmd, save, using)
-import Update.Pipeline.Extended exposing (Extended, Stack, andCall, mapM, runStack)
+import Update.Pipeline exposing (andAddCmd, andThen, mapCmd, save, using)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, lift2, runStack, umap)
 
 
 type Msg resource
@@ -109,7 +109,7 @@ sendRequest suffix maybeBody model =
             model
     in
     model
-        |> mapM (setResource Requested)
+        |> lift (setResource Requested)
         |> andAddCmd (request suffix maybeBody)
 
 
@@ -129,7 +129,7 @@ withResource fun =
         (\( { resource }, _ ) ->
             case resource of
                 Available item ->
-                    mapM (setResource (Available (fun item)))
+                    lift (setResource (Available (fun item)))
 
                 _ ->
                     save
@@ -138,44 +138,79 @@ withResource fun =
 
 update :
     Msg resource
-    -> { onSuccess : resource -> a, onError : Http.Error -> a }
+    ->
+        { onSuccess : resource -> a
+        , onError : Http.Error -> a
+        }
     -> Extended (Model resource) a
     -> ( Extended (Model resource) a, Cmd (Msg resource) )
 update msg { onSuccess, onError } model =
     case msg of
         Response (Ok resource) ->
             model
-                |> mapM (setResource (Available resource))
+                |> lift (setResource (Available resource))
                 |> andCall (onSuccess resource)
 
         Response (Err error) ->
             model
-                |> mapM (setResource (Error error))
+                |> lift (setResource (Error error))
                 |> andCall (onError error)
 
 
-type alias Run model resource msg c =
-    Stack model (Model resource) msg (Msg resource) c -> model -> ( model, Cmd msg )
-
-
-type alias Parent a resource =
+type alias HasApi resource a =
     { a | api : Model resource }
 
 
-run : (Msg resource -> msg) -> Run (Parent a resource) resource msg c
+insertAsApiIn :
+    HasApi resource a
+    -> Model resource
+    -> ( HasApi resource a, Cmd msg )
+insertAsApiIn model api =
+    save { model | api = api }
+
+
+run :
+    (Msg resource -> msg)
+    -> Run (HasApi resource a) (Model resource) msg (Msg resource) c
 run =
-    runStack .api (\model api -> save { model | api = api })
+    runStack .api insertAsApiIn
+
+
+runPlack :
+    (a -> b)
+    -> (a -> b -> ( c, Cmd msg2 ))
+    -> (msg1 -> msg2)
+    -> (Extended b d -> ( Extended b d, Cmd msg1 ))
+    -> Extended a d
+    -> ( Extended c d, Cmd msg2 )
+runPlack get set toMsg plack model =
+    model
+        |> umap get
+        |> plack
+        |> mapCmd toMsg
+        |> andThen (lift2 set model)
+
+
+type alias RunE m m1 msg msg1 a =
+    (Extended m1 a -> ( Extended m1 a, Cmd msg ))
+    -> Extended m a
+    -> ( Extended m a, Cmd msg1 )
+
+
+runE : (msg1 -> msg2) -> RunE (HasApi resource a) (Model resource) msg1 msg2 b
+runE =
+    runPlack .api insertAsApiIn
 
 
 runUpdate :
     (Msg resource -> msg)
     -> Msg resource
     ->
-        { onSuccess : resource -> Parent a resource -> ( Parent a resource, Cmd msg )
-        , onError : Http.Error -> Parent a resource -> ( Parent a resource, Cmd msg )
+        { onSuccess : resource -> HasApi resource a -> ( HasApi resource a, Cmd msg )
+        , onError : Http.Error -> HasApi resource a -> ( HasApi resource a, Cmd msg )
         }
-    -> Parent a resource
-    -> ( Parent a resource, Cmd msg )
+    -> HasApi resource a
+    -> ( HasApi resource a, Cmd msg )
 runUpdate toMsg msg handlers =
     update msg handlers
         |> run toMsg
