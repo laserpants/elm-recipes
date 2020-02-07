@@ -171,17 +171,9 @@ type alias HasCollection item a =
     { a | api : Collection item }
 
 
-insertCollectionAsApiIn :
-    HasCollection item a
-    -> Collection item
-    -> ( HasCollection item a, Cmd msg )
-insertCollectionAsApiIn model api =
-    save { model | api = api }
-
-
 run : (msg1 -> msg) -> Run (HasCollection item a) (Collection item) msg msg1 b
 run =
-    runStack .api insertCollectionAsApiIn
+    runStack .api (\model api -> save { model | api = api })
 
 
 runUpdate :
