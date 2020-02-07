@@ -2,7 +2,7 @@ module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
 import Update.Pipeline exposing (andAddCmd, andThen, mapCmd, save, using)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, lift2, runStack, umap)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, lift2, mapE, runStack)
 
 
 type Msg resource
@@ -185,7 +185,7 @@ runPlack :
     -> ( Extended c d, Cmd msg2 )
 runPlack get set toMsg plack model =
     model
-        |> umap get
+        |> mapE get
         |> plack
         |> mapCmd toMsg
         |> andThen (lift2 set model)

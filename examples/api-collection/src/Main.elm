@@ -19,6 +19,8 @@ type alias Flags =
 
 type Msg
     = BookCollectionMsg (Api.Msg Book)
+    | GotoPrev
+    | GotoNext
 
 
 type alias Model =
@@ -60,6 +62,14 @@ update msg model =
             model
                 |> inApi (Api.update apiMsg)
 
+        GotoPrev ->
+            model
+                |> inApi Api.prevPage
+
+        GotoNext ->
+            model
+                |> inApi Api.nextPage
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
@@ -68,6 +78,28 @@ subscriptions _ =
 
 view : Model -> Document Msg
 view { api } =
+    let
+        { pages, current } =
+            api
+
+        prevButton =
+            if current > 1 then
+                [ a [ href "#", onClick GotoPrev ] [ text "Previous page" ]
+                , text " | "
+                ]
+
+            else
+                []
+
+        nextButton =
+            if current < pages then
+                [ text " | "
+                , a [ href "#", onClick GotoNext ] [ text "Next page" ]
+                ]
+
+            else
+                []
+    in
     { title = ""
     , body =
         [ case api.api.resource of
@@ -86,9 +118,17 @@ view { api } =
                             , td [] [ text author ]
                             ]
                 in
-                div
-                    []
-                    [ table [] (List.map row books.page)
+                div []
+                    [ div
+                        []
+                        [ table [] (List.map row books.page)
+                        ]
+                    , div
+                        []
+                        (prevButton
+                            ++ [ text ("Page " ++ String.fromInt current ++ " (" ++ String.fromInt pages ++ ")") ]
+                            ++ nextButton
+                        )
                     ]
 
             Requested ->

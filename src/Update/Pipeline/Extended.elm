@@ -18,18 +18,18 @@ shuffle ( ( model, cmd ), calls ) =
     ( ( model, calls ), cmd )
 
 
-umap : (a -> b) -> Extended a c -> Extended b c
-umap f ( x, calls ) =
+mapE : (a -> b) -> Extended a c -> Extended b c
+mapE f ( x, calls ) =
     ( f x, calls )
 
 
-umap2 : (a -> b -> c) -> Extended a d -> Extended b d -> Extended c d
-umap2 f ( x, calls1 ) ( y, calls2 ) =
+mapE2 : (a -> b -> c) -> Extended a d -> Extended b d -> Extended c d
+mapE2 f ( x, calls1 ) ( y, calls2 ) =
     ( f x y, calls1 ++ calls2 )
 
 
-umap3 : (a -> b -> c -> d) -> Extended a e -> Extended b e -> Extended c e -> Extended d e
-umap3 f ( x, calls1 ) ( y, calls2 ) ( z, calls3 ) =
+mapE3 : (a -> b -> c -> d) -> Extended a e -> Extended b e -> Extended c e -> Extended d e
+mapE3 f ( x, calls1 ) ( y, calls2 ) ( z, calls3 ) =
     ( f x y z, calls1 ++ calls2 ++ calls3 )
 
 
@@ -38,7 +38,7 @@ lift :
     -> Extended a c
     -> ( Extended b c, Cmd msg )
 lift fun a =
-    shuffle (umap fun a)
+    shuffle (mapE fun a)
 
 
 lift2 :
@@ -47,7 +47,7 @@ lift2 :
     -> Extended b d
     -> ( Extended c d, Cmd msg )
 lift2 fun a b =
-    shuffle (umap2 fun a b)
+    shuffle (mapE2 fun a b)
 
 
 lift3 :
@@ -57,7 +57,7 @@ lift3 :
     -> Extended c e
     -> ( Extended d e, Cmd msg )
 lift3 fun a b c =
-    shuffle (umap3 fun a b c)
+    shuffle (mapE3 fun a b c)
 
 
 andLift :
@@ -94,33 +94,32 @@ type alias Run m m1 msg msg1 a =
     -> ( m, Cmd msg )
 
 
-
---baz what get set toMsg stack model =
---    ( get model, [] )
---        |> stack
---        |> mapCmd toMsg
---        |> andLift (set model)
---        |> andThen (sequenceCalls << what)
-
-
-runStack_ :
-    (d -> m1)
-    -> (d -> a -> ( b, Cmd msg ))
-    -> (msg1 -> msg)
-    -> (( m1, List f ) -> ( Extended a (Extended b c -> ( Extended b c, Cmd msg )), Cmd msg1 ))
-    -> Extended d c
-    -> ( Extended b c, Cmd msg )
-runStack_ get set toMsg stack ( model, calls ) =
+run :
+    (Extended b c -> Extended a (a -> ( a, Cmd msg1 )))
+    -> (d -> e)
+    -> (d -> a1 -> ( b, Cmd msg1 ))
+    -> (msg -> msg1)
+    -> (Extended e f -> ( Extended a1 c, Cmd msg ))
+    -> d
+    -> ( a, Cmd msg1 )
+run fun get set toMsg stack model =
     ( get model, [] )
         |> stack
         |> mapCmd toMsg
         |> andLift (set model)
-        |> andThen (sequenceCalls << Tuple.mapFirst extend)
+        |> andThen (fun >> sequenceCalls)
 
 
-
---    baz (Tuple.mapFirst extend) get set toMsg stack model
---        |> andThen (addCalls calls)
+runStackE :
+    (d -> m1)
+    -> (d -> a -> ( b, Cmd msg ))
+    -> (msg1 -> msg)
+    -> (Extended m1 f -> ( Extended a (Extended b c -> ( Extended b c, Cmd msg )), Cmd msg1 ))
+    -> Extended d c
+    -> ( Extended b c, Cmd msg )
+runStackE g s m stack ( model, calls ) =
+    run (Tuple.mapFirst extend) g s m stack model
+        |> andThen (addCalls calls)
 
 
 runStack :
@@ -130,9 +129,5 @@ runStack :
     -> (Extended m1 c -> ( Extended m1 (m -> ( m, Cmd msg )), Cmd msg1 ))
     -> a
     -> ( m, Cmd msg )
-runStack get set toMsg stack model =
-    ( get model, [] )
-        |> stack
-        |> mapCmd toMsg
-        |> andLift (set model)
-        |> andThen sequenceCalls
+runStack =
+    run identity

@@ -3,7 +3,7 @@ module Recipes.Api.Collection exposing (..)
 import Http exposing (Expect)
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, runE)
 import Update.Pipeline exposing (andMap, andThen, join, map, mapCmd, save, sequence, using, with)
-import Update.Pipeline.Extended exposing (Extended, Run, andLift, lift, lift2, runStack_, shuffle, umap, umap2)
+import Update.Pipeline.Extended exposing (Extended, Run, andLift, lift, lift2, runStackE)
 import Url.Builder as Builder
 
 
@@ -29,7 +29,10 @@ type alias Collection item =
     }
 
 
-insertAsApiIn : Collection item -> Api.Model (Envelope item) -> ( Collection item, Cmd (Msg item) )
+insertAsApiIn :
+    Collection item
+    -> Api.Model (Envelope item)
+    -> ( Collection item, Cmd (Msg item) )
 insertAsApiIn model api =
     save { model | api = api }
 
@@ -67,9 +70,9 @@ defaultQueryFormat offset limit =
         ]
 
 
-inApi : Run (Extended (Collection item) a) (Api.Model (Envelope item)) (Msg item) (Api.Msg (Envelope item)) b
+inApi : Run (Extended (Collection item) e) (Api.Model (Envelope item)) (Msg item) (Api.Msg (Envelope item)) a
 inApi =
-    runStack_ .api insertAsApiIn ApiMsg
+    runStackE .api insertAsApiIn ApiMsg
 
 
 init : RequestConfig item -> ( Collection item, Cmd (Msg item) )
@@ -107,9 +110,9 @@ goToPage :
     Int
     -> Extended (Collection item) a
     -> ( Extended (Collection item) a, Cmd (Msg item) )
-goToPage page model =
+goToPage page (( { pages }, _ ) as model) =
     model
-        |> lift (setCurrent page)
+        |> lift (setCurrent (clamp 1 pages page))
         |> andThen fetchPage
 
 
@@ -152,7 +155,7 @@ update :
 update msg =
     case msg of
         ApiMsg apiMsg ->
-            runStack_ .api insertAsApiIn ApiMsg (Api.update apiMsg { apiDefaultHandlers | onSuccess = updateCurrentPage })
+            inApi (Api.update apiMsg { apiDefaultHandlers | onSuccess = updateCurrentPage })
 
         NextPage ->
             nextPage
