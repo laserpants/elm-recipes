@@ -21,12 +21,17 @@ type alias BookList =
     List Book
 
 
+type Field
+    = Title
+    | Author
+
+
 type Msg
     = BookListMsg (Api.Msg BookList)
     | BookMsg (Api.Msg Book)
     | AddBook
-    | TitleInput String
-    | AuthorInput String
+    | RefreshList
+    | Input Field String
 
 
 type alias Fields =
@@ -158,12 +163,16 @@ update msg model =
             model
                 |> inBookApi (Api.sendRequest "" (Just json))
 
-        TitleInput title ->
+        RefreshList ->
+            model
+                |> inBookListApi (Api.sendEmptyRequest)
+
+        Input Title title ->
             model.fields
                 |> setBookTitle title
                 |> insertAsFieldsIn model
 
-        AuthorInput author ->
+        Input Author author ->
             model.fields
                 |> setBookAuthor author
                 |> insertAsFieldsIn model
@@ -230,7 +239,7 @@ newBookForm { resource } { bookTitle, bookAuthor } =
                     [ input
                         [ placeholder "Book title"
                         , value bookTitle
-                        , onInput TitleInput
+                        , onInput (Input Title)
                         ]
                         []
                     ]
@@ -243,7 +252,7 @@ newBookForm { resource } { bookTitle, bookAuthor } =
                     [ input
                         [ placeholder "Author"
                         , value bookAuthor
-                        , onInput AuthorInput
+                        , onInput (Input Author)
                         ]
                         []
                     ]
@@ -263,6 +272,7 @@ view { bookList, book, fields } =
     { title = "Api recipe example"
     , body =
         [ div [] [ bookListView bookList ]
+        , div [] [ button [ onClick RefreshList ] [ text "Refresh" ] ]
         , div [] [ hr [] [] ]
         , div [] [ newBookForm book fields ]
         ]
