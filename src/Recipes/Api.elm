@@ -2,7 +2,7 @@ module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
 import Update.Pipeline exposing (andAddCmd, andThen, mapCmd, save, using)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, lift2, mapE, runStack)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack)
 
 
 type Msg resource
@@ -174,32 +174,6 @@ run :
     -> Run (HasApi resource a) (Model resource) msg (Msg resource) c
 run =
     runStack .api insertAsApiIn
-
-
-runPlack :
-    (a -> b)
-    -> (a -> b -> ( c, Cmd msg2 ))
-    -> (msg1 -> msg2)
-    -> (Extended b d -> ( Extended b d, Cmd msg1 ))
-    -> Extended a d
-    -> ( Extended c d, Cmd msg2 )
-runPlack get set toMsg plack model =
-    model
-        |> mapE get
-        |> plack
-        |> mapCmd toMsg
-        |> andThen (lift2 set model)
-
-
-type alias RunE m m1 msg msg1 a =
-    (Extended m1 a -> ( Extended m1 a, Cmd msg ))
-    -> Extended m a
-    -> ( Extended m a, Cmd msg1 )
-
-
-runE : (msg1 -> msg2) -> RunE (HasApi resource a) (Model resource) msg1 msg2 b
-runE =
-    runPlack .api insertAsApiIn
 
 
 runUpdate :

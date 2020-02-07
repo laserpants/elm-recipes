@@ -1,7 +1,7 @@
 module Recipes.Api.Collection exposing (..)
 
 import Http exposing (Expect)
-import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, runE)
+import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers)
 import Update.Pipeline exposing (andMap, andThen, join, map, mapCmd, save, sequence, using, with)
 import Update.Pipeline.Extended exposing (Extended, Run, andLift, lift, lift2, runStackE)
 import Url.Builder as Builder
