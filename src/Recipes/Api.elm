@@ -112,11 +112,7 @@ sendRequest :
     -> Maybe Http.Body
     -> Extended (Model resource) a
     -> ( Extended (Model resource) a, Cmd (Msg resource) )
-sendRequest suffix maybeBody model =
-    let
-        ( { request }, _ ) =
-            model
-    in
+sendRequest suffix maybeBody (( { request }, _ ) as model) =
     model
         |> lift (setResource Requested)
         |> andAddCmd (request suffix maybeBody)
