@@ -1,8 +1,8 @@
 module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
-import Update.Pipeline exposing (andAddCmd, save, using)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack)
+import Update.Pipeline exposing (andAddCmd, andThen, save, using)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, extend, lift, runStack, sequenceCalls)
 
 
 type Msg resource
@@ -81,6 +81,15 @@ init { endpoint, method, expect, headers } =
                 }
     in
     save { resource = NotRequested, request = request }
+
+
+initAndRequest :
+    RequestConfig resource
+    -> ( Model resource, Cmd (Msg resource) )
+initAndRequest req =
+    init req
+        |> andThen (sendEmptyRequest << extend)
+        |> andThen sequenceCalls
 
 
 toHeader : ( String, String ) -> Http.Header

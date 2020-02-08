@@ -37,7 +37,6 @@ init =
     Api.init << requestConfig
 
 
-
---initAndRequest : JsonRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
---initAndRequest =
---    Api.initAndRequest << requestConfig
+initAndRequest : JsonRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
+initAndRequest =
+    Api.initAndRequest << requestConfig

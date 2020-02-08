@@ -8,8 +8,8 @@ import Html.Events exposing (..)
 import Json.Decode as Json
 import Recipes.Api as Api exposing (..)
 import Recipes.Api.Json as JsonApi exposing (..)
-import Recipes.Api.Json as JsonApi exposing (..)
 import Update.Pipeline exposing (..)
+import Update.Pipeline.Extended exposing (..)
 
 
 type alias Flags =
@@ -27,29 +27,25 @@ type Msg
 
 
 type Model
-    = Blank
+    = Initial
     | BookList (Api.Model BookList)
     | BookInfo Book
 
 
+type alias RunSwitch m m1 msg msg1 a =
+    Stack m1 m1 msg msg1 a -> m1 -> ( m, Cmd msg )
 
-inBookList =
-    Debug.todo ""
 
---inBookList
---    : Bundle (Api.Model BookList) (Api.Model BookList) Msg (Api.Msg BookList)
---    -> Api.Model BookList
---    -> ( Model, Cmd Msg )
---inBookList bundle model =
---    bundle ( model, [] )
---        |> mapCmd BooksApiMsg
---        |> sequenceCalls
---        |> map BookList
+inBookList : RunSwitch Model (Api.Model BookList) Msg (Api.Msg BookList) a
+inBookList stack model =
+    model
+        |> runStack identity (always save) BooksApiMsg stack
+        |> map BookList
 
 
 init : Flags -> ( Model, Cmd Msg )
 init () =
-    save Blank
+    save Initial
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -64,10 +60,9 @@ update msg model =
                     , headers = []
                     }
             in
-            Debug.todo ""
---            JsonApi.initAndRequest request
---                |> mapCmd BooksApiMsg
---                |> map BookList
+            JsonApi.initAndRequest request
+                |> mapCmd BooksApiMsg
+                |> map BookList
 
         ( ShowBook book, _ ) ->
             save (BookInfo book)
@@ -90,7 +85,7 @@ view model =
     { title = ""
     , body =
         [ case model of
-            Blank ->
+            Initial ->
                 button
                     [ onClick FetchBooks ]
                     [ text "Fetch books" ]

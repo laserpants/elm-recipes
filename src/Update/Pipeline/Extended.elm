@@ -82,15 +82,17 @@ andCall =
     andThen << call
 
 
-sequenceCalls : ( a, List (a -> ( a, Cmd msg )) ) -> ( a, Cmd msg )
+sequenceCalls : Extended a (a -> ( a, Cmd msg )) -> ( a, Cmd msg )
 sequenceCalls ( model, calls ) =
     sequence calls model
 
 
+type alias Stack m m1 msg msg1 a =
+    Extended m1 a -> ( Extended m1 (m -> ( m, Cmd msg )), Cmd msg1 )
+
+
 type alias Run m m1 msg msg1 a =
-    (Extended m1 a -> ( Extended m1 (m -> ( m, Cmd msg )), Cmd msg1 ))
-    -> m
-    -> ( m, Cmd msg )
+    Stack m m1 msg msg1 a -> m -> ( m, Cmd msg )
 
 
 run :
@@ -117,7 +119,8 @@ runStackE :
     -> Extended d c
     -> ( Extended b c, Cmd msg )
 runStackE g s m stack ( model, calls ) =
-    run (Tuple.mapFirst extend) g s m stack model
+    model
+        |> run (Tuple.mapFirst extend) g s m stack
         |> andThen (addCalls calls)
 
 
@@ -125,7 +128,7 @@ runStack :
     (a -> m1)
     -> (a -> m1 -> ( m, Cmd msg ))
     -> (msg1 -> msg)
-    -> (Extended m1 c -> ( Extended m1 (m -> ( m, Cmd msg )), Cmd msg1 ))
+    -> Stack m m1 msg msg1 b
     -> a
     -> ( m, Cmd msg )
 runStack =

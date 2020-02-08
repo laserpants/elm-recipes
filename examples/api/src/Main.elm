@@ -165,7 +165,7 @@ update msg model =
 
         RefreshList ->
             model
-                |> inBookListApi (Api.sendEmptyRequest)
+                |> inBookListApi Api.sendEmptyRequest
 
         Input Title title ->
             model.fields
