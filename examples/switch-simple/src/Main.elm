@@ -38,6 +38,10 @@ type alias Model =
     }
 
 
+type alias PageInfo =
+    Switch.From2 Page About.Model About.Msg Login.Model Login.Msg
+
+
 pages : Switch.From2 Page About.Model About.Msg Login.Model Login.Msg
 pages =
     let
@@ -70,6 +74,7 @@ switchView =
     Html.map SwitchMsg << Switch.view pages
 
 
+inSwitch : Switch.RunSwitch PageInfo Model (OneOf2 About.Model Login.Model) Msg (OneOf2 About.Msg Login.Msg)
 inSwitch =
     Switch.run SwitchMsg pages
 

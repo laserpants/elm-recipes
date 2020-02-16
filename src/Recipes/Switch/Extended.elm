@@ -77,7 +77,7 @@ from opt info =
     }
 
 
-type alias From2 page handlers a m1 msg1 m2 msg2 =
+type alias From2 page handlers m1 msg1 m2 msg2 a =
     { a1 : Info_
                 (Maybe page)
                 (m1 -> ( m1, Cmd msg1 ))
@@ -307,13 +307,16 @@ insertAsSwitchIn model switch =
     save { model | switch = switch }
 
 
+type alias RunSwitch info m m1 msg msg1 = 
+    (info -> m1 -> ( Extended m1 (m -> ( m, Cmd msg )), Cmd msg1 ))
+    -> m
+    -> ( m, Cmd msg )
+
+
 run : 
     (msg1 -> msg2)
       -> d
-      -> (
-      d
-      -> Switch a1 a2 a3 a4
-      -> ( Extended (Switch a1 a2 a3 a4) (HasSwitch a1 a2 a3 a4 a -> ( HasSwitch a1 a2 a3 a4 a, Cmd msg2 )), Cmd msg1) )
+      -> (d -> Switch a1 a2 a3 a4 -> ( Extended (Switch a1 a2 a3 a4) (HasSwitch a1 a2 a3 a4 a -> ( HasSwitch a1 a2 a3 a4 a, Cmd msg2 )), Cmd msg1) )
       -> { a | switch : Switch a1 a2 a3 a4 }
       -> ( HasSwitch a1 a2 a3 a4 a, Cmd msg2 )
 run =

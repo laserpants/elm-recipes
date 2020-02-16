@@ -247,6 +247,12 @@ insertAsSwitchIn model switch =
     save { model | switch = switch }
 
 
+type alias RunSwitch info m m1 msg msg1 = 
+    (info -> m1 -> ( m1, Cmd msg1 ))
+    -> m
+    -> ( m, Cmd msg )
+
+
 run
     : (msg1 -> msg2)
       -> c
