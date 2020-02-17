@@ -9,8 +9,7 @@ import Html.Events exposing (..)
 import Maybe.Extra as Maybe
 import Page.About as About
 import Page.Login as Login
-import Recipes.Switch as Switch
-import Recipes.Switch.Extended as Switch exposing (OneOf2)
+import Recipes.Switch.Extended as Switch exposing (RunSwitch, OneOf2_)
 import Update.Pipeline exposing (andMap, andThen, map, map2, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, extend, lift)
 import Url exposing (Url)
@@ -29,17 +28,17 @@ type Page
 
 
 type Msg
-    = SwitchMsg (OneOf2 About.Msg Login.Msg)
+    = SwitchMsg (OneOf2_ About.Msg Login.Msg)
     | Goto Page
 
 
 type alias Model =
-    { switch : OneOf2 About.Model Login.Model
+    { switch : OneOf2_ About.Model Login.Model
     }
 
 
 type alias PageInfo a =
-    Switch.From2 Page { onSomething : Int -> a } About.Model About.Msg Login.Model Login.Msg a
+    Switch.Between2 Page { onSomething : Int -> a } About.Model About.Msg Login.Model Login.Msg a
 
 
 pages : PageInfo a
@@ -59,22 +58,22 @@ pages =
             , view = Login.view
             }
     in
-    Switch.from2
+    Switch.between2
         ( AboutPage, aboutPage )
         ( LoginPage, loginPage )
 
 
-switchSubscriptions : OneOf2 About.Model Login.Model -> Sub Msg
+switchSubscriptions : OneOf2_ About.Model Login.Model -> Sub Msg
 switchSubscriptions =
-    Sub.map SwitchMsg << Switch.subscriptions pages
+    Sub.map SwitchMsg << Switch.subscriptions_ pages
 
 
-switchView : OneOf2 About.Model Login.Model -> Html Msg
+switchView : OneOf2_ About.Model Login.Model -> Html Msg
 switchView =
-    Html.map SwitchMsg << Switch.view pages
+    Html.map SwitchMsg << Switch.view_ pages
 
 
-inSwitch : Switch.RunSwitch (PageInfo a) Model (OneOf2 About.Model Login.Model) Msg (OneOf2 About.Msg Login.Msg)
+inSwitch : RunSwitch (PageInfo a) Model (OneOf2_ About.Model Login.Model) Msg (OneOf2_ About.Msg Login.Msg)
 inSwitch =
     Switch.run SwitchMsg pages 
 
@@ -84,7 +83,7 @@ init () =
     let
         switch =
             pages
-                |> Switch.toto AboutPage {}
+                |> Switch.init AboutPage {}
     in
     save Model
         |> andMap (mapCmd SwitchMsg switch)
@@ -101,7 +100,7 @@ update msg model =
         SwitchMsg switchMsg ->
             model
                 |> inSwitch
-                    (Switch.update switchMsg
+                    (Switch.update_ switchMsg
                         { onSomething = handleSomething }
                     )
 
