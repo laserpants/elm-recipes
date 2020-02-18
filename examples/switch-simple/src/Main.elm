@@ -9,10 +9,8 @@ import Html.Events exposing (..)
 import Maybe.Extra as Maybe
 import Page.About as About
 import Page.Login as Login
-import Recipes.Switch.Standard as Switch exposing (..)
---import Recipes.Switch.Extended as Switch_
+import Recipes.Switch as Switch exposing (OneOf2, RunSwitch)
 import Update.Pipeline exposing (andMap, andThen, map, map2, mapCmd, save)
-import Update.Pipeline.Extended exposing (Extended, Run, extend, lift)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, parse)
 
@@ -39,10 +37,10 @@ type alias Model =
 
 
 type alias PageInfo =
-    Switch.From2 Page About.Model About.Msg Login.Model Login.Msg
+    Switch.Layout2 Page About.Model About.Msg Login.Model Login.Msg
 
 
-pages : Switch.From2 Page About.Model About.Msg Login.Model Login.Msg
+pages : PageInfo
 pages =
     let
         aboutPage =
@@ -59,7 +57,7 @@ pages =
             , view = Login.view
             }
     in
-    from2
+    Switch.layout2
         ( AboutPage, aboutPage )
         ( LoginPage, loginPage )
 
@@ -74,7 +72,7 @@ switchView =
     Html.map SwitchMsg << Switch.view pages
 
 
-inSwitch : Switch.RunSwitch PageInfo Model (OneOf2 About.Model Login.Model) Msg (OneOf2 About.Msg Login.Msg)
+inSwitch : RunSwitch PageInfo Model (OneOf2 About.Model Login.Model) Msg (OneOf2 About.Msg Login.Msg)
 inSwitch =
     Switch.run SwitchMsg pages
 

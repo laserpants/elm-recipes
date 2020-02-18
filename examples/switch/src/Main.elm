@@ -9,7 +9,7 @@ import Html.Events exposing (..)
 import Maybe.Extra as Maybe
 import Page.About as About
 import Page.Login as Login
-import Recipes.Switch.Extended as Switch exposing (RunSwitch, OneOf2_)
+import Recipes.Switch.Extended as Switch exposing (OneOf2, RunSwitch)
 import Update.Pipeline exposing (andMap, andThen, map, map2, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, extend, lift)
 import Url exposing (Url)
@@ -28,17 +28,17 @@ type Page
 
 
 type Msg
-    = SwitchMsg (OneOf2_ About.Msg Login.Msg)
+    = SwitchMsg (OneOf2 About.Msg Login.Msg)
     | Goto Page
 
 
 type alias Model =
-    { switch : OneOf2_ About.Model Login.Model
+    { switch : OneOf2 About.Model Login.Model
     }
 
 
 type alias PageInfo a =
-    Switch.Between2 Page { onSomething : Int -> a } About.Model About.Msg Login.Model Login.Msg a
+    Switch.Layout2 Page { onSomething : Int -> a } About.Model About.Msg Login.Model Login.Msg a
 
 
 pages : PageInfo a
@@ -58,24 +58,24 @@ pages =
             , view = Login.view
             }
     in
-    Switch.between2
+    Switch.layout2
         ( AboutPage, aboutPage )
         ( LoginPage, loginPage )
 
 
-switchSubscriptions : OneOf2_ About.Model Login.Model -> Sub Msg
+switchSubscriptions : OneOf2 About.Model Login.Model -> Sub Msg
 switchSubscriptions =
-    Sub.map SwitchMsg << Switch.subscriptions_ pages
+    Sub.map SwitchMsg << Switch.subscriptions pages
 
 
-switchView : OneOf2_ About.Model Login.Model -> Html Msg
+switchView : OneOf2 About.Model Login.Model -> Html Msg
 switchView =
-    Html.map SwitchMsg << Switch.view_ pages
+    Html.map SwitchMsg << Switch.view pages
 
 
-inSwitch : RunSwitch (PageInfo a) Model (OneOf2_ About.Model Login.Model) Msg (OneOf2_ About.Msg Login.Msg)
+inSwitch : RunSwitch (PageInfo a) Model (OneOf2 About.Model Login.Model) Msg (OneOf2 About.Msg Login.Msg)
 inSwitch =
-    Switch.run SwitchMsg pages 
+    Switch.run SwitchMsg pages
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -100,7 +100,7 @@ update msg model =
         SwitchMsg switchMsg ->
             model
                 |> inSwitch
-                    (Switch.update_ switchMsg
+                    (Switch.update switchMsg
                         { onSomething = handleSomething }
                     )
 
