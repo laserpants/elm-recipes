@@ -7,8 +7,9 @@ import Page.Login
 import Page.NewPost
 import Page.Register
 import Page.ShowPost
-import Recipes.Switch.Extended as Switch exposing (OneOf6, Layout6, runStack)
+import Recipes.Switch.Extended as Switch exposing (OneOf6, Layout6, RunSwitch, runStack)
 import Update.Pipeline exposing (save)
+import Update.Pipeline.Extended exposing (Extended)
 
 
 type Page
@@ -29,17 +30,22 @@ type alias Model =
     OneOf6 Page.Home.Model Page.NewPost.Model Page.ShowPost.Model Page.Login.Model Page.Register.Model Page.About.Model
 
 
---insertAsPageIn : { a | page : Page } -> Page -> ( { a | page : Page }, Cmd msg )
+type alias HasPageModel b =
+    { b | page : Model }
+
+
+insertAsPageIn : HasPageModel b -> Model -> ( HasPageModel b, Cmd msg )
 insertAsPageIn model page =
     save { model | page = page }
 
 
-run =
-    runStack .page insertAsPageIn
-
-
 type alias Info a =
     Layout6 Page {} Page.Home.Model Page.Home.Msg Page.NewPost.Model Page.NewPost.Msg Page.ShowPost.Model Page.ShowPost.Msg Page.Login.Model Page.Login.Msg Page.Register.Model Page.Register.Msg Page.About.Model Page.About.Msg a
+
+
+run : (msg2 -> msg1) -> Info a -> RunSwitch (Info a) (HasPageModel b) Model msg1 msg2
+run =
+    runStack .page insertAsPageIn
 
 
 pages : Info a
@@ -96,9 +102,10 @@ pages =
         ( AboutPage, aboutPage )
 
 
+
+init : Page -> ( Model, Cmd Msg )
 init page =
-    pages
-        |> Switch.init page {}
+    Switch.init page {} pages
 
 
 subscriptions : Model -> Sub Msg

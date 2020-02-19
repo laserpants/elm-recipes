@@ -5,17 +5,25 @@ import Browser.Navigation as Navigation
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Maybe.Extra as Maybe
 import Page as Page exposing (Page(..), pages)
 import Recipes.Router as Router exposing (Router)
 import Recipes.Switch.Extended as Switch exposing (RunSwitch)
 import Route as Route exposing (Route(..))
-import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
+import Update.Pipeline exposing (andMap, andThen, mapCmd, save, using, when)
+import Update.Pipeline.Extended exposing (Run)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
 
 
+type alias Session =
+    { user : { email : String } }
+
+
 type alias Flags =
-    ()
+    { session : String
+    , basePath : String
+    }
 
 
 type Msg
@@ -26,7 +34,28 @@ type Msg
 type alias Model =
     { router : Router Route
     , page : Page.Model
+    , session : Maybe Session
+    , restrictedUrl : Maybe String
     }
+
+
+setRestrictedUrl : Url -> Model -> ( Model, Cmd msg )
+setRestrictedUrl { path } model =
+    let
+        url =
+            String.dropLeft (String.length model.router.basePath) path
+    in
+    save { model | restrictedUrl = Just url }
+
+
+resetRestrictedUrl : Model -> ( Model, Cmd msg )
+resetRestrictedUrl model =
+    save { model | restrictedUrl = Nothing }
+
+
+inRouter : Run Model (Router Route) Msg Router.Msg a
+inRouter =
+    Router.run RouterMsg
 
 
 inPage : RunSwitch (Page.Info a) Model Page.Model Msg Page.Msg
@@ -34,11 +63,21 @@ inPage =
     Page.run PageMsg pages
 
 
+redirect : String -> Model -> ( Model, Cmd Msg )
+redirect =
+    inRouter << Router.redirect
+
+
+loadPage : Page -> Model -> ( Model, Cmd Msg )
+loadPage page =
+    inPage (always << Switch.to page {})
+
+
 init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
-init () url key =
+init { session, basePath } url key =
     let
         router =
-            Router.init (parse Route.parser) "" key
+            Router.init (parse Route.parser) basePath key
 
         page = 
             Page.init HomePage 
@@ -46,38 +85,72 @@ init () url key =
     save Model
         |> andMap (mapCmd RouterMsg router)
         |> andMap (mapCmd PageMsg page)
+        |> andMap (save Nothing)
+        |> andMap (save Nothing)
         |> andThen (update (Router.onUrlChange RouterMsg url))
 
 
 handleRouteChange : Url -> Maybe Route -> Model -> ( Model, Cmd Msg )
-handleRouteChange _ maybeRoute model =
-    case maybeRoute of
-        Nothing ->
-            save model 
+handleRouteChange url maybeRoute =
+    let
+        whenAuthenticated doLoadPage =
+            using
+                (\{ session } ->
+                    if Nothing == session then
+                        -- Set URL to redirect back to after successful login
+                        setRestrictedUrl url
+                            >> andThen (redirect "/login")
+                            -->> andThen
+                            --    (showToast
+                            --        { message = "You must be logged in to access that page."
+                            --        , color = Warning
+                            --        }
+                            --    )
 
-        Just Home ->
-            model
-                |> inPage (always << Switch.to HomePage {})
+                    else
+                        doLoadPage
+                )
 
-        Just NewPost ->
-            model
-                |> inPage (always << Switch.to NewPostPage {})
+        unlessAuthenticated doLoadPage =
+            using
+                (\{ session } ->
+                    if Maybe.isJust session then
+                        redirect "/"
 
-        Just (ShowPost postId) ->
-            model
-                |> inPage (always << Switch.to ShowPostPage {})
+                    else
+                        doLoadPage
+                )
 
-        Just Login ->
-            model
-                |> inPage (always << Switch.to LoginPage {})
+        changePage =
+            case maybeRoute of
+                Nothing ->
+                    save 
 
-        Just Register ->
-            model
-                |> inPage (always << Switch.to RegisterPage {})
+                Just About ->
+                    loadPage AboutPage
 
-        Just About ->
-            model
-                |> inPage (always << Switch.to AboutPage {})
+                Just Home ->
+                    loadPage HomePage
+
+                Just (ShowPost postId) ->
+                    loadPage ShowPostPage
+
+                Just NewPost ->
+                     whenAuthenticated (loadPage NewPostPage)
+
+                Just Login ->
+                    unlessAuthenticated (loadPage LoginPage)
+
+                Just Register ->
+                    unlessAuthenticated (loadPage RegisterPage)
+    in
+    using
+        (\{ router } ->
+            when (Just Login /= router.route)
+                resetRestrictedUrl
+        )
+        >> andThen changePage
+        -->> andThen (inUi Ui.closeMenu)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
