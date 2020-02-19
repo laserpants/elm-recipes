@@ -6,8 +6,8 @@ import Html.Events exposing (..)
 import Update.Pipeline exposing (save)
 
 
-type Msg =
-    NoMsg
+type Msg
+    = NoMsg
 
 
 type alias Model =
@@ -15,7 +15,7 @@ type alias Model =
 
 
 init : {} -> ( Model, Cmd Msg )
-init _ = 
+init _ =
     save Model
 
 

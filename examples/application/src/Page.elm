@@ -7,7 +7,7 @@ import Page.Login
 import Page.NewPost
 import Page.Register
 import Page.ShowPost
-import Recipes.Switch.Extended as Switch exposing (OneOf6, Layout6, RunSwitch, runStack)
+import Recipes.Switch.Extended as Switch exposing (Layout6, OneOf6, RunSwitch, runStack)
 import Update.Pipeline exposing (save)
 import Update.Pipeline.Extended exposing (Extended)
 
@@ -43,12 +43,18 @@ type alias Info a =
     Layout6 Page {} Page.Home.Model Page.Home.Msg Page.NewPost.Model Page.NewPost.Msg Page.ShowPost.Model Page.ShowPost.Msg Page.Login.Model Page.Login.Msg Page.Register.Model Page.Register.Msg Page.About.Model Page.About.Msg a
 
 
-run : (msg2 -> msg1) -> Info a -> RunSwitch (Info a) (HasPageModel b) Model msg1 msg2
+
+--run : (msg2 -> msg1) -> Info a -> RunSwitch (Info a) (HasPageModel b) Model msg1 msg2
+
+
 run =
     runStack .page insertAsPageIn
 
 
-pages : Info a
+
+--pages : Info a
+
+
 pages =
     let
         homePage =
@@ -100,7 +106,6 @@ pages =
         ( LoginPage, loginPage )
         ( RegisterPage, registerPage )
         ( AboutPage, aboutPage )
-
 
 
 init : Page -> ( Model, Cmd Msg )

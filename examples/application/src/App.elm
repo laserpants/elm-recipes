@@ -58,7 +58,10 @@ inRouter =
     Router.run RouterMsg
 
 
-inPage : RunSwitch (Page.Info a) Model Page.Model Msg Page.Msg
+
+--inPage : RunSwitch (Page.Info a) Model Page.Model Msg Page.Msg
+
+
 inPage =
     Page.run PageMsg pages
 
@@ -68,7 +71,10 @@ redirect =
     inRouter << Router.redirect
 
 
-loadPage : Page -> Model -> ( Model, Cmd Msg )
+
+--loadPage : Page -> Model -> ( Model, Cmd Msg )
+
+
 loadPage page =
     inPage (always << Switch.to page {})
 
@@ -79,8 +85,8 @@ init { session, basePath } url key =
         router =
             Router.init (parse Route.parser) basePath key
 
-        page = 
-            Page.init HomePage 
+        page =
+            Page.init HomePage
     in
     save Model
         |> andMap (mapCmd RouterMsg router)
@@ -100,12 +106,12 @@ handleRouteChange url maybeRoute =
                         -- Set URL to redirect back to after successful login
                         setRestrictedUrl url
                             >> andThen (redirect "/login")
-                            -->> andThen
-                            --    (showToast
-                            --        { message = "You must be logged in to access that page."
-                            --        , color = Warning
-                            --        }
-                            --    )
+                        -->> andThen
+                        --    (showToast
+                        --        { message = "You must be logged in to access that page."
+                        --        , color = Warning
+                        --        }
+                        --    )
 
                     else
                         doLoadPage
@@ -124,7 +130,7 @@ handleRouteChange url maybeRoute =
         changePage =
             case maybeRoute of
                 Nothing ->
-                    save 
+                    save
 
                 Just About ->
                     loadPage AboutPage
@@ -136,7 +142,7 @@ handleRouteChange url maybeRoute =
                     loadPage ShowPostPage
 
                 Just NewPost ->
-                     whenAuthenticated (loadPage NewPostPage)
+                    whenAuthenticated (loadPage NewPostPage)
 
                 Just Login ->
                     unlessAuthenticated (loadPage LoginPage)
@@ -150,7 +156,10 @@ handleRouteChange url maybeRoute =
                 resetRestrictedUrl
         )
         >> andThen changePage
-        -->> andThen (inUi Ui.closeMenu)
+
+
+
+-->> andThen (inUi Ui.closeMenu)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -183,7 +192,7 @@ view { page } =
                 , li [] [ a [ href "/register" ] [ text "Register" ] ]
                 ]
             ]
-        , div [] 
+        , div []
             [ Html.map PageMsg (Page.view page)
             ]
         ]
