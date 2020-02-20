@@ -1,22 +1,36 @@
 module Page.Register exposing (..)
 
+import Form.Register
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Update.Pipeline exposing (save)
+import Recipes.Form as Form exposing (insertAsFormIn)
+import Update.Pipeline exposing (andMap, mapCmd, save)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, runStackE)
 
 
 type Msg
-    = NoMsg
+    = FormMsg Form.Register.Msg
 
 
 type alias Model =
-    {}
+    { form : Form.Register.Model
+    }
+
+
+inForm : Run (Extended Model c) Form.Register.Model Msg Form.Register.Msg f
+inForm =
+    runStackE .form insertAsFormIn FormMsg
 
 
 init : {} -> ( Model, Cmd Msg )
-init _ =
+init {} =
+    let
+        form =
+            Form.Register.init []
+    in
     save Model
+        |> andMap (mapCmd FormMsg form)
 
 
 subscriptions : Model -> Sub Msg
@@ -24,10 +38,17 @@ subscriptions _ =
     Sub.none
 
 
+update :
+    Msg
+    -> { onAuthResponse : b }
+    -> Extended Model a
+    -> ( Extended Model a, Cmd Msg )
 update msg {} model =
     save model
 
 
 view : Model -> Html Msg
-view _ =
-    div [] [ text "Register" ]
+view { form } =
+    div []
+        [ Html.map FormMsg (Form.Register.view form)
+        ]

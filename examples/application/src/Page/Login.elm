@@ -30,11 +30,6 @@ insertAsApiIn model api =
     save { model | api = api }
 
 
-insertAsFormIn : Model -> Form.Login.Model -> ( Model, Cmd Msg )
-insertAsFormIn model form =
-    save { model | form = form }
-
-
 inApi : Run (Extended Model c) (Api.Model Session) Msg (Api.Msg Session) f
 inApi =
     runStackE .api insertAsApiIn ApiMsg
