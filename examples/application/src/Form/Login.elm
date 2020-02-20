@@ -1,5 +1,6 @@
 module Form.Login exposing (..)
 
+import Form.Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -36,18 +37,18 @@ toJson { email, password, rememberMe } =
 
 
 type alias Model =
-    Form.Model Field () Data
+    Form.Model Field Error Data
 
 
-validate : Validate Field () Data
+validate : Validate Field Error Data
 validate =
     let
         validateEmail =
-            Validate.stringNotEmpty ()
-                |> Validate.andThen (Validate.email ())
+            Validate.stringNotEmpty IsEmpty
+                |> Validate.andThen (Validate.email NotAValidEmail)
 
         validatePassword =
-            Validate.stringNotEmpty ()
+            Validate.stringNotEmpty IsEmpty
     in
     Validate.record Data
         |> Validate.inputField Email validateEmail
@@ -55,7 +56,7 @@ validate =
         |> Validate.checkbox RememberMe (always << Ok)
 
 
-init : FieldList Field () -> ( Model, Cmd Msg )
+init : FieldList Field Error -> ( Model, Cmd Msg )
 init =
     Form.init validate
 

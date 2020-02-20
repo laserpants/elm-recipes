@@ -1,5 +1,6 @@
 module Form.Comment exposing (..)
 
+import Form.Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -33,17 +34,17 @@ toJson { email, body } =
 
 
 type alias Model =
-    Form.Model Field () Data
+    Form.Model Field Error Data
 
 
-validate : Validate Field () Data
+validate : Validate Field Error Data
 validate =
     let
         validateEmail =
-            Validate.stringNotEmpty ()
+            Validate.stringNotEmpty IsEmpty
 
         validateBody =
-            Validate.stringNotEmpty ()
+            Validate.stringNotEmpty IsEmpty
     in
     Validate.record Data
         |> Validate.inputField Email validateEmail

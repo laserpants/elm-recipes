@@ -1,5 +1,6 @@
 module Form.Register exposing (..)
 
+import Form.Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -47,19 +48,19 @@ toJson { name, email, username, phoneNumber, password, acceptTerms } =
 
 
 type alias Model =
-    Form.Model Field () Data
+    Form.Model Field Error Data
 
 
-validate : Validate Field () Data
+validate : Validate Field Error Data
 validate =
     let
         validateEmail =
-            Validate.stringNotEmpty ()
-                |> Validate.andThen (Validate.email ())
+            Validate.stringNotEmpty IsEmpty
+                |> Validate.andThen (Validate.email NotAValidEmail)
 
         validateUsername =
-            Validate.stringNotEmpty ()
-                |> Validate.andThen (Validate.alphaNumeric ())
+            Validate.stringNotEmpty IsEmpty
+                |> Validate.andThen (Validate.alphaNumeric NotAlphanumeric)
 
         --                |> Validate.andThen
         --                    (always
@@ -72,24 +73,24 @@ validate =
         --                           )
         --                    )
         validatePassword =
-            Validate.stringNotEmpty ()
-                |> Validate.andThen (Validate.atLeastLength 8 ())
+            Validate.stringNotEmpty IsEmpty
+                |> Validate.andThen (Validate.atLeastLength 8 PasswordTooShort)
 
         validatePasswordConfirmation =
-            Validate.stringNotEmpty ()
-                |> Validate.andThen (Validate.mustMatchField Password ())
+            Validate.stringNotEmpty IsEmpty
+                |> Validate.andThen (Validate.mustMatchField Password DoesNotMatchPassword)
     in
     Validate.record Data
-        |> Validate.inputField Name (Validate.stringNotEmpty ())
+        |> Validate.inputField Name (Validate.stringNotEmpty IsEmpty)
         |> Validate.inputField Email validateEmail
         |> Validate.inputField Username validateUsername
-        |> Validate.inputField PhoneNumber (Validate.stringNotEmpty ())
+        |> Validate.inputField PhoneNumber (Validate.stringNotEmpty IsEmpty)
         |> Validate.inputField Password validatePassword
         |> Validate.inputField PasswordConfirmation validatePasswordConfirmation
-        |> Validate.checkbox AcceptTerms (Validate.mustBeChecked ())
+        |> Validate.checkbox AcceptTerms (Validate.mustBeChecked TermsNotAccepted)
 
 
-init : FieldList Field () -> ( Model, Cmd Msg )
+init : FieldList Field Error -> ( Model, Cmd Msg )
 init =
     Form.init validate
 
@@ -123,7 +124,7 @@ view { fields, disabled } =
                     [ input
                         (Form.inputAttrs Name name)
                         []
-                    , div [] [ errorHelper name]
+                    , div [] [ errorHelper name ]
                     ]
                 , div []
                     [ label [] [ text "Email" ]
@@ -132,7 +133,7 @@ view { fields, disabled } =
                     [ input
                         (Form.inputAttrs Email email)
                         []
-                    , div [] [ errorHelper email]
+                    , div [] [ errorHelper email ]
                     ]
                 , div []
                     [ label [] [ text "Username" ]
@@ -141,7 +142,7 @@ view { fields, disabled } =
                     [ input
                         (Form.inputAttrs Username username)
                         []
-                    , div [] [ errorHelper username]
+                    , div [] [ errorHelper username ]
                     ]
                 , div []
                     [ label [] [ text "Phone number" ]
@@ -150,7 +151,7 @@ view { fields, disabled } =
                     [ input
                         (Form.inputAttrs PhoneNumber phoneNumber)
                         []
-                    , div [] [ errorHelper phoneNumber]
+                    , div [] [ errorHelper phoneNumber ]
                     ]
                 , div []
                     [ label [] [ text "Password" ]
@@ -159,7 +160,7 @@ view { fields, disabled } =
                     [ input
                         ([ type_ "password" ] ++ Form.inputAttrs Password password)
                         []
-                    , div [] [ errorHelper password]
+                    , div [] [ errorHelper password ]
                     ]
                 , div []
                     [ label [] [ text "Confirm password" ]
@@ -168,7 +169,7 @@ view { fields, disabled } =
                     [ input
                         ([ type_ "password" ] ++ Form.inputAttrs PasswordConfirmation passwordConfirmation)
                         []
-                    , div [] [ errorHelper passwordConfirmation]
+                    , div [] [ errorHelper passwordConfirmation ]
                     ]
                 , div []
                     [ label [] [ text "Accept terms" ]

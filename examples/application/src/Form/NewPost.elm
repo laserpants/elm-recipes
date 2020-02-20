@@ -1,5 +1,6 @@
 module Form.NewPost exposing (..)
 
+import Form.Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -33,24 +34,24 @@ toJson { title, body } =
 
 
 type alias Model =
-    Form.Model Field () Data
+    Form.Model Field Error Data
 
 
-validate : Validate Field () Data
+validate : Validate Field Error Data
 validate =
     let
         validateTitle =
-            Validate.stringNotEmpty ()
+            Validate.stringNotEmpty IsEmpty
 
         validateBody =
-            Validate.stringNotEmpty ()
+            Validate.stringNotEmpty IsEmpty
     in
     Validate.record Data
         |> Validate.inputField Title validateTitle
         |> Validate.inputField Body validateBody
 
 
-init : FieldList Field () -> ( Model, Cmd Msg )
+init : FieldList Field Error -> ( Model, Cmd Msg )
 init =
     Form.init validate
 
