@@ -5,17 +5,17 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
 import Json.Encode as Encode
-import Recipes.Form as Form exposing (Validate, checkbox, inputField)
+import Recipes.Form as Form exposing (Validate, FieldList, checkbox, inputField)
 import Recipes.Form.Validate as Validate
 
 
-type Fields
+type Field
     = Title
     | Body
 
 
 type alias Msg =
-    Form.Msg Fields
+    Form.Msg Field
 
 
 type alias Data =
@@ -33,10 +33,10 @@ toJson { title, body } =
 
 
 type alias Model =
-    Form.Model Fields () Data
+    Form.Model Field () Data
 
 
-validate : Validate Fields () Data
+validate : Validate Field () Data
 validate =
     let
         validateTitle =
@@ -50,7 +50,7 @@ validate =
         |> Validate.inputField Body validateBody
 
 
-init : List ( Fields, Form.Field () ) -> ( Model, Cmd Msg )
+init : FieldList Field () -> ( Model, Cmd Msg )
 init =
     Form.init validate
 
