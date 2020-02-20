@@ -115,42 +115,75 @@ view { fields, disabled } =
         AcceptTerms
         (\name email username phoneNumber password passwordConfirmation acceptTerms ->
             [ fieldset
-                []
-                []
-
-            --                [ Html.Attributes.disabled disabled ]
-            --                [ div []
-            --                    [ label [] [ text "Email" ]
-            --                    ]
-            --                , div []
-            --                    [ input
-            --                        (Form.inputAttrs Email email)
-            --                        []
-            --                    , div [] [ errorHelper email ]
-            --                    ]
-            --                , div []
-            --                    [ label [] [ text "Password" ]
-            --                    ]
-            --                , div []
-            --                    [ input
-            --                        ([ type_ "password" ] ++ Form.inputAttrs Password password)
-            --                        []
-            --                    , div [] [ errorHelper password ]
-            --                    ]
-            --                , div []
-            --                    [ label [] [ text "Rememer me" ]
-            --                    ]
-            --                , div []
-            --                    [ input
-            --                        ([ type_ "checkbox" ] ++ Form.checkboxAttrs RememberMe rememberMe)
-            --                        []
-            --                    ]
-            --                , div []
-            --                    [ button []
-            --                        [ text "Log in"
-            --                        ]
-            --                    ]
-            --                ]
+                [ Html.Attributes.disabled disabled ]
+                [ div []
+                    [ label [] [ text "Name" ]
+                    ]
+                , div []
+                    [ input
+                        (Form.inputAttrs Name name)
+                        []
+                    , div [] [ errorHelper name]
+                    ]
+                , div []
+                    [ label [] [ text "Email" ]
+                    ]
+                , div []
+                    [ input
+                        (Form.inputAttrs Email email)
+                        []
+                    , div [] [ errorHelper email]
+                    ]
+                , div []
+                    [ label [] [ text "Username" ]
+                    ]
+                , div []
+                    [ input
+                        (Form.inputAttrs Username username)
+                        []
+                    , div [] [ errorHelper username]
+                    ]
+                , div []
+                    [ label [] [ text "Phone number" ]
+                    ]
+                , div []
+                    [ input
+                        (Form.inputAttrs PhoneNumber phoneNumber)
+                        []
+                    , div [] [ errorHelper phoneNumber]
+                    ]
+                , div []
+                    [ label [] [ text "Password" ]
+                    ]
+                , div []
+                    [ input
+                        ([ type_ "password" ] ++ Form.inputAttrs Password password)
+                        []
+                    , div [] [ errorHelper password]
+                    ]
+                , div []
+                    [ label [] [ text "Confirm password" ]
+                    ]
+                , div []
+                    [ input
+                        ([ type_ "password" ] ++ Form.inputAttrs PasswordConfirmation passwordConfirmation)
+                        []
+                    , div [] [ errorHelper passwordConfirmation]
+                    ]
+                , div []
+                    [ label [] [ text "Accept terms" ]
+                    ]
+                , div []
+                    [ input
+                        ([ type_ "checkbox" ] ++ Form.checkboxAttrs AcceptTerms acceptTerms)
+                        []
+                    ]
+                , div []
+                    [ button []
+                        [ text "Send"
+                        ]
+                    ]
+                ]
             ]
                 |> Html.form [ onSubmit Form.Submit ]
         )

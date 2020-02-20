@@ -38,13 +38,23 @@ subscriptions _ =
     Sub.none
 
 
+handleSubmit :
+    Form.Register.Data
+    -> Extended Model a
+    -> ( Extended Model a, Cmd Msg )
+handleSubmit formData =
+    save
+
+
 update :
     Msg
     -> { onAuthResponse : b }
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
-update msg {} model =
-    save model
+update msg {} =
+    case msg of
+        FormMsg formMsg ->
+            inForm (Form.update formMsg { onSubmit = handleSubmit })
 
 
 view : Model -> Html Msg
