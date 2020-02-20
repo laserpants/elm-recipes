@@ -2,6 +2,8 @@
 
 var Elm = require('../src/Main.elm').Elm;
 var storage = require('./storage.js')('elm-recipes-application-demo-app-session');
+
+require('./api.js');
 require('../index.html');
 
 var app = Elm.Main.init({

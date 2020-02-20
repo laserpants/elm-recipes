@@ -78,8 +78,8 @@ view { fields, disabled } =
         (\email password rememberMe ->
             [ fieldset
                 [ Html.Attributes.disabled disabled ]
-                [ div [] 
-                    [ label [] [ text "Email" ] 
+                [ div []
+                    [ label [] [ text "Email" ]
                     ]
                 , div []
                     [ input
@@ -87,17 +87,17 @@ view { fields, disabled } =
                         []
                     , div [] [ errorHelper email ]
                     ]
-                , div [] 
-                    [ label [] [ text "Password" ] 
+                , div []
+                    [ label [] [ text "Password" ]
                     ]
                 , div []
                     [ input
-                        (Form.inputAttrs Password password)
+                        ([ type_ "password" ] ++ Form.inputAttrs Password password)
                         []
                     , div [] [ errorHelper password ]
                     ]
-                , div [] 
-                    [ label [] [ text "Rememer me" ] 
+                , div []
+                    [ label [] [ text "Rememer me" ]
                     ]
                 , div []
                     [ input

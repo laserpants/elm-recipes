@@ -2,6 +2,7 @@ module App exposing (..)
 
 import Browser exposing (Document)
 import Browser.Navigation as Navigation
+import Data.Session exposing (Session)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -14,10 +15,6 @@ import Update.Pipeline exposing (andMap, andThen, mapCmd, save, using, when)
 import Update.Pipeline.Extended exposing (Run)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
-
-
-type alias Session =
-    { user : { email : String } }
 
 
 type alias Flags =
@@ -71,10 +68,7 @@ redirect =
     inRouter << Router.redirect
 
 
-
---loadPage : Page -> Model -> ( Model, Cmd Msg )
-
-
+loadPage : Page -> Model -> ( Model, Cmd Msg )
 loadPage page =
     inPage (always << Switch.to page {})
 
@@ -162,6 +156,11 @@ handleRouteChange url maybeRoute =
 -->> andThen (inUi Ui.closeMenu)
 
 
+handleAuthResponse : Maybe Session -> Model -> ( Model, Cmd Msg )
+handleAuthResponse maybeSession =
+    Debug.log (Debug.toString maybeSession) save
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -171,7 +170,7 @@ update msg model =
 
         PageMsg pageMsg ->
             model
-                |> inPage (Switch.update pageMsg {})
+                |> inPage (Switch.update pageMsg { onAuthResponse = handleAuthResponse })
 
 
 subscriptions : Model -> Sub Msg
