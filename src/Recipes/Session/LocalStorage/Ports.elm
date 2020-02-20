@@ -5,4 +5,3 @@ port setSession : String -> Cmd msg
 
 
 port clearSession : () -> Cmd msg
-
