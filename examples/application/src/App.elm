@@ -108,7 +108,7 @@ handleRouteChange url maybeRoute =
                             >> andThen (redirect "/login")
                         -->> andThen
                         --    (showToast
-                        --        { message = "You must be logged in to access that page."
+                        --        { message = "You must log in to access that page."
                         --        , color = Warning
                         --        }
                         --    )

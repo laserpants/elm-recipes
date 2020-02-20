@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as Json
-import Recipes.Api as Api exposing (apiDefaultHandlers)
+import Recipes.Api as Api exposing (apiDefaultHandlers, insertAsApiIn)
 import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
 import Update.Pipeline exposing (andMap, mapCmd, save)
@@ -23,11 +23,6 @@ type alias Model =
     { api : Api.Model Session
     , form : Form.Login.Model
     }
-
-
-insertAsApiIn : Model -> Api.Model Session -> ( Model, Cmd Msg )
-insertAsApiIn model api =
-    save { model | api = api }
 
 
 inApi : Run (Extended Model c) (Api.Model Session) Msg (Api.Msg Session) f
