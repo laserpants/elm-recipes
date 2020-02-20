@@ -25,8 +25,8 @@ inForm =
 
 init : {} -> ( Model, Cmd Msg )
 init {} =
-    let 
-        form = 
+    let
+        form =
             Form.NewPost.init []
     in
     save Model
@@ -38,8 +38,8 @@ subscriptions _ =
     Sub.none
 
 
-handleSubmit : 
-    Form.NewPost.Data 
+handleSubmit :
+    Form.NewPost.Data
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
 handleSubmit _ =

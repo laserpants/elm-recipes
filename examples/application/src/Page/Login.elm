@@ -57,7 +57,7 @@ init {} =
                 }
 
         form =
-             Form.Login.init []
+            Form.Login.init []
     in
     save Model
         |> andMap (mapCmd ApiMsg api)

@@ -57,7 +57,7 @@ validate =
 
 init : List ( Fields, Form.Field () ) -> ( Model, Cmd Msg )
 init =
-    Form.init validate 
+    Form.init validate
 
 
 view : Model -> Html Msg
