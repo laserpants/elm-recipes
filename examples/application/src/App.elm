@@ -2,16 +2,17 @@ module App exposing (..)
 
 import Browser exposing (Document)
 import Browser.Navigation as Navigation
-import Data.Session exposing (Session)
+import Data.Session as Session exposing (Session)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Maybe.Extra as Maybe
 import Page as Page exposing (Page(..), pages)
 import Recipes.Router as Router exposing (Router)
+import Recipes.Session.LocalStorage as LocalStorage
 import Recipes.Switch.Extended as Switch exposing (RunSwitch)
 import Route as Route exposing (Route(..))
-import Update.Pipeline exposing (andMap, andThen, mapCmd, save, using, when)
+import Update.Pipeline exposing (andMap, andThen, andThenIf, mapCmd, save, using, when, with)
 import Update.Pipeline.Extended exposing (Run)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
@@ -34,6 +35,11 @@ type alias Model =
     , session : Maybe Session
     , restrictedUrl : Maybe String
     }
+
+
+setSession : Maybe Session -> Model -> ( Model, Cmd msg )
+setSession session model =
+    save { model | session = session }
 
 
 setRestrictedUrl : Url -> Model -> ( Model, Cmd msg )
@@ -158,19 +164,26 @@ handleRouteChange url maybeRoute =
 
 handleAuthResponse : Maybe Session -> Model -> ( Model, Cmd Msg )
 handleAuthResponse maybeSession =
-    Debug.log (Debug.toString maybeSession) save
+    let
+        authenticated =
+            Maybe.isJust maybeSession
+
+        returnToRestrictedUrl =
+            with .restrictedUrl (redirect << Maybe.withDefault "/")
+    in
+    setSession maybeSession
+        >> andThen (LocalStorage.updateStorage Session.encoder maybeSession)
+        >> andThenIf authenticated returnToRestrictedUrl
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg =
     case msg of
         RouterMsg routerMsg ->
-            model
-                |> Router.runUpdate RouterMsg routerMsg { onRouteChange = handleRouteChange }
+            inRouter (Router.update routerMsg { onRouteChange = handleRouteChange })
 
         PageMsg pageMsg ->
-            model
-                |> inPage (Switch.update pageMsg { onAuthResponse = handleAuthResponse })
+            inPage (Switch.update pageMsg { onAuthResponse = handleAuthResponse })
 
 
 subscriptions : Model -> Sub Msg

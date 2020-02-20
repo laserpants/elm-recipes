@@ -251,6 +251,8 @@ reset :
     -> ( Extended (ModelState f e d s) a, Cmd (Msg f) )
 reset =
     lift resetFields
+        >> andThen (lift (setDisabled False))
+        >> andThen (lift (setSubmitted False))
 
 
 setState :

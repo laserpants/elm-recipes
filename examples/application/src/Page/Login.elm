@@ -66,7 +66,10 @@ subscriptions _ =
     Sub.none
 
 
-handleSubmit : Form.Login.Data -> Extended Model a -> ( Extended Model a, Cmd Msg )
+handleSubmit :
+    Form.Login.Data
+    -> Extended Model a
+    -> ( Extended Model a, Cmd Msg )
 handleSubmit formData =
     let
         json =
@@ -82,16 +85,24 @@ update :
     -> ( Extended Model a, Cmd Msg )
 update msg { onAuthResponse } =
     let
-        handleSuccess session =
+        respondWith response =
             inForm Form.reset
-                >> andCall (onAuthResponse (Just session))
+                >> andCall (onAuthResponse response)
+
+        handleSuccess session =
+            respondWith (Just session)
 
         handleError _ =
-            call (onAuthResponse Nothing)
+            respondWith Nothing
     in
     case msg of
         ApiMsg apiMsg ->
-            inApi (Api.update apiMsg { onSuccess = handleSuccess, onError = handleError })
+            inApi
+                (Api.update apiMsg
+                    { onSuccess = handleSuccess
+                    , onError = handleError
+                    }
+                )
 
         FormMsg formMsg ->
             inForm (Form.update formMsg { onSubmit = handleSubmit })
