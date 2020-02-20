@@ -55,10 +55,13 @@ init {} =
                 , decoder = Json.field "session" Session.decoder
                 , headers = []
                 }
+
+        form =
+             Form.Login.init []
     in
     save Model
         |> andMap (mapCmd ApiMsg api)
-        |> andMap (mapCmd FormMsg Form.Login.init)
+        |> andMap (mapCmd FormMsg form)
 
 
 subscriptions : Model -> Sub Msg

@@ -25,8 +25,12 @@ inForm =
 
 init : {} -> ( Model, Cmd Msg )
 init {} =
+    let 
+        form = 
+            Form.NewPost.init []
+    in
     save Model
-        |> andMap (mapCmd FormMsg Form.NewPost.init)
+        |> andMap (mapCmd FormMsg form)
 
 
 subscriptions : Model -> Sub Msg
@@ -34,6 +38,10 @@ subscriptions _ =
     Sub.none
 
 
+handleSubmit : 
+    Form.NewPost.Data 
+    -> Extended Model a
+    -> ( Extended Model a, Cmd Msg )
 handleSubmit _ =
     save
 
@@ -50,5 +58,7 @@ update msg {} =
 
 
 view : Model -> Html Msg
-view _ =
-    div [] [ text "New post" ]
+view { form } =
+    div []
+        [ Html.map FormMsg (Form.NewPost.view form)
+        ]

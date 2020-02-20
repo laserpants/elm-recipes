@@ -55,9 +55,9 @@ validate =
         |> Validate.checkbox RememberMe (always << Ok)
 
 
-init : ( Model, Cmd Msg )
+init : List ( Fields, Form.Field () ) -> ( Model, Cmd Msg )
 init =
-    Form.init validate []
+    Form.init validate 
 
 
 view : Model -> Html Msg
