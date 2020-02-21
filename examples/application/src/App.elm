@@ -9,7 +9,7 @@ import Html.Events exposing (..)
 import Maybe.Extra as Maybe
 import Page as Page exposing (Page(..), pages)
 import Recipes.Router as Router exposing (Router)
-import Recipes.Session.LocalStorage as LocalStorage
+import Recipes.Session.LocalStorage as LocalStorage exposing (setSession)
 import Recipes.Switch.Extended as Switch exposing (RunSwitch)
 import Route as Route exposing (Route(..))
 import Update.Pipeline exposing (andMap, andThen, andThenIf, mapCmd, save, using, when, with)
@@ -37,11 +37,6 @@ type alias Model =
     }
 
 
-setSession : Maybe Session -> Model -> ( Model, Cmd msg )
-setSession session model =
-    save { model | session = session }
-
-
 setRestrictedUrl : Url -> Model -> ( Model, Cmd msg )
 setRestrictedUrl { path } model =
     let
@@ -61,10 +56,7 @@ inRouter =
     Router.run RouterMsg
 
 
-
---inPage : RunSwitch (Page.Info a) Model Page.Model Msg Page.Msg
-
-
+inPage : RunSwitch (Page.Info a) Model Page.Model Msg Page.Msg
 inPage =
     Page.run PageMsg pages
 

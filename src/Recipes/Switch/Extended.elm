@@ -151,7 +151,12 @@ type alias Info page init subs update view =
 
 
 type alias Defaults page handlers m =
-    Info (Maybe page) ({} -> ( (), Cmd () )) (() -> Sub ()) (() -> handlers -> m -> ( m, Cmd () )) (() -> Html ())
+    Info 
+       (Maybe page) 
+       ({} -> ( (), Cmd () )) 
+       (() -> Sub ()) 
+       (() -> handlers -> m -> ( m, Cmd () ))
+       (() -> Html ())
 
 
 type alias Layout2 page handlers m1 msg1 m2 msg2 a =
@@ -234,17 +239,17 @@ type alias Layout5 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 a =
 
 type alias Layout6 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 m6 msg6 a =
     { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
+        Info (Maybe page) ({} -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
     , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
+        Info (Maybe page) ({} -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
     , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
+        Info (Maybe page) ({} -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
     , a4 :
-        Info (Maybe page) (m4 -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
+        Info (Maybe page) ({} -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
     , a5 :
-        Info (Maybe page) (m5 -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
+        Info (Maybe page) ({} -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
     , a6 :
-        Info (Maybe page) (m6 -> ( m6, Cmd msg6 )) (m6 -> Sub msg6) (msg6 -> handlers -> Extended m6 a -> ( Extended m6 a, Cmd msg6 )) (m6 -> Html msg6)
+        Info (Maybe page) ({} -> ( m6, Cmd msg6 )) (m6 -> Sub msg6) (msg6 -> handlers -> Extended m6 a -> ( Extended m6 a, Cmd msg6 )) (m6 -> Html msg6)
     , a7 : Defaults page handlers (Extended () a)
     , a8 : Defaults page handlers (Extended () a)
     , a9 : Defaults page handlers (Extended () a)

@@ -1,5 +1,6 @@
 module Page exposing (..)
 
+import Data.Session exposing (Session)
 import Html exposing (Html)
 import Page.About
 import Page.Home
@@ -40,21 +41,15 @@ insertAsPageIn model page =
 
 
 type alias Info a =
-    Layout6 Page {} Page.Home.Model Page.Home.Msg Page.NewPost.Model Page.NewPost.Msg Page.ShowPost.Model Page.ShowPost.Msg Page.Login.Model Page.Login.Msg Page.Register.Model Page.Register.Msg Page.About.Model Page.About.Msg a
+    Layout6 Page { onAuthResponse : Maybe Session -> a } Page.Home.Model Page.Home.Msg Page.NewPost.Model Page.NewPost.Msg Page.ShowPost.Model Page.ShowPost.Msg Page.Login.Model Page.Login.Msg Page.Register.Model Page.Register.Msg Page.About.Model Page.About.Msg a
 
 
-
---run : (msg2 -> msg1) -> Info a -> RunSwitch (Info a) (HasPageModel b) Model msg1 msg2
-
-
+run : (msg2 -> msg1) -> Info a -> RunSwitch (Info a) (HasPageModel b) Model msg1 msg2
 run =
     runStack .page insertAsPageIn
 
 
-
---pages : Info a
-
-
+pages : Info a
 pages =
     let
         homePage =
