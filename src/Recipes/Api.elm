@@ -99,7 +99,7 @@ toHeader ( a, b ) =
 
 apiDefaultHandlers :
     { onSuccess : resource -> a -> ( a, Cmd msg )
-    , onError : Http.Error -> a1 -> ( a1, Cmd msg1 )
+    , onError : Http.Error -> a -> ( a, Cmd msg )
     }
 apiDefaultHandlers =
     { onSuccess = always save
