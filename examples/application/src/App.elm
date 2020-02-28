@@ -10,7 +10,7 @@ import Maybe.Extra as Maybe
 import Page as Page exposing (Pages, book, pages)
 import Recipes.Router as Router exposing (Router)
 import Recipes.Session.LocalStorage as LocalStorage exposing (setSession)
-import Recipes.Switch.Extended as Switch exposing (RunSwitch)
+import Recipes.Switch.Extended as Switch exposing (Info, RunSwitch)
 import Route as Route exposing (Route(..))
 import Update.Pipeline exposing (andMap, andThen, andThenIf, mapCmd, save, using, when, with)
 import Update.Pipeline.Extended exposing (Run)
@@ -66,10 +66,11 @@ redirect =
     inRouter << Router.redirect
 
 
-
---loadPage : Page -> Model -> ( Model, Cmd Msg )
-
-
+loadPage :
+    (Pages a -> Info arg Page.Model Page.Msg m msg h a)
+    -> arg
+    -> Model
+    -> ( Model, Cmd Msg )
 loadPage page arg =
     inPage (Switch.to page arg)
 
