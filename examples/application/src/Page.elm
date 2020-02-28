@@ -92,7 +92,14 @@ type alias Labels item1 item2 item3 item4 item5 item6 =
     }
 
 
-book : { homePage : Item1 a t, newPostPage : Item2 a t, showPostPage : Item3 a t, loginPage : Item4 a t, registerPage : Item5 a t, aboutPage : Item6 a t }
+book :
+    { homePage : Item1 a b
+    , newPostPage : Item2 a b
+    , showPostPage : Item3 a b
+    , loginPage : Item4 a b
+    , registerPage : Item5 a b
+    , aboutPage : Item6 a b
+    }
 book =
     label6 Labels
 
