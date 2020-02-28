@@ -48,10 +48,10 @@ handleSubmit formData =
 
 update :
     Msg
-    -> { onAuthResponse : b, onAddPost : c }
+    -> b
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
-update msg {} =
+update msg _ =
     case msg of
         FormMsg formMsg ->
             inForm (Form.update formMsg { onSubmit = handleSubmit })

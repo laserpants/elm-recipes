@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as Json
-import Recipes.Api as Api exposing (apiDefaultHandlers, insertAsApiIn)
+import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, insertAsApiIn)
 import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
 import Update.Pipeline exposing (andMap, mapCmd, save)
@@ -69,10 +69,7 @@ handleSubmit =
 
 update :
     Msg
-    ->
-        { onAuthResponse : b
-        , onAddPost : Post -> a
-        }
+    -> { c | onAddPost : Post -> a }
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
 update msg { onAddPost } =
@@ -88,7 +85,14 @@ update msg { onAddPost } =
 
 
 view : Model -> Html Msg
-view { form } =
+view { api, form } =
     div []
-        [ Html.map FormMsg (Form.NewPost.view form)
+        [ case api.resource of
+              Error error ->
+                  text (Debug.toString error)
+
+              _ ->
+                  text ""
+
+        , Html.map FormMsg (Form.NewPost.view form)
         ]

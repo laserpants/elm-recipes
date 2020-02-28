@@ -62,8 +62,8 @@ inPage =
     Page.run PageMsg pages
 
 
-redirect : String -> Model -> ( Model, Cmd Msg )
-redirect =
+redirectTo : String -> Model -> ( Model, Cmd Msg )
+redirectTo =
     inRouter << Router.redirect
 
 
@@ -72,8 +72,8 @@ loadPage :
     -> arg
     -> Model
     -> ( Model, Cmd Msg )
-loadPage page arg =
-    inPage (Switch.to page arg)
+loadPage page =
+    inPage << Switch.to page
 
 
 init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
@@ -102,7 +102,7 @@ handleRouteChange url maybeRoute =
                     if Nothing == session then
                         -- Set URL to redirect back to after successful login
                         setRestrictedUrl url
-                            >> andThen (redirect "/login")
+                            >> andThen (redirectTo "/login")
                         -->> andThen
                         --    (showToast
                         --        { message = "You must log in to access that page."
@@ -118,7 +118,7 @@ handleRouteChange url maybeRoute =
             using
                 (\{ session } ->
                     if Maybe.isJust session then
-                        redirect "/"
+                        redirectTo "/"
 
                     else
                         doLoadPage
@@ -170,7 +170,7 @@ handleAuthResponse maybeSession =
             Maybe.isJust maybeSession
 
         returnToRestrictedUrl =
-            with .restrictedUrl (redirect << Maybe.withDefault "/")
+            with .restrictedUrl (redirectTo << Maybe.withDefault "/")
     in
     setSession maybeSession
         >> andThen (LocalStorage.updateStorage Session.encoder maybeSession)
@@ -179,7 +179,7 @@ handleAuthResponse maybeSession =
 
 handlePostAdded : Post -> Model -> ( Model, Cmd Msg )
 handlePostAdded _ =
-    redirect "/"
+    redirectTo "/"
 
 
 
@@ -195,7 +195,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg =
     case msg of
         RouterMsg routerMsg ->
-            inRouter (Router.update routerMsg { onRouteChange = handleRouteChange })
+            let
+                handlers =
+                      { onRouteChange = handleRouteChange }
+            in
+            inRouter (Router.update routerMsg handlers)
 
         PageMsg pageMsg ->
             let
