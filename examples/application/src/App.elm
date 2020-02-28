@@ -7,7 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Maybe.Extra as Maybe
-import Page as Page exposing (Page(..), pages)
+import Page as Page exposing (Pages, book, pages)
 import Recipes.Router as Router exposing (Router)
 import Recipes.Session.LocalStorage as LocalStorage exposing (setSession)
 import Recipes.Switch.Extended as Switch exposing (RunSwitch)
@@ -56,7 +56,7 @@ inRouter =
     Router.run RouterMsg
 
 
-inPage : RunSwitch (Page.Info a) Model Page.Model Msg Page.Msg
+inPage : RunSwitch (Pages a) Model Page.Model Msg Page.Msg
 inPage =
     Page.run PageMsg pages
 
@@ -66,9 +66,12 @@ redirect =
     inRouter << Router.redirect
 
 
-loadPage : Page -> Model -> ( Model, Cmd Msg )
-loadPage page =
-    inPage (always << Switch.to page {})
+
+--loadPage : Page -> Model -> ( Model, Cmd Msg )
+
+
+loadPage page arg =
+    inPage (Switch.to page arg)
 
 
 init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
@@ -78,7 +81,7 @@ init { session, basePath } url key =
             Router.init (parse Route.parser) basePath key
 
         page =
-            Page.init HomePage
+            Switch.init book.homePage {} pages
     in
     save Model
         |> andMap (mapCmd RouterMsg router)
@@ -120,27 +123,38 @@ handleRouteChange url maybeRoute =
                 )
 
         changePage =
+            let
+                { homePage, newPostPage, showPostPage, loginPage, registerPage, aboutPage } =
+                    book
+            in
             case maybeRoute of
                 Nothing ->
                     save
 
                 Just About ->
-                    loadPage AboutPage
+                    --inPage (Switch.to (Opt6 ()))
+                    --inPage (Switch.to aboutPage ())
+                    loadPage aboutPage ()
 
                 Just Home ->
-                    loadPage HomePage
+                    --inPage (Switch.to homePage {})
+                    loadPage homePage {}
 
                 Just (ShowPost postId) ->
-                    loadPage ShowPostPage
+                    --inPage (Switch.to showPostPage {})
+                    loadPage showPostPage {}
 
                 Just NewPost ->
-                    whenAuthenticated (loadPage NewPostPage)
+                    --inPage (Switch.to newPostPage {})
+                    whenAuthenticated (loadPage newPostPage {})
 
                 Just Login ->
-                    unlessAuthenticated (loadPage LoginPage)
+                    --inPage (Switch.to loginPage {})
+                    unlessAuthenticated (loadPage loginPage {})
 
                 Just Register ->
-                    unlessAuthenticated (loadPage RegisterPage)
+                    --inPage (Switch.to registerPage {})
+                    unlessAuthenticated (loadPage registerPage {})
     in
     using
         (\{ router } ->

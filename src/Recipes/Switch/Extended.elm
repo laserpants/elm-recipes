@@ -1,9 +1,13 @@
 module Recipes.Switch.Extended exposing (..)
 
 import Html exposing (Html, text)
-import Recipes.Switch exposing (Switch(..), from, insertAsSwitchIn, switch)
-import Update.Pipeline exposing (save, map, mapCmd, andThen)
-import Update.Pipeline.Extended exposing (Extended, mapE, extend, andLift, sequenceCalls)
+import Recipes.Switch exposing (Switch(..), insertAsSwitchIn)
+import Update.Pipeline exposing (andThen, map, mapCmd, save)
+import Update.Pipeline.Extended exposing (Extended, andLift, extend, mapE, sequenceCalls)
+
+
+type alias Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 =
+    Recipes.Switch.Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
 
 
 type alias OneOf2 a1 a2 =
@@ -62,772 +66,44 @@ insertAsSwitchIn =
     Recipes.Switch.insertAsSwitchIn
 
 
-switch :
-    Switch { a | init : b -> ( a1, Cmd msg1 ) } { a | init : b -> ( a2, Cmd msg2 ) } { a | init : b -> ( a3, Cmd msg3 ) } { a | init : b -> ( a4, Cmd msg4 ) } { a | init : b -> ( a5, Cmd msg5 ) } { a | init : b -> ( a6, Cmd msg6 ) } { a | init : b -> ( a7, Cmd msg7 ) } { a | init : b -> ( a8, Cmd msg8 ) } { a | init : b -> ( a9, Cmd msg9 ) } { a | init : b -> ( a10, Cmd msg10 ) } { a | init : b -> ( a11, Cmd msg11 ) } { a | init : b -> ( a12, Cmd msg12 ) }
-    -> b
-    -> ( Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12, Cmd (Switch msg1 msg2 msg3 msg4 msg5 msg6 msg7 msg8 msg9 msg10 msg11 msg12) )
-switch =
-    Recipes.Switch.switch
-
-
 subscriptions :
-    { a
-        | a1 : { b1 | subscriptions : a1 -> Sub msg1 }
-        , a2 : { b2 | subscriptions : a2 -> Sub msg2 }
-        , a3 : { b3 | subscriptions : a3 -> Sub msg3 }
-        , a4 : { b4 | subscriptions : a4 -> Sub msg4 }
-        , a5 : { b5 | subscriptions : a5 -> Sub msg5 }
-        , a6 : { b6 | subscriptions : a6 -> Sub msg6 }
-        , a7 : { b7 | subscriptions : a7 -> Sub msg7 }
-        , a8 : { b8 | subscriptions : a8 -> Sub msg8 }
-        , a9 : { b9 | subscriptions : a9 -> Sub msg9 }
-        , a10 : { b10 | subscriptions : a10 -> Sub msg10 }
-        , a11 : { b11 | subscriptions : a11 -> Sub msg11 }
-        , a12 : { b12 | subscriptions : a12 -> Sub msg12 }
+    { a1 : { b1 | subscriptions : a1 -> Sub msg1, toMsg : msg1 -> msg }
+    , a2 : { b2 | subscriptions : a2 -> Sub msg2, toMsg : msg2 -> msg }
+    , a3 : { b3 | subscriptions : a3 -> Sub msg3, toMsg : msg3 -> msg }
+    , a4 : { b4 | subscriptions : a4 -> Sub msg4, toMsg : msg4 -> msg }
+    , a5 : { b5 | subscriptions : a5 -> Sub msg5, toMsg : msg5 -> msg }
+    , a6 : { b6 | subscriptions : a6 -> Sub msg6, toMsg : msg6 -> msg }
+    , a7 : { b7 | subscriptions : a7 -> Sub msg7, toMsg : msg7 -> msg }
+    , a8 : { b8 | subscriptions : a8 -> Sub msg8, toMsg : msg8 -> msg }
+    , a9 : { b9 | subscriptions : a9 -> Sub msg9, toMsg : msg9 -> msg }
+    , a10 : { b10 | subscriptions : a10 -> Sub msg10, toMsg : msg10 -> msg }
+    , a11 : { b11 | subscriptions : a11 -> Sub msg11, toMsg : msg11 -> msg }
+    , a12 : { b12 | subscriptions : a12 -> Sub msg12, toMsg : msg12 -> msg }
     }
     -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
-    -> Sub (Switch msg1 msg2 msg3 msg4 msg5 msg6 msg7 msg8 msg9 msg10 msg11 msg12)
+    -> Sub msg
 subscriptions =
     Recipes.Switch.subscriptions
 
 
 view :
-    { a
-        | a1 : { b1 | view : a1 -> Html msg1 }
-        , a2 : { b2 | view : a2 -> Html msg2 }
-        , a3 : { b3 | view : a3 -> Html msg3 }
-        , a4 : { b4 | view : a4 -> Html msg4 }
-        , a5 : { b5 | view : a5 -> Html msg5 }
-        , a6 : { b6 | view : a6 -> Html msg6 }
-        , a7 : { b7 | view : a7 -> Html msg7 }
-        , a8 : { b8 | view : a8 -> Html msg8 }
-        , a9 : { b9 | view : a9 -> Html msg9 }
-        , a10 : { b10 | view : a10 -> Html msg10 }
-        , a11 : { b11 | view : a11 -> Html msg11 }
-        , a12 : { b12 | view : a12 -> Html msg12 }
+    { a1 : { b1 | view : a1 -> Html msg1, toMsg : msg1 -> msg }
+    , a2 : { b2 | view : a2 -> Html msg2, toMsg : msg2 -> msg }
+    , a3 : { b3 | view : a3 -> Html msg3, toMsg : msg3 -> msg }
+    , a4 : { b4 | view : a4 -> Html msg4, toMsg : msg4 -> msg }
+    , a5 : { b5 | view : a5 -> Html msg5, toMsg : msg5 -> msg }
+    , a6 : { b6 | view : a6 -> Html msg6, toMsg : msg6 -> msg }
+    , a7 : { b7 | view : a7 -> Html msg7, toMsg : msg7 -> msg }
+    , a8 : { b8 | view : a8 -> Html msg8, toMsg : msg8 -> msg }
+    , a9 : { b9 | view : a9 -> Html msg9, toMsg : msg9 -> msg }
+    , a10 : { b10 | view : a10 -> Html msg10, toMsg : msg10 -> msg }
+    , a11 : { b11 | view : a11 -> Html msg11, toMsg : msg11 -> msg }
+    , a12 : { b12 | view : a12 -> Html msg12, toMsg : msg12 -> msg }
     }
     -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
-    -> Html (Switch msg1 msg2 msg3 msg4 msg5 msg6 msg7 msg8 msg9 msg10 msg11 msg12)
+    -> Html msg
 view =
     Recipes.Switch.view
-
-
-from :
-    page
-    ->
-        { a
-            | init : init
-            , subscriptions : subs
-            , update : update
-            , view : view
-        }
-    ->
-        { page : page
-        , init : init
-        , subscriptions : subs
-        , update : update
-        , view : view
-        }
-from =
-    Recipes.Switch.from
-
-
-defaults :
-    { init : b1 -> ( (), Cmd msg1 )
-    , subscriptions : b2 -> Sub msg2
-    , update : b3 -> b0 -> a -> ( a, Cmd msg3 )
-    , view : b4 -> Html msg4
-    }
-defaults =
-    { init = always (save ())
-    , update = always (always save)
-    , subscriptions = always Sub.none
-    , view = always (text "")
-    }
-
-
-type alias Info page init subs update view =
-    Recipes.Switch.Info page init subs update view
-
-
-type alias Defaults page handlers m =
-    Info 
-       (Maybe page) 
-       ({} -> ( (), Cmd () )) 
-       (() -> Sub ()) 
-       (() -> handlers -> m -> ( m, Cmd () ))
-       (() -> Html ())
-
-
-type alias Layout2 page handlers m1 msg1 m2 msg2 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 : Defaults page handlers (Extended () a)
-    , a4 : Defaults page handlers (Extended () a)
-    , a5 : Defaults page handlers (Extended () a)
-    , a6 : Defaults page handlers (Extended () a)
-    , a7 : Defaults page handlers (Extended () a)
-    , a8 : Defaults page handlers (Extended () a)
-    , a9 : Defaults page handlers (Extended () a)
-    , a10 : Defaults page handlers (Extended () a)
-    , a11 : Defaults page handlers (Extended () a)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout3 page handlers m1 msg1 m2 msg2 m3 msg3 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 : Defaults page handlers (Extended () a)
-    , a5 : Defaults page handlers (Extended () a)
-    , a6 : Defaults page handlers (Extended () a)
-    , a7 : Defaults page handlers (Extended () a)
-    , a8 : Defaults page handlers (Extended () a)
-    , a9 : Defaults page handlers (Extended () a)
-    , a10 : Defaults page handlers (Extended () a)
-    , a11 : Defaults page handlers (Extended () a)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout4 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 :
-        Info (Maybe page) (m4 -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
-    , a5 : Defaults page handlers (Extended () a)
-    , a6 : Defaults page handlers (Extended () a)
-    , a7 : Defaults page handlers (Extended () a)
-    , a8 : Defaults page handlers (Extended () a)
-    , a9 : Defaults page handlers (Extended () a)
-    , a10 : Defaults page handlers (Extended () a)
-    , a11 : Defaults page handlers (Extended () a)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout5 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 :
-        Info (Maybe page) (m4 -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
-    , a5 :
-        Info (Maybe page) (m5 -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
-    , a6 : Defaults page handlers (Extended () a)
-    , a7 : Defaults page handlers (Extended () a)
-    , a8 : Defaults page handlers (Extended () a)
-    , a9 : Defaults page handlers (Extended () a)
-    , a10 : Defaults page handlers (Extended () a)
-    , a11 : Defaults page handlers (Extended () a)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout6 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 m6 msg6 a =
-    { a1 :
-        Info (Maybe page) ({} -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) ({} -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) ({} -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 :
-        Info (Maybe page) ({} -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
-    , a5 :
-        Info (Maybe page) ({} -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
-    , a6 :
-        Info (Maybe page) ({} -> ( m6, Cmd msg6 )) (m6 -> Sub msg6) (msg6 -> handlers -> Extended m6 a -> ( Extended m6 a, Cmd msg6 )) (m6 -> Html msg6)
-    , a7 : Defaults page handlers (Extended () a)
-    , a8 : Defaults page handlers (Extended () a)
-    , a9 : Defaults page handlers (Extended () a)
-    , a10 : Defaults page handlers (Extended () a)
-    , a11 : Defaults page handlers (Extended () a)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout7 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 m6 msg6 m7 msg7 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 :
-        Info (Maybe page) (m4 -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
-    , a5 :
-        Info (Maybe page) (m5 -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
-    , a6 :
-        Info (Maybe page) (m6 -> ( m6, Cmd msg6 )) (m6 -> Sub msg6) (msg6 -> handlers -> Extended m6 a -> ( Extended m6 a, Cmd msg6 )) (m6 -> Html msg6)
-    , a7 :
-        Info (Maybe page) (m7 -> ( m7, Cmd msg7 )) (m7 -> Sub msg7) (msg7 -> handlers -> Extended m7 a -> ( Extended m7 a, Cmd msg7 )) (m7 -> Html msg7)
-    , a8 : Defaults page handlers (Extended () a)
-    , a9 : Defaults page handlers (Extended () a)
-    , a10 : Defaults page handlers (Extended () a)
-    , a11 : Defaults page handlers (Extended () a)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout8 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 m6 msg6 m7 msg7 m8 msg8 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 :
-        Info (Maybe page) (m4 -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
-    , a5 :
-        Info (Maybe page) (m5 -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
-    , a6 :
-        Info (Maybe page) (m6 -> ( m6, Cmd msg6 )) (m6 -> Sub msg6) (msg6 -> handlers -> Extended m6 a -> ( Extended m6 a, Cmd msg6 )) (m6 -> Html msg6)
-    , a7 :
-        Info (Maybe page) (m7 -> ( m7, Cmd msg7 )) (m7 -> Sub msg7) (msg7 -> handlers -> Extended m7 a -> ( Extended m7 a, Cmd msg7 )) (m7 -> Html msg7)
-    , a8 :
-        Info (Maybe page) (m8 -> ( m8, Cmd msg8 )) (m8 -> Sub msg8) (msg8 -> handlers -> Extended m8 a -> ( Extended m8 a, Cmd msg8 )) (m8 -> Html msg8)
-    , a9 : Defaults page handlers (Extended () a)
-    , a10 : Defaults page handlers (Extended () a)
-    , a11 : Defaults page handlers (Extended () a)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout9 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 m6 msg6 m7 msg7 m8 msg8 m9 msg9 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 :
-        Info (Maybe page) (m4 -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
-    , a5 :
-        Info (Maybe page) (m5 -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
-    , a6 :
-        Info (Maybe page) (m6 -> ( m6, Cmd msg6 )) (m6 -> Sub msg6) (msg6 -> handlers -> Extended m6 a -> ( Extended m6 a, Cmd msg6 )) (m6 -> Html msg6)
-    , a7 :
-        Info (Maybe page) (m7 -> ( m7, Cmd msg7 )) (m7 -> Sub msg7) (msg7 -> handlers -> Extended m7 a -> ( Extended m7 a, Cmd msg7 )) (m7 -> Html msg7)
-    , a8 :
-        Info (Maybe page) (m8 -> ( m8, Cmd msg8 )) (m8 -> Sub msg8) (msg8 -> handlers -> Extended m8 a -> ( Extended m8 a, Cmd msg8 )) (m8 -> Html msg8)
-    , a9 :
-        Info (Maybe page) (m9 -> ( m9, Cmd msg9 )) (m9 -> Sub msg9) (msg9 -> handlers -> Extended m9 a -> ( Extended m9 a, Cmd msg9 )) (m9 -> Html msg9)
-    , a10 : Defaults page handlers (Extended () a)
-    , a11 : Defaults page handlers (Extended () a)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout10 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 m6 msg6 m7 msg7 m8 msg8 m9 msg9 m10 msg10 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 :
-        Info (Maybe page) (m4 -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
-    , a5 :
-        Info (Maybe page) (m5 -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
-    , a6 :
-        Info (Maybe page) (m6 -> ( m6, Cmd msg6 )) (m6 -> Sub msg6) (msg6 -> handlers -> Extended m6 a -> ( Extended m6 a, Cmd msg6 )) (m6 -> Html msg6)
-    , a7 :
-        Info (Maybe page) (m7 -> ( m7, Cmd msg7 )) (m7 -> Sub msg7) (msg7 -> handlers -> Extended m7 a -> ( Extended m7 a, Cmd msg7 )) (m7 -> Html msg7)
-    , a8 :
-        Info (Maybe page) (m8 -> ( m8, Cmd msg8 )) (m8 -> Sub msg8) (msg8 -> handlers -> Extended m8 a -> ( Extended m8 a, Cmd msg8 )) (m8 -> Html msg8)
-    , a9 :
-        Info (Maybe page) (m9 -> ( m9, Cmd msg9 )) (m9 -> Sub msg9) (msg9 -> handlers -> Extended m9 a -> ( Extended m9 a, Cmd msg9 )) (m9 -> Html msg9)
-    , a10 :
-        Info (Maybe page) (m10 -> ( m10, Cmd msg10 )) (m10 -> Sub msg10) (msg10 -> handlers -> Extended m10 a -> ( Extended m10 a, Cmd msg10 )) (m10 -> Html msg10)
-    , a11 : Defaults page handlers (Extended () a)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout11 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 m6 msg6 m7 msg7 m8 msg8 m9 msg9 m10 msg10 m11 msg11 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 :
-        Info (Maybe page) (m4 -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
-    , a5 :
-        Info (Maybe page) (m5 -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
-    , a6 :
-        Info (Maybe page) (m6 -> ( m6, Cmd msg6 )) (m6 -> Sub msg6) (msg6 -> handlers -> Extended m6 a -> ( Extended m6 a, Cmd msg6 )) (m6 -> Html msg6)
-    , a7 :
-        Info (Maybe page) (m7 -> ( m7, Cmd msg7 )) (m7 -> Sub msg7) (msg7 -> handlers -> Extended m7 a -> ( Extended m7 a, Cmd msg7 )) (m7 -> Html msg7)
-    , a8 :
-        Info (Maybe page) (m8 -> ( m8, Cmd msg8 )) (m8 -> Sub msg8) (msg8 -> handlers -> Extended m8 a -> ( Extended m8 a, Cmd msg8 )) (m8 -> Html msg8)
-    , a9 :
-        Info (Maybe page) (m9 -> ( m9, Cmd msg9 )) (m9 -> Sub msg9) (msg9 -> handlers -> Extended m9 a -> ( Extended m9 a, Cmd msg9 )) (m9 -> Html msg9)
-    , a10 :
-        Info (Maybe page) (m10 -> ( m10, Cmd msg10 )) (m10 -> Sub msg10) (msg10 -> handlers -> Extended m10 a -> ( Extended m10 a, Cmd msg10 )) (m10 -> Html msg10)
-    , a11 :
-        Info (Maybe page) (m11 -> ( m11, Cmd msg11 )) (m11 -> Sub msg11) (msg11 -> handlers -> Extended m11 a -> ( Extended m11 a, Cmd msg11 )) (m11 -> Html msg11)
-    , a12 : Defaults page handlers (Extended () a)
-    }
-
-
-type alias Layout12 page handlers m1 msg1 m2 msg2 m3 msg3 m4 msg4 m5 msg5 m6 msg6 m7 msg7 m8 msg8 m9 msg9 m10 msg10 m11 msg11 m12 msg12 a =
-    { a1 :
-        Info (Maybe page) (m1 -> ( m1, Cmd msg1 )) (m1 -> Sub msg1) (msg1 -> handlers -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )) (m1 -> Html msg1)
-    , a2 :
-        Info (Maybe page) (m2 -> ( m2, Cmd msg2 )) (m2 -> Sub msg2) (msg2 -> handlers -> Extended m2 a -> ( Extended m2 a, Cmd msg2 )) (m2 -> Html msg2)
-    , a3 :
-        Info (Maybe page) (m3 -> ( m3, Cmd msg3 )) (m3 -> Sub msg3) (msg3 -> handlers -> Extended m3 a -> ( Extended m3 a, Cmd msg3 )) (m3 -> Html msg3)
-    , a4 :
-        Info (Maybe page) (m4 -> ( m4, Cmd msg4 )) (m4 -> Sub msg4) (msg4 -> handlers -> Extended m4 a -> ( Extended m4 a, Cmd msg4 )) (m4 -> Html msg4)
-    , a5 :
-        Info (Maybe page) (m5 -> ( m5, Cmd msg5 )) (m5 -> Sub msg5) (msg5 -> handlers -> Extended m5 a -> ( Extended m5 a, Cmd msg5 )) (m5 -> Html msg5)
-    , a6 :
-        Info (Maybe page) (m6 -> ( m6, Cmd msg6 )) (m6 -> Sub msg6) (msg6 -> handlers -> Extended m6 a -> ( Extended m6 a, Cmd msg6 )) (m6 -> Html msg6)
-    , a7 :
-        Info (Maybe page) (m7 -> ( m7, Cmd msg7 )) (m7 -> Sub msg7) (msg7 -> handlers -> Extended m7 a -> ( Extended m7 a, Cmd msg7 )) (m7 -> Html msg7)
-    , a8 :
-        Info (Maybe page) (m8 -> ( m8, Cmd msg8 )) (m8 -> Sub msg8) (msg8 -> handlers -> Extended m8 a -> ( Extended m8 a, Cmd msg8 )) (m8 -> Html msg8)
-    , a9 :
-        Info (Maybe page) (m9 -> ( m9, Cmd msg9 )) (m9 -> Sub msg9) (msg9 -> handlers -> Extended m9 a -> ( Extended m9 a, Cmd msg9 )) (m9 -> Html msg9)
-    , a10 :
-        Info (Maybe page) (m10 -> ( m10, Cmd msg10 )) (m10 -> Sub msg10) (msg10 -> handlers -> Extended m10 a -> ( Extended m10 a, Cmd msg10 )) (m10 -> Html msg10)
-    , a11 :
-        Info (Maybe page) (m11 -> ( m11, Cmd msg11 )) (m11 -> Sub msg11) (msg11 -> handlers -> Extended m11 a -> ( Extended m11 a, Cmd msg11 )) (m11 -> Html msg11)
-    , a12 :
-        Info (Maybe page) (m12 -> ( m12, Cmd msg12 )) (m12 -> Sub msg12) (msg12 -> handlers -> Extended m12 a -> ( Extended m12 a, Cmd msg12 )) (m12 -> Html msg12)
-    }
-
-
-layout2 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Defaults page handlers (Extended () b)
-        , a4 : Defaults page handlers (Extended () b)
-        , a5 : Defaults page handlers (Extended () b)
-        , a6 : Defaults page handlers (Extended () b)
-        , a7 : Defaults page handlers (Extended () b)
-        , a8 : Defaults page handlers (Extended () b)
-        , a9 : Defaults page handlers (Extended () b)
-        , a10 : Defaults page handlers (Extended () b)
-        , a11 : Defaults page handlers (Extended () b)
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout2 ( opt1, info1 ) ( opt2, info2 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from Nothing defaults
-    , a4 = from Nothing defaults
-    , a5 = from Nothing defaults
-    , a6 = from Nothing defaults
-    , a7 = from Nothing defaults
-    , a8 = from Nothing defaults
-    , a9 = from Nothing defaults
-    , a10 = from Nothing defaults
-    , a11 = from Nothing defaults
-    , a12 = from Nothing defaults
-    }
-
-
-layout3 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Defaults page handlers (Extended () b)
-        , a5 : Defaults page handlers (Extended () b)
-        , a6 : Defaults page handlers (Extended () b)
-        , a7 : Defaults page handlers (Extended () b)
-        , a8 : Defaults page handlers (Extended () b)
-        , a9 : Defaults page handlers (Extended () b)
-        , a10 : Defaults page handlers (Extended () b)
-        , a11 : Defaults page handlers (Extended () b)
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout3 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from Nothing defaults
-    , a5 = from Nothing defaults
-    , a6 = from Nothing defaults
-    , a7 = from Nothing defaults
-    , a8 = from Nothing defaults
-    , a9 = from Nothing defaults
-    , a10 = from Nothing defaults
-    , a11 = from Nothing defaults
-    , a12 = from Nothing defaults
-    }
-
-
-layout4 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    -> ( a4, { a | init : b4, subscriptions : c4, update : d4, view : e4 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Info (Maybe a4) b4 c4 d4 e4
-        , a5 : Defaults page handlers (Extended () b)
-        , a6 : Defaults page handlers (Extended () b)
-        , a7 : Defaults page handlers (Extended () b)
-        , a8 : Defaults page handlers (Extended () b)
-        , a9 : Defaults page handlers (Extended () b)
-        , a10 : Defaults page handlers (Extended () b)
-        , a11 : Defaults page handlers (Extended () b)
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout4 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) ( opt4, info4 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from (Just opt4) info4
-    , a5 = from Nothing defaults
-    , a6 = from Nothing defaults
-    , a7 = from Nothing defaults
-    , a8 = from Nothing defaults
-    , a9 = from Nothing defaults
-    , a10 = from Nothing defaults
-    , a11 = from Nothing defaults
-    , a12 = from Nothing defaults
-    }
-
-
-layout5 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    -> ( a4, { a | init : b4, subscriptions : c4, update : d4, view : e4 } )
-    -> ( a5, { a | init : b5, subscriptions : c5, update : d5, view : e5 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Info (Maybe a4) b4 c4 d4 e4
-        , a5 : Info (Maybe a5) b5 c5 d5 e5
-        , a6 : Defaults page handlers (Extended () b)
-        , a7 : Defaults page handlers (Extended () b)
-        , a8 : Defaults page handlers (Extended () b)
-        , a9 : Defaults page handlers (Extended () b)
-        , a10 : Defaults page handlers (Extended () b)
-        , a11 : Defaults page handlers (Extended () b)
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout5 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) ( opt4, info4 ) ( opt5, info5 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from (Just opt4) info4
-    , a5 = from (Just opt5) info5
-    , a6 = from Nothing defaults
-    , a7 = from Nothing defaults
-    , a8 = from Nothing defaults
-    , a9 = from Nothing defaults
-    , a10 = from Nothing defaults
-    , a11 = from Nothing defaults
-    , a12 = from Nothing defaults
-    }
-
-
-layout6 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    -> ( a4, { a | init : b4, subscriptions : c4, update : d4, view : e4 } )
-    -> ( a5, { a | init : b5, subscriptions : c5, update : d5, view : e5 } )
-    -> ( a6, { a | init : b6, subscriptions : c6, update : d6, view : e6 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Info (Maybe a4) b4 c4 d4 e4
-        , a5 : Info (Maybe a5) b5 c5 d5 e5
-        , a6 : Info (Maybe a6) b6 c6 d6 e6
-        , a7 : Defaults page handlers (Extended () b)
-        , a8 : Defaults page handlers (Extended () b)
-        , a9 : Defaults page handlers (Extended () b)
-        , a10 : Defaults page handlers (Extended () b)
-        , a11 : Defaults page handlers (Extended () b)
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout6 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) ( opt4, info4 ) ( opt5, info5 ) ( opt6, info6 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from (Just opt4) info4
-    , a5 = from (Just opt5) info5
-    , a6 = from (Just opt6) info6
-    , a7 = from Nothing defaults
-    , a8 = from Nothing defaults
-    , a9 = from Nothing defaults
-    , a10 = from Nothing defaults
-    , a11 = from Nothing defaults
-    , a12 = from Nothing defaults
-    }
-
-
-layout7 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    -> ( a4, { a | init : b4, subscriptions : c4, update : d4, view : e4 } )
-    -> ( a5, { a | init : b5, subscriptions : c5, update : d5, view : e5 } )
-    -> ( a6, { a | init : b6, subscriptions : c6, update : d6, view : e6 } )
-    -> ( a7, { a | init : b7, subscriptions : c7, update : d7, view : e7 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Info (Maybe a4) b4 c4 d4 e4
-        , a5 : Info (Maybe a5) b5 c5 d5 e5
-        , a6 : Info (Maybe a6) b6 c6 d6 e6
-        , a7 : Info (Maybe a7) b7 c7 d7 e7
-        , a8 : Defaults page handlers (Extended () b)
-        , a9 : Defaults page handlers (Extended () b)
-        , a10 : Defaults page handlers (Extended () b)
-        , a11 : Defaults page handlers (Extended () b)
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout7 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) ( opt4, info4 ) ( opt5, info5 ) ( opt6, info6 ) ( opt7, info7 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from (Just opt4) info4
-    , a5 = from (Just opt5) info5
-    , a6 = from (Just opt6) info6
-    , a7 = from (Just opt7) info7
-    , a8 = from Nothing defaults
-    , a9 = from Nothing defaults
-    , a10 = from Nothing defaults
-    , a11 = from Nothing defaults
-    , a12 = from Nothing defaults
-    }
-
-
-layout8 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    -> ( a4, { a | init : b4, subscriptions : c4, update : d4, view : e4 } )
-    -> ( a5, { a | init : b5, subscriptions : c5, update : d5, view : e5 } )
-    -> ( a6, { a | init : b6, subscriptions : c6, update : d6, view : e6 } )
-    -> ( a7, { a | init : b7, subscriptions : c7, update : d7, view : e7 } )
-    -> ( a8, { a | init : b8, subscriptions : c8, update : d8, view : e8 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Info (Maybe a4) b4 c4 d4 e4
-        , a5 : Info (Maybe a5) b5 c5 d5 e5
-        , a6 : Info (Maybe a6) b6 c6 d6 e6
-        , a7 : Info (Maybe a7) b7 c7 d7 e7
-        , a8 : Info (Maybe a8) b8 c8 d8 e8
-        , a9 : Defaults page handlers (Extended () b)
-        , a10 : Defaults page handlers (Extended () b)
-        , a11 : Defaults page handlers (Extended () b)
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout8 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) ( opt4, info4 ) ( opt5, info5 ) ( opt6, info6 ) ( opt7, info7 ) ( opt8, info8 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from (Just opt4) info4
-    , a5 = from (Just opt5) info5
-    , a6 = from (Just opt6) info6
-    , a7 = from (Just opt7) info7
-    , a8 = from (Just opt8) info8
-    , a9 = from Nothing defaults
-    , a10 = from Nothing defaults
-    , a11 = from Nothing defaults
-    , a12 = from Nothing defaults
-    }
-
-
-layout9 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    -> ( a4, { a | init : b4, subscriptions : c4, update : d4, view : e4 } )
-    -> ( a5, { a | init : b5, subscriptions : c5, update : d5, view : e5 } )
-    -> ( a6, { a | init : b6, subscriptions : c6, update : d6, view : e6 } )
-    -> ( a7, { a | init : b7, subscriptions : c7, update : d7, view : e7 } )
-    -> ( a8, { a | init : b8, subscriptions : c8, update : d8, view : e8 } )
-    -> ( a9, { a | init : b9, subscriptions : c9, update : d9, view : e9 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Info (Maybe a4) b4 c4 d4 e4
-        , a5 : Info (Maybe a5) b5 c5 d5 e5
-        , a6 : Info (Maybe a6) b6 c6 d6 e6
-        , a7 : Info (Maybe a7) b7 c7 d7 e7
-        , a8 : Info (Maybe a8) b8 c8 d8 e8
-        , a9 : Info (Maybe a9) b9 c9 d9 e9
-        , a10 : Defaults page handlers (Extended () b)
-        , a11 : Defaults page handlers (Extended () b)
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout9 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) ( opt4, info4 ) ( opt5, info5 ) ( opt6, info6 ) ( opt7, info7 ) ( opt8, info8 ) ( opt9, info9 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from (Just opt4) info4
-    , a5 = from (Just opt5) info5
-    , a6 = from (Just opt6) info6
-    , a7 = from (Just opt7) info7
-    , a8 = from (Just opt8) info8
-    , a9 = from (Just opt9) info9
-    , a10 = from Nothing defaults
-    , a11 = from Nothing defaults
-    , a12 = from Nothing defaults
-    }
-
-
-layout10 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    -> ( a4, { a | init : b4, subscriptions : c4, update : d4, view : e4 } )
-    -> ( a5, { a | init : b5, subscriptions : c5, update : d5, view : e5 } )
-    -> ( a6, { a | init : b6, subscriptions : c6, update : d6, view : e6 } )
-    -> ( a7, { a | init : b7, subscriptions : c7, update : d7, view : e7 } )
-    -> ( a8, { a | init : b8, subscriptions : c8, update : d8, view : e8 } )
-    -> ( a9, { a | init : b9, subscriptions : c9, update : d9, view : e9 } )
-    -> ( a10, { a | init : b10, subscriptions : c10, update : d10, view : e10 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Info (Maybe a4) b4 c4 d4 e4
-        , a5 : Info (Maybe a5) b5 c5 d5 e5
-        , a6 : Info (Maybe a6) b6 c6 d6 e6
-        , a7 : Info (Maybe a7) b7 c7 d7 e7
-        , a8 : Info (Maybe a8) b8 c8 d8 e8
-        , a9 : Info (Maybe a9) b9 c9 d9 e9
-        , a10 : Info (Maybe a10) b10 c10 d10 e10
-        , a11 : Defaults page handlers (Extended () b)
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout10 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) ( opt4, info4 ) ( opt5, info5 ) ( opt6, info6 ) ( opt7, info7 ) ( opt8, info8 ) ( opt9, info9 ) ( opt10, info10 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from (Just opt4) info4
-    , a5 = from (Just opt5) info5
-    , a6 = from (Just opt6) info6
-    , a7 = from (Just opt7) info7
-    , a8 = from (Just opt8) info8
-    , a9 = from (Just opt9) info9
-    , a10 = from (Just opt10) info10
-    , a11 = from Nothing defaults
-    , a12 = from Nothing defaults
-    }
-
-
-layout11 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    -> ( a4, { a | init : b4, subscriptions : c4, update : d4, view : e4 } )
-    -> ( a5, { a | init : b5, subscriptions : c5, update : d5, view : e5 } )
-    -> ( a6, { a | init : b6, subscriptions : c6, update : d6, view : e6 } )
-    -> ( a7, { a | init : b7, subscriptions : c7, update : d7, view : e7 } )
-    -> ( a8, { a | init : b8, subscriptions : c8, update : d8, view : e8 } )
-    -> ( a9, { a | init : b9, subscriptions : c9, update : d9, view : e9 } )
-    -> ( a10, { a | init : b10, subscriptions : c10, update : d10, view : e10 } )
-    -> ( a11, { a | init : b11, subscriptions : c11, update : d11, view : e11 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Info (Maybe a4) b4 c4 d4 e4
-        , a5 : Info (Maybe a5) b5 c5 d5 e5
-        , a6 : Info (Maybe a6) b6 c6 d6 e6
-        , a7 : Info (Maybe a7) b7 c7 d7 e7
-        , a8 : Info (Maybe a8) b8 c8 d8 e8
-        , a9 : Info (Maybe a9) b9 c9 d9 e9
-        , a10 : Info (Maybe a10) b10 c10 d10 e10
-        , a11 : Info (Maybe a11) b11 c11 d11 e11
-        , a12 : Defaults page handlers (Extended () b)
-        }
-layout11 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) ( opt4, info4 ) ( opt5, info5 ) ( opt6, info6 ) ( opt7, info7 ) ( opt8, info8 ) ( opt9, info9 ) ( opt10, info10 ) ( opt11, info11 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from (Just opt4) info4
-    , a5 = from (Just opt5) info5
-    , a6 = from (Just opt6) info6
-    , a7 = from (Just opt7) info7
-    , a8 = from (Just opt8) info8
-    , a9 = from (Just opt9) info9
-    , a10 = from (Just opt10) info10
-    , a11 = from (Just opt11) info11
-    , a12 = from Nothing defaults
-    }
-
-
-layout12 :
-    ( a1, { a | init : b1, subscriptions : c1, update : d1, view : e1 } )
-    -> ( a2, { a | init : b2, subscriptions : c2, update : d2, view : e2 } )
-    -> ( a3, { a | init : b3, subscriptions : c3, update : d3, view : e3 } )
-    -> ( a4, { a | init : b4, subscriptions : c4, update : d4, view : e4 } )
-    -> ( a5, { a | init : b5, subscriptions : c5, update : d5, view : e5 } )
-    -> ( a6, { a | init : b6, subscriptions : c6, update : d6, view : e6 } )
-    -> ( a7, { a | init : b7, subscriptions : c7, update : d7, view : e7 } )
-    -> ( a8, { a | init : b8, subscriptions : c8, update : d8, view : e8 } )
-    -> ( a9, { a | init : b9, subscriptions : c9, update : d9, view : e9 } )
-    -> ( a10, { a | init : b10, subscriptions : c10, update : d10, view : e10 } )
-    -> ( a11, { a | init : b11, subscriptions : c11, update : d11, view : e11 } )
-    -> ( a12, { a | init : b12, subscriptions : c12, update : d12, view : e12 } )
-    ->
-        { a1 : Info (Maybe a1) b1 c1 d1 e1
-        , a2 : Info (Maybe a2) b2 c2 d2 e2
-        , a3 : Info (Maybe a3) b3 c3 d3 e3
-        , a4 : Info (Maybe a4) b4 c4 d4 e4
-        , a5 : Info (Maybe a5) b5 c5 d5 e5
-        , a6 : Info (Maybe a6) b6 c6 d6 e6
-        , a7 : Info (Maybe a7) b7 c7 d7 e7
-        , a8 : Info (Maybe a8) b8 c8 d8 e8
-        , a9 : Info (Maybe a9) b9 c9 d9 e9
-        , a10 : Info (Maybe a10) b10 c10 d10 e10
-        , a11 : Info (Maybe a11) b11 c11 d11 e11
-        , a12 : Info (Maybe a12) b12 c12 d12 e12
-        }
-layout12 ( opt1, info1 ) ( opt2, info2 ) ( opt3, info3 ) ( opt4, info4 ) ( opt5, info5 ) ( opt6, info6 ) ( opt7, info7 ) ( opt8, info8 ) ( opt9, info9 ) ( opt10, info10 ) ( opt11, info11 ) ( opt12, info12 ) =
-    { a1 = from (Just opt1) info1
-    , a2 = from (Just opt2) info2
-    , a3 = from (Just opt3) info3
-    , a4 = from (Just opt4) info4
-    , a5 = from (Just opt5) info5
-    , a6 = from (Just opt6) info6
-    , a7 = from (Just opt7) info7
-    , a8 = from (Just opt8) info8
-    , a9 = from (Just opt9) info9
-    , a10 = from (Just opt10) info10
-    , a11 = from (Just opt11) info11
-    , a12 = from (Just opt12) info12
-    }
 
 
 runStack :
@@ -861,28 +137,87 @@ run =
 
 
 update :
-    Switch a1_2 a2_2 a3_2 a4_2 a5_2 a6_2 a7_2 a8_2 a9_2 a10_2 a11_2 a12_2
+    Switch msg1 msg2 msg3 msg4 msg5 msg6 msg7 msg8 msg9 msg10 msg11 msg12
     -> b
     ->
-        { a
-            | a1 : { b1 | update : a1_2 -> b -> ( a1_1, List d1 ) -> ( Extended a1_1 c, Cmd a1 ) }
-            , a2 : { b2 | update : a2_2 -> b -> ( a2_1, List d2 ) -> ( Extended a2_1 c, Cmd a2 ) }
-            , a3 : { b3 | update : a3_2 -> b -> ( a3_1, List d3 ) -> ( Extended a3_1 c, Cmd a3 ) }
-            , a4 : { b4 | update : a4_2 -> b -> ( a4_1, List d4 ) -> ( Extended a4_1 c, Cmd a4 ) }
-            , a5 : { b5 | update : a5_2 -> b -> ( a5_1, List d5 ) -> ( Extended a5_1 c, Cmd a5 ) }
-            , a6 : { b6 | update : a6_2 -> b -> ( a6_1, List d6 ) -> ( Extended a6_1 c, Cmd a6 ) }
-            , a7 : { b7 | update : a7_2 -> b -> ( a7_1, List d7 ) -> ( Extended a7_1 c, Cmd a7 ) }
-            , a8 : { b8 | update : a8_2 -> b -> ( a8_1, List d8 ) -> ( Extended a8_1 c, Cmd a8 ) }
-            , a9 : { b9 | update : a9_2 -> b -> ( a9_1, List d9 ) -> ( Extended a9_1 c, Cmd a9 ) }
-            , a10 : { b10 | update : a10_2 -> b -> ( a10_1, List d10 ) -> ( Extended a10_1 c, Cmd a10 ) }
-            , a11 : { b11 | update : a11_2 -> b -> ( a11_1, List d11 ) -> ( Extended a11_1 c, Cmd a11 ) }
-            , a12 : { b12 | update : a12_2 -> b -> ( a12_1, List d12 ) -> ( Extended a12_1 c, Cmd a12 ) }
+        { a1 :
+            { e1
+                | toModel : a1 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg1 -> msg
+                , update : msg1 -> b -> ( a1, List c ) -> ( Extended a1 c, Cmd msg1 )
+            }
+        , a2 :
+            { e2
+                | toModel : a2 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg2 -> msg
+                , update : msg2 -> b -> ( a2, List c ) -> ( Extended a2 c, Cmd msg2 )
+            }
+        , a3 :
+            { e3
+                | toModel : a3 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg3 -> msg
+                , update : msg3 -> b -> ( a3, List c ) -> ( Extended a3 c, Cmd msg3 )
+            }
+        , a4 :
+            { e4
+                | toModel : a4 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg4 -> msg
+                , update : msg4 -> b -> ( a4, List c ) -> ( Extended a4 c, Cmd msg4 )
+            }
+        , a5 :
+            { e5
+                | toModel : a5 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg5 -> msg
+                , update : msg5 -> b -> ( a5, List c ) -> ( Extended a5 c, Cmd msg5 )
+            }
+        , a6 :
+            { e6
+                | toModel : a6 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg6 -> msg
+                , update : msg6 -> b -> ( a6, List c ) -> ( Extended a6 c, Cmd msg6 )
+            }
+        , a7 :
+            { e7
+                | toModel : a7 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg7 -> msg
+                , update : msg7 -> b -> ( a7, List c ) -> ( Extended a7 c, Cmd msg7 )
+            }
+        , a8 :
+            { e8
+                | toModel : a8 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg8 -> msg
+                , update : msg8 -> b -> ( a8, List c ) -> ( Extended a8 c, Cmd msg8 )
+            }
+        , a9 :
+            { e9
+                | toModel : a9 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg9 -> msg
+                , update : msg9 -> b -> ( a9, List c ) -> ( Extended a9 c, Cmd msg9 )
+            }
+        , a10 :
+            { e10
+                | toModel : a10 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg10 -> msg
+                , update : msg10 -> b -> ( a10, List c ) -> ( Extended a10 c, Cmd msg10 )
+            }
+        , a11 :
+            { e11
+                | toModel : a11 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg11 -> msg
+                , update : msg11 -> b -> ( a11, List c ) -> ( Extended a11 c, Cmd msg11 )
+            }
+        , a12 :
+            { e12
+                | toModel : a12 -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+                , toMsg : msg12 -> msg
+                , update : msg12 -> b -> ( a12, List c ) -> ( Extended a12 c, Cmd msg12 )
+            }
         }
-    -> Switch a1_1 a2_1 a3_1 a4_1 a5_1 a6_1 a7_1 a8_1 a9_1 a10_1 a11_1 a12_1
-    -> ( Extended (Switch a1_1 a2_1 a3_1 a4_1 a5_1 a6_1 a7_1 a8_1 a9_1 a10_1 a11_1 a12_1) c, Cmd (Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12) )
+    -> Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+    -> ( Extended (Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12) c, Cmd msg )
 update msgS handlers { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12 } modelS =
     let
-        appl ( toMsg, toModel ) info msg model =
+        appl ({ toModel, toMsg } as info) msg model =
             ( model, [] )
                 |> info.update msg handlers
                 |> mapCmd toMsg
@@ -890,123 +225,373 @@ update msgS handlers { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12 } model
     in
     case ( msgS, modelS ) of
         ( Opt1 msg, Opt1 model ) ->
-            appl ( Opt1, Opt1 ) a1 msg model
+            appl a1 msg model
 
         ( Opt2 msg, Opt2 model ) ->
-            appl ( Opt2, Opt2 ) a2 msg model
+            appl a2 msg model
 
         ( Opt3 msg, Opt3 model ) ->
-            appl ( Opt3, Opt3 ) a3 msg model
+            appl a3 msg model
 
         ( Opt4 msg, Opt4 model ) ->
-            appl ( Opt4, Opt4 ) a4 msg model
+            appl a4 msg model
 
         ( Opt5 msg, Opt5 model ) ->
-            appl ( Opt5, Opt5 ) a5 msg model
+            appl a5 msg model
 
         ( Opt6 msg, Opt6 model ) ->
-            appl ( Opt6, Opt6 ) a6 msg model
+            appl a6 msg model
 
         ( Opt7 msg, Opt7 model ) ->
-            appl ( Opt7, Opt7 ) a7 msg model
+            appl a7 msg model
 
         ( Opt8 msg, Opt8 model ) ->
-            appl ( Opt8, Opt8 ) a8 msg model
+            appl a8 msg model
 
         ( Opt9 msg, Opt9 model ) ->
-            appl ( Opt9, Opt9 ) a9 msg model
+            appl a9 msg model
 
         ( Opt10 msg, Opt10 model ) ->
-            appl ( Opt10, Opt10 ) a10 msg model
+            appl a10 msg model
 
         ( Opt11 msg, Opt11 model ) ->
-            appl ( Opt11, Opt11 ) a11 msg model
+            appl a11 msg model
 
         ( Opt12 msg, Opt12 model ) ->
-            appl ( Opt12, Opt12 ) a12 msg model
+            appl a12 msg model
 
         _ ->
             save (extend modelS)
 
 
 init :
-    page
+    (arg -> { e | init : d -> ( a, Cmd msg ), toModel : a -> b, toMsg : msg -> msg2 })
+    -> d
     -> arg
-    ->
-        { a
-            | a1 : { b1 | init : arg -> ( a1, Cmd msg1 ), page : Maybe page }
-            , a2 : { b2 | init : arg -> ( a2, Cmd msg2 ), page : Maybe page }
-            , a3 : { b3 | init : arg -> ( a3, Cmd msg3 ), page : Maybe page }
-            , a4 : { b4 | init : arg -> ( a4, Cmd msg4 ), page : Maybe page }
-            , a5 : { b5 | init : arg -> ( a5, Cmd msg5 ), page : Maybe page }
-            , a6 : { b6 | init : arg -> ( a6, Cmd msg6 ), page : Maybe page }
-            , a7 : { b7 | init : arg -> ( a7, Cmd msg7 ), page : Maybe page }
-            , a8 : { b8 | init : arg -> ( a8, Cmd msg8 ), page : Maybe page }
-            , a9 : { b9 | init : arg -> ( a9, Cmd msg9 ), page : Maybe page }
-            , a10 : { b10 | init : arg -> ( a10, Cmd msg10 ), page : Maybe page }
-            , a11 : { b11 | init : arg -> ( a11, Cmd msg11 ), page : Maybe page }
-            , a12 : { b12 | init : arg -> ( a12, Cmd msg12 ), page : Maybe page }
-        }
-    -> ( Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12, Cmd (Switch msg1 msg2 msg3 msg4 msg5 msg6 msg7 msg8 msg9 msg10 msg11 msg12) )
+    -> ( b, Cmd msg2 )
 init =
-    Recipes.Switch.to
+    Recipes.Switch.init
 
 
 to :
-    page
+    (c1 -> { e | init : arg -> ( a2, Cmd msg1 ), toModel : a2 -> a, toMsg : msg1 -> msg })
     -> arg
+    -> c1
+    -> a1
+    -> ( Extended a c, Cmd msg )
+to get arg pages =
+    map extend << Recipes.Switch.to get arg pages
+
+
+type alias Info arg m msg m1 msg1 h a =
+    { init : arg -> ( m1, Cmd msg1 )
+    , subscriptions : m1 -> Sub msg1
+    , update : msg1 -> h -> Extended m1 a -> ( Extended m1 a, Cmd msg1 )
+    , view : m1 -> Html msg1
+    , toMsg : msg1 -> msg
+    , toModel : m1 -> m
+    }
+
+
+type alias Layout2 h m1 msg1 a1 m2 msg2 a2 a =
+    { a1 : Info a1 (OneOf2 m1 m2) (OneOf2 msg1 msg2) m1 msg1 h a
+    , a2 : Info a2 (OneOf2 m1 m2) (OneOf2 msg1 msg2) m2 msg2 h a
+    , a3 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    , a4 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    , a5 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    , a6 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    , a7 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    , a8 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    , a9 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    , a10 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    , a11 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    , a12 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
+    }
+
+
+type alias Layout6 h m1 msg1 a1 m2 msg2 a2 m3 msg3 a3 m4 msg4 a4 m5 msg5 a5 m6 msg6 a6 a =
+    { a1 : Info a1 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m1 msg1 h a
+    , a2 : Info a2 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m2 msg2 h a
+    , a3 : Info a3 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m3 msg3 h a
+    , a4 : Info a4 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m4 msg4 h a
+    , a5 : Info a5 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m5 msg5 h a
+    , a6 : Info a6 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m6 msg6 h a
+    , a7 : Info {} (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) () () h a
+    , a8 : Info {} (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) () () h a
+    , a9 : Info {} (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) () () h a
+    , a10 : Info {} (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) () () h a
+    , a11 : Info {} (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) () () h a
+    , a12 : Info {} (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) () () h a
+    }
+
+
+layout2 :
+    { init : init1, subscriptions : subs1, update : update1, view : view1 }
+    -> { init : init2, subscriptions : subs2, update : update2, view : view2 }
     ->
-        { a
-            | a1 : { b1 | init : arg -> ( a1, Cmd msg1 ), page : Maybe page }
-            , a2 : { b2 | init : arg -> ( a2, Cmd msg2 ), page : Maybe page }
-            , a3 : { b3 | init : arg -> ( a3, Cmd msg3 ), page : Maybe page }
-            , a4 : { b4 | init : arg -> ( a4, Cmd msg4 ), page : Maybe page }
-            , a5 : { b5 | init : arg -> ( a5, Cmd msg5 ), page : Maybe page }
-            , a6 : { b6 | init : arg -> ( a6, Cmd msg6 ), page : Maybe page }
-            , a7 : { b7 | init : arg -> ( a7, Cmd msg7 ), page : Maybe page }
-            , a8 : { b8 | init : arg -> ( a8, Cmd msg8 ), page : Maybe page }
-            , a9 : { b9 | init : arg -> ( a9, Cmd msg9 ), page : Maybe page }
-            , a10 : { b10 | init : arg -> ( a10, Cmd msg10 ), page : Maybe page }
-            , a11 : { b11 | init : arg -> ( a11, Cmd msg11 ), page : Maybe page }
-            , a12 : { b12 | init : arg -> ( a12, Cmd msg12 ), page : Maybe page }
+        { a1 :
+            { init : init1
+            , subscriptions : subs1
+            , toModel : a1 -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : msg1 -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : update1
+            , view : view1
+            }
+        , a2 :
+            { init : init2
+            , subscriptions : subs2
+            , toModel : a2 -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : msg2 -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : update2
+            , view : view2
+            }
+        , a3 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a4 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a5 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a6 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a7 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a8 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a9 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a10 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a11 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a12 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
         }
-    -> ( Extended (Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12) c, Cmd (Switch msg1 msg2 msg3 msg4 msg5 msg6 msg7 msg8 msg9 msg10 msg11 msg12) )
-to page arg { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12 } =
-    if a1.page == Just page then
-        map extend (switch (Opt1 a1) arg)
+layout2 info1 info2 =
+    { a1 = { init = info1.init, update = info1.update, view = info1.view, subscriptions = info1.subscriptions, toMsg = Opt1, toModel = Opt1 }
+    , a2 = { init = info2.init, update = info2.update, view = info2.view, subscriptions = info2.subscriptions, toMsg = Opt2, toModel = Opt2 }
+    , a3 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt3, toModel = Opt3 }
+    , a4 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt4, toModel = Opt4 }
+    , a5 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt5, toModel = Opt5 }
+    , a6 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt6, toModel = Opt6 }
+    , a7 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt7, toModel = Opt7 }
+    , a8 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt8, toModel = Opt8 }
+    , a9 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt9, toModel = Opt9 }
+    , a10 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt10, toModel = Opt10 }
+    , a11 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt11, toModel = Opt11 }
+    , a12 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt12, toModel = Opt12 }
+    }
 
-    else if a2.page == Just page then
-        map extend (switch (Opt2 a2) arg)
 
-    else if a3.page == Just page then
-        map extend (switch (Opt3 a3) arg)
+layout6 :
+    { init : init1, subscriptions : subs1, update : update1, view : view1 }
+    -> { init : init2, subscriptions : subs2, update : update2, view : view2 }
+    -> { init : init3, subscriptions : subs3, update : update3, view : view3 }
+    -> { init : init4, subscriptions : subs4, update : update4, view : view4 }
+    -> { init : init5, subscriptions : subs5, update : update5, view : view5 }
+    -> { init : init6, subscriptions : subs6, update : update6, view : view6 }
+    ->
+        { a1 :
+            { init : init1
+            , subscriptions : subs1
+            , toModel : a1 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : msg1 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : update1
+            , view : view1
+            }
+        , a2 :
+            { init : init2
+            , subscriptions : subs2
+            , toModel : a2 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : msg2 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : update2
+            , view : view2
+            }
+        , a3 :
+            { init : init3
+            , subscriptions : subs3
+            , toModel : a3 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : msg3 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : update3
+            , view : view3
+            }
+        , a4 :
+            { init : init4
+            , subscriptions : subs4
+            , toModel : a4 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : msg4 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : update4
+            , view : view4
+            }
+        , a5 :
+            { init : init5
+            , subscriptions : subs5
+            , toModel : a5 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : msg5 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : update5
+            , view : view5
+            }
+        , a6 :
+            { init : init6
+            , subscriptions : subs6
+            , toModel : a6 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : msg6 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : update6
+            , view : view6
+            }
+        , a7 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a8 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a9 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a10 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a11 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a12 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
+            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        }
+layout6 info1 info2 info3 info4 info5 info6 =
+    { a1 = { init = info1.init, update = info1.update, view = info1.view, subscriptions = info1.subscriptions, toMsg = Opt1, toModel = Opt1 }
+    , a2 = { init = info2.init, update = info2.update, view = info2.view, subscriptions = info2.subscriptions, toMsg = Opt2, toModel = Opt2 }
+    , a3 = { init = info3.init, update = info3.update, view = info3.view, subscriptions = info3.subscriptions, toMsg = Opt3, toModel = Opt3 }
+    , a4 = { init = info4.init, update = info4.update, view = info4.view, subscriptions = info4.subscriptions, toMsg = Opt4, toModel = Opt4 }
+    , a5 = { init = info5.init, update = info5.update, view = info5.view, subscriptions = info5.subscriptions, toMsg = Opt5, toModel = Opt5 }
+    , a6 = { init = info6.init, update = info6.update, view = info6.view, subscriptions = info6.subscriptions, toMsg = Opt6, toModel = Opt6 }
+    , a7 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt7, toModel = Opt7 }
+    , a8 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt8, toModel = Opt8 }
+    , a9 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt9, toModel = Opt9 }
+    , a10 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt10, toModel = Opt10 }
+    , a11 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt11, toModel = Opt11 }
+    , a12 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt12, toModel = Opt12 }
+    }
 
-    else if a4.page == Just page then
-        map extend (switch (Opt4 a4) arg)
 
-    else if a5.page == Just page then
-        map extend (switch (Opt5 a5) arg)
+label2 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> e) -> e
+label2 =
+    Recipes.Switch.label2
 
-    else if a6.page == Just page then
-        map extend (switch (Opt6 a6) arg)
 
-    else if a7.page == Just page then
-        map extend (switch (Opt7 a7) arg)
+label6 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> ({ b | a3 : e } -> e) -> ({ b | a4 : g } -> g) -> ({ b | a5 : i } -> i) -> ({ b | a6 : k } -> k) -> m) -> m
+label6 =
+    Recipes.Switch.label6
 
-    else if a8.page == Just page then
-        map extend (switch (Opt8 a8) arg)
 
-    else if a9.page == Just page then
-        map extend (switch (Opt9 a9) arg)
+type alias Item1 a b =
+    Recipes.Switch.Item1 a b
 
-    else if a10.page == Just page then
-        map extend (switch (Opt10 a10) arg)
 
-    else if a11.page == Just page then
-        map extend (switch (Opt11 a11) arg)
+type alias Item2 a b =
+    Recipes.Switch.Item2 a b
 
-    else if a12.page == Just page then
-        map extend (switch (Opt12 a12) arg)
 
-    else
-        map extend (switch Miss arg)
+type alias Item3 a b =
+    Recipes.Switch.Item3 a b
+
+
+type alias Item4 a b =
+    Recipes.Switch.Item4 a b
+
+
+type alias Item5 a b =
+    Recipes.Switch.Item5 a b
+
+
+type alias Item6 a b =
+    Recipes.Switch.Item6 a b

@@ -15,7 +15,7 @@ type alias Model =
     {}
 
 
-init : a -> ( Model, Cmd Msg )
+init : {} -> ( Model, Cmd Msg )
 init _ =
     save Model
 

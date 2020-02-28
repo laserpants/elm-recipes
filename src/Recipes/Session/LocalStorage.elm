@@ -2,7 +2,7 @@ module Recipes.Session.LocalStorage exposing (..)
 
 import Json.Encode exposing (Value, encode)
 import Recipes.Session.LocalStorage.Ports as Ports
-import Update.Pipeline exposing (save, addCmd)
+import Update.Pipeline exposing (addCmd, save)
 
 
 setSession : a -> { b | session : a } -> ( { b | session : a }, Cmd msg )
@@ -17,8 +17,8 @@ updateStorage sessionEncoder maybeSession =
             addCmd (Ports.clearSession ())
 
         Just session ->
-            let 
-                encodedSession = 
+            let
+                encodedSession =
                     encode 0 (sessionEncoder session)
             in
             addCmd (Ports.setSession encodedSession)

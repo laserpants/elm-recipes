@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Update.Pipeline exposing (save)
+import Update.Pipeline.Extended exposing (Extended)
 
 
 type Msg
@@ -14,7 +15,7 @@ type alias Model =
     {}
 
 
-init : {} -> ( Model, Cmd Msg )
+init : () -> ( Model, Cmd Msg )
 init _ =
     save Model
 
@@ -24,6 +25,11 @@ subscriptions _ =
     Sub.none
 
 
+update :
+    Msg
+    -> { onAuthResponse : b }
+    -> Extended Model a
+    -> ( Extended Model a, Cmd Msg )
 update msg {} model =
     save model
 

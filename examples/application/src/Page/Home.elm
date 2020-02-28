@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Update.Pipeline exposing (save)
+import Update.Pipeline.Extended exposing (Extended)
 
 
 type Msg
@@ -24,8 +25,13 @@ subscriptions _ =
     Sub.none
 
 
+update :
+    Msg
+    -> { onAuthResponse : b }
+    -> Extended Model a
+    -> ( Extended Model a, Cmd Msg )
 update msg {} model =
-    save model
+    Debug.todo ""
 
 
 view : Model -> Html Msg
