@@ -2,12 +2,13 @@ module App exposing (..)
 
 import Browser exposing (Document)
 import Browser.Navigation as Navigation
+import Data.Post exposing (Post)
 import Data.Session as Session exposing (Session)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Maybe.Extra as Maybe
-import Page as Page exposing (Pages, book, pages)
+import Page as Page exposing (Pages, index, pages)
 import Recipes.Router as Router exposing (Router)
 import Recipes.Session.LocalStorage as LocalStorage exposing (setSession)
 import Recipes.Switch.Extended as Switch exposing (Info, RunSwitch)
@@ -82,7 +83,7 @@ init { session, basePath } url key =
             Router.init (parse Route.parser) basePath key
 
         page =
-            Switch.init book.homePage {} pages
+            Switch.init index.homePage () pages
     in
     save Model
         |> andMap (mapCmd RouterMsg router)
@@ -126,36 +127,29 @@ handleRouteChange url maybeRoute =
         changePage =
             let
                 { homePage, newPostPage, showPostPage, loginPage, registerPage, aboutPage } =
-                    book
+                    index
             in
             case maybeRoute of
                 Nothing ->
                     save
 
                 Just About ->
-                    --inPage (Switch.to (Opt6 ()))
-                    --inPage (Switch.to aboutPage ())
                     loadPage aboutPage ()
 
                 Just Home ->
-                    --inPage (Switch.to homePage {})
-                    loadPage homePage {}
+                    loadPage homePage ()
 
                 Just (ShowPost postId) ->
-                    --inPage (Switch.to showPostPage {})
-                    loadPage showPostPage {}
+                    loadPage showPostPage ()
 
                 Just NewPost ->
-                    --inPage (Switch.to newPostPage {})
-                    whenAuthenticated (loadPage newPostPage {})
+                    whenAuthenticated (loadPage newPostPage ())
 
                 Just Login ->
-                    --inPage (Switch.to loginPage {})
-                    unlessAuthenticated (loadPage loginPage {})
+                    unlessAuthenticated (loadPage loginPage ())
 
                 Just Register ->
-                    --inPage (Switch.to registerPage {})
-                    unlessAuthenticated (loadPage registerPage {})
+                    unlessAuthenticated (loadPage registerPage ())
     in
     using
         (\{ router } ->
@@ -183,6 +177,20 @@ handleAuthResponse maybeSession =
         >> andThenIf authenticated returnToRestrictedUrl
 
 
+handlePostAdded : Post -> Model -> ( Model, Cmd Msg )
+handlePostAdded _ =
+    redirect "/"
+
+
+
+--        >> andThen
+--            (inUi
+--                (Ui.showToast
+--                    { message = "Your post was published.", color = Info }
+--                )
+--            )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg =
     case msg of
@@ -190,7 +198,13 @@ update msg =
             inRouter (Router.update routerMsg { onRouteChange = handleRouteChange })
 
         PageMsg pageMsg ->
-            inPage (Switch.update pageMsg { onAuthResponse = handleAuthResponse })
+            let
+                handlers =
+                    { onAuthResponse = handleAuthResponse
+                    , onAddPost = handlePostAdded
+                    }
+            in
+            inPage (Switch.update pageMsg handlers)
 
 
 subscriptions : Model -> Sub Msg

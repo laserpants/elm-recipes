@@ -1,5 +1,6 @@
 module Page exposing (..)
 
+import Data.Post exposing (Post)
 import Data.Session exposing (Session)
 import Html exposing (Html, text)
 import Page.About
@@ -15,11 +16,25 @@ import Update.Pipeline.Extended exposing (Extended)
 
 
 type alias Msg =
-    OneOf6 Page.Home.Msg Page.NewPost.Msg Page.ShowPost.Msg Page.Login.Msg Page.Register.Msg Page.About.Msg
+    OneOf6
+        -- \
+        Page.Home.Msg
+        Page.NewPost.Msg
+        Page.ShowPost.Msg
+        Page.Login.Msg
+        Page.Register.Msg
+        Page.About.Msg
 
 
 type alias Model =
-    OneOf6 Page.Home.Model Page.NewPost.Model Page.ShowPost.Model Page.Login.Model Page.Register.Model Page.About.Model
+    OneOf6
+        -- \
+        Page.Home.Model
+        Page.NewPost.Model
+        Page.ShowPost.Model
+        Page.Login.Model
+        Page.Register.Model
+        Page.About.Model
 
 
 type alias HasPageModel a =
@@ -40,11 +55,33 @@ run =
 
 
 type alias Handlers a =
-    { onAuthResponse : Maybe Session -> a }
+    { onAuthResponse : Maybe Session -> a
+    , onAddPost : Post -> a
+    }
 
 
 type alias Pages a =
-    Layout6 (Handlers a) Page.Home.Model Page.Home.Msg {} Page.NewPost.Model Page.NewPost.Msg {} Page.ShowPost.Model Page.ShowPost.Msg {} Page.Login.Model Page.Login.Msg {} Page.Register.Model Page.Register.Msg {} Page.About.Model Page.About.Msg () a
+    Layout6 (Handlers a)
+        -- \
+        Page.Home.Model
+        Page.Home.Msg
+        ()
+        Page.NewPost.Model
+        Page.NewPost.Msg
+        ()
+        Page.ShowPost.Model
+        Page.ShowPost.Msg
+        ()
+        Page.Login.Model
+        Page.Login.Msg
+        ()
+        Page.Register.Model
+        Page.Register.Msg
+        ()
+        Page.About.Model
+        Page.About.Msg
+        ()
+        a
 
 
 pages : Pages a
@@ -82,17 +119,17 @@ pages =
         }
 
 
-type alias Labels item1 item2 item3 item4 item5 item6 =
-    { homePage : item1
-    , newPostPage : item2
-    , showPostPage : item3
-    , loginPage : item4
-    , registerPage : item5
-    , aboutPage : item6
+type alias Labels a1 a2 a3 a4 a5 a6 =
+    { homePage : a1
+    , newPostPage : a2
+    , showPostPage : a3
+    , loginPage : a4
+    , registerPage : a5
+    , aboutPage : a6
     }
 
 
-book :
+index :
     { homePage : Item1 a b
     , newPostPage : Item2 a b
     , showPostPage : Item3 a b
@@ -100,7 +137,7 @@ book :
     , registerPage : Item5 a b
     , aboutPage : Item6 a b
     }
-book =
+index =
     label6 Labels
 
 

@@ -23,8 +23,8 @@ inForm =
     runStackE .form insertAsFormIn FormMsg
 
 
-init : {} -> ( Model, Cmd Msg )
-init {} =
+init : () -> ( Model, Cmd Msg )
+init () =
     let
         form =
             Form.Register.init []
@@ -48,7 +48,7 @@ handleSubmit formData =
 
 update :
     Msg
-    -> { onAuthResponse : b }
+    -> { onAuthResponse : b, onAddPost : c }
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
 update msg {} =

@@ -27,7 +27,7 @@ subscriptions _ =
 
 update :
     Msg
-    -> { onAuthResponse : b }
+    -> { onAuthResponse : b, onAddPost : c }
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
 update msg {} model =

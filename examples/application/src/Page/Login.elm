@@ -35,8 +35,8 @@ inForm =
     runStackE .form insertAsFormIn FormMsg
 
 
-init : {} -> ( Model, Cmd Msg )
-init {} =
+init : () -> ( Model, Cmd Msg )
+init () =
     let
         api =
             JsonApi.init
@@ -63,17 +63,13 @@ handleSubmit :
     Form.Login.Data
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
-handleSubmit formData =
-    let
-        json =
-            Http.jsonBody (Form.Login.toJson formData)
-    in
-    inApi (Api.sendRequest "" (Just json))
+handleSubmit =
+    Form.Login.toJson >> JsonApi.sendJson "" >> inApi
 
 
 update :
     Msg
-    -> { onAuthResponse : Maybe Session -> a }
+    -> { onAuthResponse : Maybe Session -> a, onAddPost : b }
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
 update msg { onAuthResponse } =

@@ -15,8 +15,8 @@ type alias Model =
     {}
 
 
-init : {} -> ( Model, Cmd Msg )
-init _ =
+init : () -> ( Model, Cmd Msg )
+init () =
     save Model
 
 
@@ -27,7 +27,7 @@ subscriptions _ =
 
 update :
     Msg
-    -> { onAuthResponse : b }
+    -> { onAuthResponse : b, onAddPost : c }
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
 update msg {} model =

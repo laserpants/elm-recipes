@@ -4,7 +4,6 @@ module.exports = function(storageKey) {
   var initSessionStorage = function(app) {
     if (app.ports && app.ports.setSession) {
       app.ports.setSession.subscribe(function(data, usePersistent) {
-        console.log('setSession');
         if ('function' === typeof(usePersistent)) {
           var storageApi = usePersistent(data) ? localStorage : sessionStorage;
           storageApi.setItem(storageKey, JSON.stringify(data));
@@ -16,7 +15,6 @@ module.exports = function(storageKey) {
 
     if (app.ports && app.ports.clearSession) {
       app.ports.clearSession.subscribe(function(data) {
-        console.log('clearSession');
         localStorage.removeItem(storageKey);
         sessionStorage.removeItem(storageKey);
       });

@@ -29,6 +29,24 @@ xhook.before(function(request, callback) {
           headers: { 'Content-Type': 'application/json' }
         });
       }
+    } else if (request.url.endsWith('posts')) {
+      if ('GET' === request.method) {
+        callback({
+          status: 200,
+          data: JSON.stringify({ posts: posts.slice().reverse() }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } else if ('POST' === request.method) {
+        var post = JSON.parse(request.body);
+        post.id = posts.length + 1;
+        post.comments = [];
+        posts.push(post);
+        callback({
+          status: 200,
+          data: JSON.stringify({ post: post }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
     }
   }, delay);
 });
