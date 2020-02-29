@@ -1,6 +1,6 @@
 module Recipes.Session.LocalStorage exposing (..)
 
-import Json.Encode exposing (Value, encode)
+import Json.Encode exposing (Value, encode, null)
 import Recipes.Session.LocalStorage.Ports as Ports
 import Update.Pipeline exposing (addCmd, save)
 
@@ -22,3 +22,8 @@ updateStorage sessionEncoder maybeSession =
                     encode 0 (sessionEncoder session)
             in
             addCmd (Ports.setSession encodedSession)
+
+
+clearStorage : m -> ( m, Cmd msg )
+clearStorage = 
+    updateStorage (always null) Nothing

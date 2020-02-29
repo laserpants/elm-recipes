@@ -4,6 +4,7 @@ import Browser exposing (Document)
 import Browser.Navigation as Navigation
 import Data.Post exposing (Post)
 import Data.Session as Session exposing (Session)
+import Data.User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -28,6 +29,7 @@ type alias Flags =
 type Msg
     = RouterMsg Router.Msg
     | PageMsg Page.Msg
+    | Logout
 
 
 type alias Model =
@@ -218,9 +220,24 @@ update msg =
                     { onAuthResponse = handleAuthResponse
                     , onPostAdded = handlePostAdded
                     , onCommentCreated = handleCommentCreated
+                    , onRegistrationComplete = always (redirectTo "/login")
                     }
             in
             inPage (Switch.update pageMsg handlers)
+
+        Logout ->
+            setSession Nothing
+                >> andThen LocalStorage.clearStorage
+                >> andThen (redirectTo "/")
+
+
+
+--                >> andThen
+--                    (showToast
+--                        { message = "You have been logged out."
+--                        , color = Info
+--                        }
+--                    )
 
 
 subscriptions : Model -> Sub Msg
@@ -239,6 +256,7 @@ view { page } =
                 , li [] [ a [ href "/posts/new" ] [ text "New post" ] ]
                 , li [] [ a [ href "/login" ] [ text "Login" ] ]
                 , li [] [ a [ href "/register" ] [ text "Register" ] ]
+                , li [] [ a [ onClick Logout ] [ text "Logout" ] ]
                 ]
             ]
         , div []

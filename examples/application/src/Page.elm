@@ -3,6 +3,7 @@ module Page exposing (..)
 import Data.Comment exposing (Comment)
 import Data.Post exposing (Post)
 import Data.Session exposing (Session)
+import Data.User exposing (User)
 import Html exposing (Html, text)
 import Page.About
 import Page.Home
@@ -59,6 +60,7 @@ type alias Handlers a =
     { onAuthResponse : Maybe Session -> a
     , onPostAdded : Post -> a
     , onCommentCreated : Comment -> a
+    , onRegistrationComplete : User -> a
     }
 
 
