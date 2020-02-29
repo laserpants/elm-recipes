@@ -1,5 +1,6 @@
 module Page exposing (..)
 
+import Data.Comment exposing (Comment)
 import Data.Post exposing (Post)
 import Data.Session exposing (Session)
 import Html exposing (Html, text)
@@ -57,6 +58,7 @@ run =
 type alias Handlers a =
     { onAuthResponse : Maybe Session -> a
     , onAddPost : Post -> a
+    , onCreateComment : Comment -> a
     }
 
 
@@ -72,7 +74,7 @@ type alias Pages a =
         ()
         Page.ShowPost.Model
         Page.ShowPost.Msg
-        ()
+        Int
         Page.Login.Model
         Page.Login.Msg
         ()

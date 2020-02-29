@@ -140,7 +140,7 @@ handleRouteChange url maybeRoute =
                     loadPage homePage ()
 
                 Just (ShowPost postId) ->
-                    loadPage showPostPage ()
+                    loadPage showPostPage postId
 
                 Just NewPost ->
                     whenAuthenticated (loadPage newPostPage ())
@@ -191,6 +191,17 @@ handlePostAdded _ =
 --            )
 
 
+handleCommentCreated _ =
+    save
+
+
+
+--    inUi
+--        (Ui.showToast
+--            { message = "Your comment has been received.", color = Info }
+--        )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg =
     case msg of
@@ -206,6 +217,7 @@ update msg =
                 handlers =
                     { onAuthResponse = handleAuthResponse
                     , onAddPost = handlePostAdded
+                    , onCreateComment = handleCommentCreated
                     }
             in
             inPage (Switch.update pageMsg handlers)

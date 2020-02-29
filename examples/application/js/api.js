@@ -1,7 +1,7 @@
 'use strict';
 
 var xhook = require('xhook');
-var { users, posts } = require('./data.js');
+var { users, posts, comments } = require('./data.js');
 
 var delay = 400;
 
@@ -32,7 +32,6 @@ xhook.before(function(request, callback) {
     } else if (request.url.endsWith('posts')) {
       if ('GET' === request.method) {
         var response = posts.slice().reverse(); 
-        console.log(response);
         callback({
           status: 200,
           data: JSON.stringify({ posts: response }),
@@ -49,6 +48,49 @@ xhook.before(function(request, callback) {
           headers: { 'Content-Type': 'application/json' }
         });
       }
+    } else if (/posts\/\d+$/.test(request.url) && 'GET' === request.method) {
+      var id = request.url.match(/posts\/(\d+)$/)[1],
+          filtered = posts.filter(function(post) { return post.id == id; });
+      if (filtered.length > 0) {
+        var response = filtered[0];
+        callback({
+          status: 200,
+          data: JSON.stringify({ post: response }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } else {
+        console.log('Not Found');
+        callback({
+          status: 404,
+          data: JSON.stringify({ error: 'Not Found' }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    } else if (/posts\/\d+\/comments$/.test(request.url) && 'POST' === request.method) {
+      var comment = JSON.parse(request.body),
+          postId = request.url.match(/posts\/(\d+)\/comments$/)[1],
+          filtered = posts.filter(function(post) { return post.id == postId; });
+      if (filtered.length > 0) {
+        var post = filtered[0];
+        post.comments = post.comments || [];
+        comment.id = comments.lenght + 1;
+        comments.push(comment);
+        post.comments.unshift(comment);
+        callback({
+          status: 200,
+          data: JSON.stringify({ post: post, comment: comment }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } else {
+        console.log('Not Found');
+        callback({
+          status: 404,
+          data: JSON.stringify({ error: 'Not Found' }),
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    } else {
+      callback();
     }
   }, delay);
 });

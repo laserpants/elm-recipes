@@ -37,4 +37,8 @@ var posts =
   }
 ];
 
-module.exports = { users, posts };
+var comments =
+[
+];
+
+module.exports = { users, posts, comments };
