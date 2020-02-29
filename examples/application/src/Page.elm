@@ -57,8 +57,8 @@ run =
 
 type alias Handlers a =
     { onAuthResponse : Maybe Session -> a
-    , onAddPost : Post -> a
-    , onCreateComment : Comment -> a
+    , onPostAdded : Post -> a
+    , onCommentCreated : Comment -> a
     }
 
 

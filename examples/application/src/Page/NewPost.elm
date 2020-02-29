@@ -69,15 +69,15 @@ handleSubmit =
 
 update :
     Msg
-    -> { c | onAddPost : Post -> a }
+    -> { c | onPostAdded : Post -> a }
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
-update msg { onAddPost } =
+update msg { onPostAdded } =
     case msg of
         ApiMsg apiMsg ->
             inApi
                 (Api.update apiMsg
-                    { apiDefaultHandlers | onSuccess = \post -> call (onAddPost post) }
+                    { apiDefaultHandlers | onSuccess = \post -> call (onPostAdded post) }
                 )
 
         FormMsg formMsg ->

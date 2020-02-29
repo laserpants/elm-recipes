@@ -216,8 +216,8 @@ update msg =
             let
                 handlers =
                     { onAuthResponse = handleAuthResponse
-                    , onAddPost = handlePostAdded
-                    , onCreateComment = handleCommentCreated
+                    , onPostAdded = handlePostAdded
+                    , onCommentCreated = handleCommentCreated
                     }
             in
             inPage (Switch.update pageMsg handlers)

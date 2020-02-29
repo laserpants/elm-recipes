@@ -119,10 +119,10 @@ insertComment comment =
 
 update :
     Msg
-    -> { b | onCreateComment : Comment -> a }
+    -> { b | onCommentCreated : Comment -> a }
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
-update msg { onCreateComment } =
+update msg { onCommentCreated } =
     case msg of
         PostApiMsg apiMsg ->
             inPostApiE (Api.update apiMsg apiDefaultHandlers)
@@ -132,7 +132,7 @@ update msg { onCreateComment } =
                 commentCreated comment =
                     inCommentFormE Form.reset
                         >> andThen (insertComment comment)
-                        >> andCall (onCreateComment comment)
+                        >> andCall (onCommentCreated comment)
             in
             inCommentApiE
                 (Api.update apiMsg
