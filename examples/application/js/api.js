@@ -7,7 +7,24 @@ var delay = 400;
 
 xhook.before(function(request, callback) {
   setTimeout(function() { 
-    if (request.url.endsWith('auth/login') && 'POST' === request.method) {
+    if (request.url.endsWith('auth/register') && 'POST' === request.method) {
+      var params = JSON.parse(request.body);
+      params.id = users.length + 1;
+      users.push(params);
+      var user = {
+        id: params.id,
+        name: params.name,
+        username: params.username,
+        email: params.email,
+        phoneNumber: params.phoneNumber,
+        rememberMe: false
+      };
+      callback({
+        status: 200,
+        data: JSON.stringify({ status: 'success', user: user }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } else if (request.url.endsWith('auth/login') && 'POST' === request.method) {
       var params = JSON.parse(request.body),
           filtered = users.filter(function(user) {
         return user.email === params.email && user.password === params.password;
