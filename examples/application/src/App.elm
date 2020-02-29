@@ -90,7 +90,10 @@ init { session, basePath } url key =
         |> andMap (mapCmd PageMsg page)
         |> andMap (save Nothing)
         |> andMap (save Nothing)
-        |> andThen (update (Router.onUrlChange RouterMsg url))
+
+
+
+--        |> andThen (update (Router.onUrlChange RouterMsg url))
 
 
 handleRouteChange : Url -> Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -197,7 +200,7 @@ update msg =
         RouterMsg routerMsg ->
             let
                 handlers =
-                      { onRouteChange = handleRouteChange }
+                    { onRouteChange = handleRouteChange }
             in
             inRouter (Router.update routerMsg handlers)
 

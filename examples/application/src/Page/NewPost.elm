@@ -88,11 +88,10 @@ view : Model -> Html Msg
 view { api, form } =
     div []
         [ case api.resource of
-              Error error ->
-                  text (Debug.toString error)
+            Error error ->
+                text (Debug.toString error)
 
-              _ ->
-                  text ""
-
+            _ ->
+                text ""
         , Html.map FormMsg (Form.NewPost.view form)
         ]

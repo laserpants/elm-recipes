@@ -1,11 +1,12 @@
 module Data.Post exposing (Post, decoder)
 
 import Data.Comment as Comment exposing (Comment)
-import Json.Decode as Json exposing (field, list, string)
+import Json.Decode as Json exposing (field, int, list, string)
 
 
 type alias Post =
-    { title : String
+    { id : Maybe Int
+    , title : String
     , body : String
     , comments : List Comment
     }
@@ -13,7 +14,8 @@ type alias Post =
 
 decoder : Json.Decoder Post
 decoder =
-    Json.map3 Post
+    Json.map4 Post
+        (Json.maybe (field "id" int))
         (field "title" string)
         (field "body" string)
         (field "comments" (list Comment.decoder))

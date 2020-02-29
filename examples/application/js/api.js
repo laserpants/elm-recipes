@@ -31,9 +31,11 @@ xhook.before(function(request, callback) {
       }
     } else if (request.url.endsWith('posts')) {
       if ('GET' === request.method) {
+        var response = posts.slice().reverse(); 
+        console.log(response);
         callback({
           status: 200,
-          data: JSON.stringify({ posts: posts.slice().reverse() }),
+          data: JSON.stringify({ posts: response }),
           headers: { 'Content-Type': 'application/json' }
         });
       } else if ('POST' === request.method) {
