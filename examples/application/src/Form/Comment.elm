@@ -42,6 +42,7 @@ validate =
     let
         validateEmail =
             Validate.stringNotEmpty IsEmpty
+                |> Validate.andThen (Validate.email NotAValidEmail)
 
         validateBody =
             Validate.stringNotEmpty IsEmpty
