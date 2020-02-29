@@ -10,6 +10,11 @@ type alias Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 =
     Recipes.Switch.Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
 
 
+initial : Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+initial =
+    Recipes.Switch.initial
+
+
 type alias OneOf2 a1 a2 =
     Recipes.Switch.OneOf2 a1 a2
 
@@ -293,7 +298,7 @@ type alias Info arg m msg m1 msg1 h a =
     }
 
 
-type alias Layout2 h m1 msg1 a1 m2 msg2 a2 a =
+type alias Layout2 h a m1 msg1 a1 m2 msg2 a2 =
     { a1 : Info a1 (OneOf2 m1 m2) (OneOf2 msg1 msg2) m1 msg1 h a
     , a2 : Info a2 (OneOf2 m1 m2) (OneOf2 msg1 msg2) m2 msg2 h a
     , a3 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
@@ -309,7 +314,7 @@ type alias Layout2 h m1 msg1 a1 m2 msg2 a2 a =
     }
 
 
-type alias Layout6 h m1 msg1 a1 m2 msg2 a2 m3 msg3 a3 m4 msg4 a4 m5 msg5 a5 m6 msg6 a6 a =
+type alias Layout6 h a m1 msg1 a1 m2 msg2 a2 m3 msg3 a3 m4 msg4 a4 m5 msg5 a5 m6 msg6 a6 =
     { a1 : Info a1 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m1 msg1 h a
     , a2 : Info a2 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m2 msg2 h a
     , a3 : Info a3 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m3 msg3 h a
@@ -563,14 +568,14 @@ layout6 info1 info2 info3 info4 info5 info6 =
     }
 
 
-label2 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> e) -> e
-label2 =
-    Recipes.Switch.label2
+index2 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> e) -> e
+index2 =
+    Recipes.Switch.index2
 
 
-label6 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> ({ b | a3 : e } -> e) -> ({ b | a4 : g } -> g) -> ({ b | a5 : i } -> i) -> ({ b | a6 : k } -> k) -> m) -> m
-label6 =
-    Recipes.Switch.label6
+index6 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> ({ b | a3 : e } -> e) -> ({ b | a4 : g } -> g) -> ({ b | a5 : i } -> i) -> ({ b | a6 : k } -> k) -> m) -> m
+index6 =
+    Recipes.Switch.index6
 
 
 type alias Item1 a b =

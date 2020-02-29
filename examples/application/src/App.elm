@@ -83,17 +83,14 @@ init { session, basePath } url key =
             Router.init (parse Route.parser) basePath key
 
         page =
-            Switch.init index.homePage () pages
+            save Switch.initial
     in
     save Model
         |> andMap (mapCmd RouterMsg router)
         |> andMap (mapCmd PageMsg page)
         |> andMap (save Nothing)
         |> andMap (save Nothing)
-
-
-
---        |> andThen (update (Router.onUrlChange RouterMsg url))
+        |> andThen (update (Router.onUrlChange RouterMsg url))
 
 
 handleRouteChange : Url -> Maybe Route -> Model -> ( Model, Cmd Msg )

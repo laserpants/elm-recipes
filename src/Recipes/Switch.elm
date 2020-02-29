@@ -20,6 +20,11 @@ type Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
     | None
 
 
+initial : Switch a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12
+initial =
+    None
+
+
 type alias OneOf2 a1 a2 =
     Switch a1 a2 () () () () () () () () () ()
 
@@ -534,13 +539,13 @@ layout2 info1 info2 =
     }
 
 
-label2 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> e) -> e
-label2 a =
+index2 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> e) -> e
+index2 a =
     a .a1 .a2
 
 
-label6 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> ({ b | a3 : e } -> e) -> ({ b | a4 : g } -> g) -> ({ b | a5 : i } -> i) -> ({ b | a6 : k } -> k) -> m) -> m
-label6 a =
+index6 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> ({ b | a3 : e } -> e) -> ({ b | a4 : g } -> g) -> ({ b | a5 : i } -> i) -> ({ b | a6 : k } -> k) -> m) -> m
+index6 a =
     a .a1 .a2 .a3 .a4 .a5 .a6
 
 

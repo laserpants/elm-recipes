@@ -9,7 +9,7 @@ import Html.Events exposing (..)
 import Maybe.Extra as Maybe
 import Page.About as About
 import Page.Login as Login
-import Recipes.Switch.Extended as Switch exposing (Item1, Item2, Layout2, OneOf2, RunSwitch, label2, layout2)
+import Recipes.Switch.Extended as Switch exposing (Item1, Item2, Layout2, OneOf2, RunSwitch, index2, layout2)
 import Update.Pipeline exposing (andMap, andThen, map, map2, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, extend, lift)
 import Url exposing (Url)
@@ -20,7 +20,7 @@ type alias Flags =
     ()
 
 
-type alias Labels a1 a2 =
+type alias Index a1 a2 =
     { aboutPage : a1
     , loginPage : a2
     }
@@ -42,7 +42,15 @@ type alias Model =
 
 
 type alias Pages a =
-    Layout2 { onSomething : Int -> a } About.Model About.Msg {} Login.Model Login.Msg {} a
+    Layout2 { onSomething : Int -> a }
+        a
+        --\
+        About.Model
+        About.Msg
+        {}
+        Login.Model
+        Login.Msg
+        {}
 
 
 pages : Pages a
@@ -81,7 +89,7 @@ init () =
         switch =
             let
                 { aboutPage } =
-                    label2 Labels
+                    index2 Index
             in
             Switch.init aboutPage {} pages
     in
@@ -107,7 +115,7 @@ update msg model =
         Goto page ->
             let
                 { aboutPage, loginPage } =
-                    label2 Labels
+                    index2 Index
             in
             case page of
                 AboutPage ->

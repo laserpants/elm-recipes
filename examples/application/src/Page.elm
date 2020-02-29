@@ -10,7 +10,7 @@ import Page.NewPost
 import Page.Register
 import Page.ShowPost
 import Recipes.Switch exposing (Switch(..))
-import Recipes.Switch.Extended as Switch exposing (Item1, Item2, Item3, Item4, Item5, Item6, Layout6, OneOf6, RunSwitch, label6, layout6, runStack)
+import Recipes.Switch.Extended as Switch exposing (Item1, Item2, Item3, Item4, Item5, Item6, Layout6, OneOf6, RunSwitch, index6, layout6, runStack)
 import Update.Pipeline exposing (save)
 import Update.Pipeline.Extended exposing (Extended)
 
@@ -62,6 +62,7 @@ type alias Handlers a =
 
 type alias Pages a =
     Layout6 (Handlers a)
+        a
         -- \
         Page.Home.Model
         Page.Home.Msg
@@ -81,7 +82,6 @@ type alias Pages a =
         Page.About.Model
         Page.About.Msg
         ()
-        a
 
 
 pages : Pages a
@@ -119,7 +119,7 @@ pages =
         }
 
 
-type alias Labels a1 a2 a3 a4 a5 a6 =
+type alias Index a1 a2 a3 a4 a5 a6 =
     { homePage : a1
     , newPostPage : a2
     , showPostPage : a3
@@ -138,7 +138,7 @@ index :
     , aboutPage : Item6 a b
     }
 index =
-    label6 Labels
+    index6 Index
 
 
 subscriptions : Model -> Sub Msg
