@@ -47,7 +47,7 @@ type Msg
 type alias Model =
     { api : Api.Model User
     , form : Form.Register.Model
-    , unavailableUsernames : Set String
+    , unavailableNames : Set String
     }
 
 
@@ -73,7 +73,7 @@ setUsernameStatus =
 
 setUsernameUnavailable : String -> Model -> ( Model, Cmd Msg )
 setUsernameUnavailable username state =
-    save { state | unavailableUsernames = Set.insert username state.unavailableUsernames }
+    save { state | unavailableNames = Set.insert username state.unavailableNames }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -133,7 +133,7 @@ checkIfUsernameAvailable :
     -> ( Extended Model a, Cmd Msg )
 checkIfUsernameAvailable name =
     choosing
-        (\{ unavailableUsernames } ->
+        (\{ unavailableNames } ->
             let
                 setStatus =
                     lift << setUsernameStatus
@@ -141,7 +141,7 @@ checkIfUsernameAvailable name =
             if String.isEmpty name then
                 setStatus Blank
 
-            else if Set.member name unavailableUsernames then
+            else if Set.member name unavailableNames then
                 setStatus (IsAvailable False)
                     >> andThen validateUsernameField
 
