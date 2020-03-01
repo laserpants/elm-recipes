@@ -1,7 +1,7 @@
 module Recipes.Form.Validate exposing (alphaNumeric, andThen, atLeastLength, checkbox, email, inputField, int, mustBeChecked, mustMatchField, record, stringNotEmpty)
 
 import AssocList as Dict
-import Recipes.Form exposing (FieldDict, Status(..), Variant(..), asBool, asString, lookupField)
+import Recipes.Form exposing (FieldDict, Status(..), Variant(..), asBool, asString, field)
 import Regex exposing (Regex)
 
 
@@ -12,16 +12,16 @@ stepValidate :
     -> ( FieldDict tag err, Maybe a1, Maybe tag )
 stepValidate target validator ( fields, maybeFun, tag ) =
     let
-        field =
-            lookupField target fields
+        field_ =
+            field target fields
 
         ( newField, maybeArg ) =
-            case validator field.value fields of
+            case validator field_.value fields of
                 Ok result ->
-                    ( { field | status = Valid }, Just result )
+                    ( { field_ | status = Valid }, Just result )
 
                 Err error ->
-                    ( { field | status = Error error }, Nothing )
+                    ( { field_ | status = Error error }, Nothing )
     in
     ( if Nothing == tag || Just target == tag then
         Dict.insert target newField fields
@@ -136,7 +136,7 @@ mustBeChecked error checked _ =
 
 mustMatchField : tag -> err -> String -> FieldDict tag err -> Result err String
 mustMatchField tag error str fields =
-    if asString (lookupField tag fields).value == str then
+    if asString (field tag fields).value == str then
         Ok str
 
     else

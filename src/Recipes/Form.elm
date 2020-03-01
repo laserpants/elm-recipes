@@ -1,4 +1,4 @@
-module Recipes.Form exposing (Field, FieldDict, FieldList, Model, ModelState, Msg(..), Status(..), Validate, Variant(..), asBool, asString, checkbox, checkboxAttrs, fieldError, init, initState, inputAttrs, inputField, insertAsFormIn, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, lookupField, reset, run, setFieldDirty, setState, update, validateField)
+module Recipes.Form exposing (Field, FieldDict, FieldList, Model, ModelState, Msg(..), Status(..), Validate, Variant(..), asBool, asString, checkbox, checkboxAttrs, fieldError, init, initState, inputAttrs, inputField, insertAsFormIn, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, field, reset, run, setFieldDirty, setState, update, validateField, stringValue, boolValue)
 
 import AssocList as Dict exposing (Dict)
 import Html exposing (Html)
@@ -28,6 +28,9 @@ asString var =
         _ ->
             ""
 
+stringValue : Field err -> String
+stringValue = asString << .value
+
 
 asBool : Variant -> Bool
 asBool var =
@@ -37,6 +40,10 @@ asBool var =
 
         _ ->
             False
+
+
+boolValue : Field err -> Bool
+boolValue = asBool << .value
 
 
 type Msg field
@@ -196,8 +203,8 @@ setFormState state model =
     save { model | state = state }
 
 
-lookupField : field -> FieldDict field err -> Field err
-lookupField target =
+field : field -> FieldDict field err -> Field err
+field target =
     withDefaultNullField << Dict.get target
 
 
@@ -215,13 +222,13 @@ validateField :
     f
     -> Extended (ModelState f e d s) a
     -> ( Extended (ModelState f e d s) a, Cmd (Msg f) )
-validateField field (( { validate, state, fields }, _ ) as model) =
+validateField field_ (( { validate, state, fields }, _ ) as model) =
     let
         updateFields ( newFields, _, _ ) =
             lift (setFields newFields) model
     in
     fields
-        |> validate state (Just field)
+        |> validate state (Just field_)
         |> updateFields
 
 
@@ -273,7 +280,7 @@ setFieldDirty :
     -> Extended (ModelState f e d s) a
     -> ( Extended (ModelState f e d s) a, Cmd (Msg f) )
 setFieldDirty tag dirty =
-    withField tag (\field -> { field | dirty = dirty })
+    withField tag (\field_ -> { field_ | dirty = dirty })
 
 
 update :
@@ -298,8 +305,8 @@ update msg { onSubmit } model =
     (case msg of
         Submit ->
             let
-                fieldSetSubmitted _ field =
-                    { field
+                fieldSetSubmitted _ field_ =
+                    { field_
                         | dirty = True
                         , submitted = True
                     }
@@ -310,8 +317,8 @@ update msg { onSubmit } model =
 
         Input target value ->
             let
-                fieldSetValue field =
-                    { field
+                fieldSetValue field_ =
+                    { field_
                         | value = value
                         , dirty = True
                     }
@@ -322,7 +329,7 @@ update msg { onSubmit } model =
 
         Blur target ->
             fields
-                |> applyToField target (\field -> { field | dirty = False })
+                |> applyToField target (\field_ -> { field_ | dirty = False })
                 |> validate state (Just target)
 
         Focus _ ->
@@ -361,8 +368,8 @@ lookup2 :
     -> Html msg
 lookup2 fields f1 f2 fun =
     fun
-        (lookupField f1 fields)
-        (lookupField f2 fields)
+        (field f1 fields)
+        (field f2 fields)
 
 
 lookup3 :
@@ -374,9 +381,9 @@ lookup3 :
     -> Html msg
 lookup3 fields f1 f2 f3 fun =
     fun
-        (lookupField f1 fields)
-        (lookupField f2 fields)
-        (lookupField f3 fields)
+        (field f1 fields)
+        (field f2 fields)
+        (field f3 fields)
 
 
 lookup4 :
@@ -389,10 +396,10 @@ lookup4 :
     -> Html msg
 lookup4 fields f1 f2 f3 f4 fun =
     fun
-        (lookupField f1 fields)
-        (lookupField f2 fields)
-        (lookupField f3 fields)
-        (lookupField f4 fields)
+        (field f1 fields)
+        (field f2 fields)
+        (field f3 fields)
+        (field f4 fields)
 
 
 lookup5 :
@@ -406,11 +413,11 @@ lookup5 :
     -> Html msg
 lookup5 fields f1 f2 f3 f4 f5 fun =
     fun
-        (lookupField f1 fields)
-        (lookupField f2 fields)
-        (lookupField f3 fields)
-        (lookupField f4 fields)
-        (lookupField f5 fields)
+        (field f1 fields)
+        (field f2 fields)
+        (field f3 fields)
+        (field f4 fields)
+        (field f5 fields)
 
 
 lookup6 :
@@ -425,12 +432,12 @@ lookup6 :
     -> Html msg
 lookup6 fields f1 f2 f3 f4 f5 f6 fun =
     fun
-        (lookupField f1 fields)
-        (lookupField f2 fields)
-        (lookupField f3 fields)
-        (lookupField f4 fields)
-        (lookupField f5 fields)
-        (lookupField f6 fields)
+        (field f1 fields)
+        (field f2 fields)
+        (field f3 fields)
+        (field f4 fields)
+        (field f5 fields)
+        (field f6 fields)
 
 
 lookup7 :
@@ -446,10 +453,10 @@ lookup7 :
     -> Html msg
 lookup7 fields f1 f2 f3 f4 f5 f6 f7 fun =
     fun
-        (lookupField f1 fields)
-        (lookupField f2 fields)
-        (lookupField f3 fields)
-        (lookupField f4 fields)
-        (lookupField f5 fields)
-        (lookupField f6 fields)
-        (lookupField f7 fields)
+        (field f1 fields)
+        (field f2 fields)
+        (field f3 fields)
+        (field f4 fields)
+        (field f5 fields)
+        (field f6 fields)
+        (field f7 fields)
