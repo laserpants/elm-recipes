@@ -47,12 +47,18 @@ toJson { name, email, username, phoneNumber, password, acceptTerms } =
         ]
 
 
+type UsernameStatus
+    = Blank
+    | IsAvailable Bool
+    | Unknown
+
+
 type alias Model =
-    Form.Model Field Error Data
+    Form.ModelState Field Error Data UsernameStatus
 
 
-validate : Validate Field Error Data
-validate =
+validate : UsernameStatus -> Validate Field Error Data
+validate usernameStatus =
     let
         validateEmail =
             Validate.stringNotEmpty IsEmpty
@@ -61,17 +67,17 @@ validate =
         validateUsername =
             Validate.stringNotEmpty IsEmpty
                 |> Validate.andThen (Validate.alphaNumeric NotAlphanumeric)
+                |> Validate.andThen
+                    (always
+                        << (case usernameStatus of
+                                IsAvailable False ->
+                                    always (Err UsernameTaken)
 
-        --                |> Validate.andThen
-        --                    (always
-        --                        << (case usernameStatus of
-        --                                IsAvailable False ->
-        --                                    always (Err UsernameTaken)
-        --
-        --                                _ ->
-        --                                    Ok
-        --                           )
-        --                    )
+                                _ ->
+                                    Ok
+                           )
+                    )
+
         validatePassword =
             Validate.stringNotEmpty IsEmpty
                 |> Validate.andThen (Validate.atLeastLength 8 PasswordTooShort)
@@ -91,12 +97,12 @@ validate =
 
 
 init : FieldList Field Error -> ( Model, Cmd Msg )
-init =
-    Form.init validate
+init fields =
+    Form.initState validate fields Blank
 
 
 view : Model -> Html Msg
-view { fields, disabled } =
+view { fields, disabled, state } =
     let
         errorHelper field =
             case Form.fieldError field of
@@ -143,6 +149,7 @@ view { fields, disabled } =
                         (Form.inputAttrs Username username)
                         []
                     , div [] [ errorHelper username ]
+                    , div [] [ text (Debug.toString state) ]
                     ]
                 , div []
                     [ label [] [ text "Phone number" ]

@@ -8,7 +8,7 @@ type Error
     | TermsNotAccepted
     | DoesNotMatchPassword
     | PasswordTooShort
-      --    | UsernameTaken
+    | UsernameTaken
     | NotAlphanumeric
 
 

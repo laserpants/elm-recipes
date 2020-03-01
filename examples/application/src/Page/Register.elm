@@ -1,37 +1,79 @@
 module Page.Register exposing (..)
 
 import Data.User as User exposing (User)
-import Form.Register
+import Data.Websocket.UsernameAvailableResponse as UsernameAvailableResponse exposing (UsernameAvailableResponse)
+import Form.Error exposing (Error(..))
+import Form.Register exposing (Field(..), UsernameStatus(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
+import Json.Encode as Encode
+import Page.Register.Ports as Ports
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, insertAsApiIn)
 import Recipes.Api.Json as JsonApi
-import Recipes.Form as Form exposing (insertAsFormIn)
-import Update.Pipeline exposing (andMap, mapCmd, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, runStackE)
+import Recipes.Form as Form exposing (FieldDict, insertAsFormIn)
+import Set exposing (Set)
+import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, mapCmd, save, using, when)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, lift, runStack, runStackE)
+import Util exposing (liftWhen, extendedUsing)
+
+
+type WebSocketMessage
+    = WsUsernameAvailable UsernameAvailableResponse
+
+
+websocketMessageDecoder : Json.Decoder WebSocketMessage
+websocketMessageDecoder =
+    let
+        payloadDecoder messageType =
+            case messageType of
+                "username_available_response" ->
+                    Json.map WsUsernameAvailable UsernameAvailableResponse.decoder
+
+                _ ->
+                    Json.fail "Unrecognized message type"
+    in
+    Json.field "type" Json.string
+        |> Json.andThen payloadDecoder
 
 
 type Msg
     = ApiMsg (Api.Msg User)
     | FormMsg Form.Register.Msg
+    | WebsocketMsg String
 
 
 type alias Model =
     { api : Api.Model User
     , form : Form.Register.Model
+    , unavailableUsernames : Set String
     }
 
 
-inApi : Run (Extended Model c) (Api.Model User) Msg (Api.Msg User) f
+inApi : Run (Extended Model b) (Api.Model User) Msg (Api.Msg User) a
 inApi =
     runStackE .api insertAsApiIn ApiMsg
 
 
-inForm : Run (Extended Model c) Form.Register.Model Msg Form.Register.Msg f
+inForm : Run Model Form.Register.Model Msg Form.Register.Msg a
 inForm =
+    runStack .form insertAsFormIn FormMsg
+
+
+inFormE : Run (Extended Model b) Form.Register.Model Msg Form.Register.Msg a
+inFormE =
     runStackE .form insertAsFormIn FormMsg
+
+
+setUsernameStatus : UsernameStatus -> Model -> ( Model, Cmd Msg )
+setUsernameStatus =
+    inForm << Form.setState
+
+
+setUsernameUnavailable : String -> Model -> ( Model, Cmd Msg )
+setUsernameUnavailable username state =
+    save { state | unavailableUsernames = Set.insert username state.unavailableUsernames }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -51,11 +93,12 @@ init () =
     save Model
         |> andMap (mapCmd ApiMsg api)
         |> andMap (mapCmd FormMsg form)
+        |> andMap (save Set.empty)
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Ports.websocketIn WebsocketMsg
 
 
 handleSubmit :
@@ -64,6 +107,52 @@ handleSubmit :
     -> ( Extended Model a, Cmd Msg )
 handleSubmit =
     Form.Register.toJson >> JsonApi.sendJson "" >> inApi
+
+
+usernameIsAvailableQuery : String -> Json.Value
+usernameIsAvailableQuery username =
+    Encode.object
+        [ ( "type", Encode.string "username_available_query" )
+        , ( "username", Encode.string username )
+        ]
+
+
+validateUsernameField :
+    Extended Model a
+    -> ( Extended Model a, Cmd Msg )
+validateUsernameField =
+    inFormE
+        (Form.validateField Username
+            >> andThen (Form.setFieldDirty Username False)
+        )
+
+
+checkIfUsernameAvailable :
+    String
+    -> Extended Model a
+    -> ( Extended Model a, Cmd Msg )
+checkIfUsernameAvailable name =
+    extendedUsing
+        (\{ unavailableUsernames } ->
+            let
+                setStatus =
+                    lift << setUsernameStatus
+            in
+            if String.isEmpty name then
+                setStatus Blank
+
+            else if Set.member name unavailableUsernames then
+                setStatus (IsAvailable False)
+                    >> andThen validateUsernameField
+
+            else
+                let
+                    encodedMsg =
+                        Encode.encode 0 (usernameIsAvailableQuery name)
+                in
+                setStatus Unknown
+                    >> andAddCmd (Ports.websocketOut encodedMsg)
+        )
 
 
 update :
@@ -77,11 +166,43 @@ update msg { onRegistrationComplete } =
             let
                 handleSuccess user =
                     call (onRegistrationComplete user)
+
+                handlers =
+                    { apiDefaultHandlers | onSuccess = handleSuccess }
             in
-            inApi (Api.update apiMsg { apiDefaultHandlers | onSuccess = handleSuccess })
+            inApi (Api.update apiMsg handlers)
 
         FormMsg formMsg ->
-            inForm (Form.update formMsg { onSubmit = handleSubmit })
+            inFormE (Form.update formMsg { onSubmit = handleSubmit })
+                >> andThen
+                    (case formMsg of
+                        Form.Input Username username ->
+                            checkIfUsernameAvailable (Form.asString username)
+
+                        _ ->
+                            save
+                    )
+
+        WebsocketMsg wsMsg ->
+            case Json.decodeString websocketMessageDecoder wsMsg of
+                Ok (WsUsernameAvailable { username, available }) ->
+                    extendedUsing
+                        (\{ form } ->
+                            let 
+                                fieldValue = 
+                                    form.fields
+                                        |> Form.field Username 
+                                        |> Form.stringValue 
+                            in
+                            liftWhen (username == fieldValue)
+                                (setUsernameStatus (IsAvailable available))
+                        )
+                        >> andThenIf (not available)
+                            (lift (setUsernameUnavailable username))
+                        >> andThen validateUsernameField
+
+                _ ->
+                    save
 
 
 view : Model -> Html Msg
