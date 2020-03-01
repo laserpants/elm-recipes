@@ -1,6 +1,6 @@
 module Util exposing (..)
 
-import Update.Pipeline exposing (when, using)
+import Update.Pipeline exposing (using, when)
 import Update.Pipeline.Extended exposing (Extended, lift)
 
 

@@ -16,7 +16,7 @@ import Recipes.Form as Form exposing (FieldDict, insertAsFormIn)
 import Set exposing (Set)
 import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, mapCmd, save, using, when)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, lift, runStack, runStackE)
-import Util exposing (liftWhen, extendedUsing)
+import Util exposing (extendedUsing, liftWhen)
 
 
 type WebSocketMessage
@@ -188,11 +188,11 @@ update msg { onRegistrationComplete } =
                 Ok (WsUsernameAvailable { username, available }) ->
                     extendedUsing
                         (\{ form } ->
-                            let 
-                                fieldValue = 
+                            let
+                                fieldValue =
                                     form.fields
-                                        |> Form.field Username 
-                                        |> Form.stringValue 
+                                        |> Form.field Username
+                                        |> Form.stringValue
                             in
                             liftWhen (username == fieldValue)
                                 (setUsernameStatus (IsAvailable available))
