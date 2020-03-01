@@ -12,11 +12,11 @@ import Json.Encode as Encode
 import Page.Register.Ports as Ports
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, insertAsApiIn)
 import Recipes.Api.Json as JsonApi
-import Recipes.Form as Form exposing (FieldDict, insertAsFormIn)
+import Recipes.Form as Form exposing (insertAsFormIn)
 import Set exposing (Set)
 import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, mapCmd, save, using, when)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, lift, runStack, runStackE)
-import Util exposing (extendedUsing, liftWhen)
+import Util exposing (choosing)
 
 
 type WebSocketMessage
@@ -132,7 +132,7 @@ checkIfUsernameAvailable :
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
 checkIfUsernameAvailable name =
-    extendedUsing
+    choosing
         (\{ unavailableUsernames } ->
             let
                 setStatus =
@@ -186,7 +186,7 @@ update msg { onRegistrationComplete } =
         WebsocketMsg wsMsg ->
             case Json.decodeString websocketMessageDecoder wsMsg of
                 Ok (WsUsernameAvailable { username, available }) ->
-                    extendedUsing
+                    choosing
                         (\{ form } ->
                             let
                                 fieldValue =
@@ -194,8 +194,8 @@ update msg { onRegistrationComplete } =
                                         |> Form.field Username
                                         |> Form.stringValue
                             in
-                            liftWhen (username == fieldValue)
-                                (setUsernameStatus (IsAvailable available))
+                            when (username == fieldValue)
+                                (lift (setUsernameStatus (IsAvailable available)))
                         )
                         >> andThenIf (not available)
                             (lift (setUsernameUnavailable username))
