@@ -1,8 +1,8 @@
 module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
-import Update.Pipeline exposing (andAddCmd, andThen, save, using)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, extend, lift, runStack, sequenceCalls)
+import Update.Pipeline exposing (andAddCmd, andThen, save)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, extend, lift, runStack, sequenceCalls, choosing)
 
 
 type Msg resource
@@ -130,8 +130,8 @@ withResource :
     -> Extended (Model resource) a
     -> ( Extended (Model resource) a, Cmd (Msg resource) )
 withResource fun =
-    using
-        (\( { resource }, _ ) ->
+    choosing
+        (\{ resource } ->
             case resource of
                 Available item ->
                     lift (setResource (Available (fun item)))

@@ -15,8 +15,7 @@ import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
 import Set exposing (Set)
 import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, mapCmd, save, using, when)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, lift, runStack, runStackE)
-import Util exposing (choosing)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, lift, runStack, runStackE, choosing)
 
 
 type WebSocketMessage
