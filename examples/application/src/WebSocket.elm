@@ -1,3 +1,5 @@
 module WebSocket exposing (..)
 
-todo = 1
+
+todo =
+    1

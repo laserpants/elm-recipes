@@ -246,18 +246,24 @@ subscriptions { page } =
 
 
 view : Model -> Document Msg
-view { page } =
+view { page, session } =
     { title = ""
     , body =
         [ div []
             [ ul []
-                [ li [] [ a [ href "/" ] [ text "Home" ] ]
-                , li [] [ a [ href "/about" ] [ text "About" ] ]
-                , li [] [ a [ href "/posts/new" ] [ text "New post" ] ]
-                , li [] [ a [ href "/login" ] [ text "Login" ] ]
-                , li [] [ a [ href "/register" ] [ text "Register" ] ]
-                , li [] [ a [ onClick Logout ] [ text "Logout" ] ]
-                ]
+                ([ li [] [ a [ href "/" ] [ text "Home" ] ]
+                 , li [] [ a [ href "/about" ] [ text "About" ] ]
+                 , li [] [ a [ href "/posts/new" ] [ text "New post" ] ]
+                 , li [] [ a [ href "/login" ] [ text "Login" ] ]
+                 , li [] [ a [ href "/register" ] [ text "Register" ] ]
+                 ]
+                    ++ (if Maybe.isJust session then
+                            [ li [] [ a [ onClick Logout ] [ text "Logout" ] ] ]
+
+                        else
+                            []
+                       )
+                )
             ]
         , div []
             [ Html.map PageMsg (Page.view page)
