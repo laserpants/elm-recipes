@@ -258,7 +258,7 @@ view { page, session } =
                  , li [] [ a [ href "/register" ] [ text "Register" ] ]
                  ]
                     ++ (if Maybe.isJust session then
-                            [ li [] [ a [ onClick Logout ] [ text "Logout" ] ] ]
+                            [ li [] [ a [ onClick Logout ] [ text "Log out" ] ] ]
 
                         else
                             []
