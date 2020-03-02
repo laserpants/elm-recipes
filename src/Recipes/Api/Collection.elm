@@ -2,8 +2,8 @@ module Recipes.Api.Collection exposing (..)
 
 import Http exposing (Expect)
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers)
-import Update.Pipeline exposing (andMap, andThen, save, using, with)
-import Update.Pipeline.Extended exposing (Extended, Run, andLift, lift, runStack, runStackE)
+import Update.Pipeline exposing (andMap, andThen, save, with)
+import Update.Pipeline.Extended exposing (Extended, Run, andLift, lift, runStack, runStackE, choosing)
 import Url.Builder as Builder
 
 
@@ -120,14 +120,14 @@ nextPage :
     Extended (Collection item) a
     -> ( Extended (Collection item) a, Cmd (Msg item) )
 nextPage =
-    using (\( { current }, _ ) -> goToPage (current + 1))
+    choosing (\{ current } -> goToPage (current + 1))
 
 
 prevPage :
     Extended (Collection item) a
     -> ( Extended (Collection item) a, Cmd (Msg item) )
 prevPage =
-    using (\( { current }, _ ) -> goToPage (max 1 (current - 1)))
+    choosing (\{ current } -> goToPage (max 1 (current - 1)))
 
 
 updateCurrentPage :
