@@ -1,7 +1,6 @@
 module Page.Home exposing (..)
 
 import Data.Post as Post exposing (Post)
-import WebSocket.Ping as Ping
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -13,6 +12,7 @@ import Recipes.Api.Json as JsonApi
 import Recipes.WebSocket as WebSocket
 import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, runStack, runStackE)
+import WebSocket.Ping as Ping
 
 
 type Msg
@@ -56,10 +56,12 @@ init () =
 
         websocket =
             WebSocket.init
-                |> andThen (WebSocket.insertHandler
-                    PingWsResponseMsg
-                    Ping.responseId
-                    Ping.responseDecoder)
+                |> andThen
+                    (WebSocket.insertHandler
+                        PingWsResponseMsg
+                        Ping.responseId
+                        Ping.responseDecoder
+                    )
     in
     save Model
         |> andMap (mapCmd ApiMsg api)

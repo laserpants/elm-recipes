@@ -1,7 +1,6 @@
 module Page.Register exposing (..)
 
 import Data.User as User exposing (User)
-import WebSocket.UsernameAvailable as UsernameAvailable
 import Dict
 import Form.Error exposing (Error(..))
 import Form.Register exposing (Field(..), UsernameStatus(..))
@@ -17,6 +16,7 @@ import Recipes.WebSocket as WebSocket
 import Set exposing (Set)
 import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, mapCmd, save, using, when)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, choosing, lift, runStack, runStackE)
+import WebSocket.UsernameAvailable as UsernameAvailable
 
 
 type Msg
@@ -75,10 +75,12 @@ init () =
 
         websocket =
             WebSocket.init
-                |> andThen (WebSocket.insertHandler
-                      UsernameAvailableWsResponseMsg
-                      UsernameAvailable.responseId
-                      UsernameAvailable.responseDecoder)
+                |> andThen
+                    (WebSocket.insertHandler
+                        UsernameAvailableWsResponseMsg
+                        UsernameAvailable.responseId
+                        UsernameAvailable.responseDecoder
+                    )
     in
     save Model
         |> andMap (mapCmd ApiMsg api)

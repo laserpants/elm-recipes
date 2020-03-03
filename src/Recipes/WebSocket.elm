@@ -29,14 +29,13 @@ insertHandler :
     -> MessageHandler msg
     -> ( MessageHandler msg, Cmd msg )
 insertHandler toMsg key decoder =
-    let 
+    let
         handler =
             decoder
                 |> Json.field "payload"
                 |> Json.andThen (toMsg >> Json.succeed)
     in
-    addParser key handler 
-
+    addParser key handler
 
 
 init : ( MessageHandler msg, Cmd msg )
