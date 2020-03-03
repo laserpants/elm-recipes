@@ -22,13 +22,13 @@ addParser key decoder model =
     save { model | parsers = Dict.insert key decoder model.parsers }
 
 
-insertHandler :
+createHandler :
     (a -> msg)
     -> String
     -> Json.Decoder a
     -> MessageHandler msg
     -> ( MessageHandler msg, Cmd msg )
-insertHandler toMsg key decoder =
+createHandler toMsg key decoder =
     let
         handler =
             decoder

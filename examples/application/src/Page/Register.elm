@@ -76,7 +76,7 @@ init () =
         websocket =
             WebSocket.init
                 |> andThen
-                    (WebSocket.insertHandler
+                    (WebSocket.createHandler
                         UsernameAvailableWsResponseMsg
                         UsernameAvailable.responseId
                         UsernameAvailable.responseDecoder

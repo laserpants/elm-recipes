@@ -57,7 +57,7 @@ init () =
         websocket =
             WebSocket.init
                 |> andThen
-                    (WebSocket.insertHandler
+                    (WebSocket.createHandler
                         PingWsResponseMsg
                         Ping.responseId
                         Ping.responseDecoder
