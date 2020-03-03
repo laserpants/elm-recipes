@@ -1,7 +1,7 @@
 module Page.Register exposing (..)
 
 import Data.User as User exposing (User)
-import Data.WebSocket.UsernameAvailable as UsernameAvailable
+import WebSocket.UsernameAvailable as UsernameAvailable
 import Dict
 import Form.Error exposing (Error(..))
 import Form.Register exposing (Field(..), UsernameStatus(..))
@@ -23,7 +23,7 @@ type Msg
     = ApiMsg (Api.Msg User)
     | FormMsg Form.Register.Msg
     | WebSocketMsg (Result WebSocket.Error Msg)
-    | UsernameAvailableResponseMsg UsernameAvailable.Response
+    | UsernameAvailableWsResponseMsg UsernameAvailable.WsResponse
 
 
 type alias Model =
@@ -76,8 +76,8 @@ init () =
         websocket =
             WebSocket.init
                 |> andThen (WebSocket.insertHandler
-                      UsernameAvailableResponseMsg
-                      UsernameAvailable.responseAtom
+                      UsernameAvailableWsResponseMsg
+                      UsernameAvailable.responseId
                       UsernameAvailable.responseDecoder)
     in
     save Model
@@ -127,14 +127,8 @@ checkIfUsernameAvailable name =
                     >> andThen (inFormE validateUsernameField)
 
             else
-                let
-                    message =
-                        Encode.object
-                            [ ( "username", Encode.string name )
-                            ]
-                in
                 setStatus Unknown
-                    >> andThen (WebSocket.sendMessage "username_available_query" message)
+                    >> andThen (UsernameAvailable.sendRequest { username = name })
         )
 
 
@@ -169,7 +163,7 @@ update msg ({ onRegistrationComplete } as callbacks) =
         WebSocketMsg ws ->
             WebSocket.updateExtendedModel update callbacks ws
 
-        UsernameAvailableResponseMsg { username, isAvailable } ->
+        UsernameAvailableWsResponseMsg { username, isAvailable } ->
             choosing
                 (\{ form } ->
                     let

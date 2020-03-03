@@ -1,7 +1,7 @@
 module Page.Home exposing (..)
 
 import Data.Post as Post exposing (Post)
-import Data.WebSocket.Ping as Ping
+import WebSocket.Ping as Ping
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -19,7 +19,7 @@ type Msg
     = ApiMsg (Api.Msg (List Post))
     | WebSocketMsg (Result WebSocket.Error Msg)
     | SendPing
-    | PingResponseMsg Ping.Response
+    | PingWsResponseMsg Ping.WsResponse
 
 
 type alias Model =
@@ -57,8 +57,8 @@ init () =
         websocket =
             WebSocket.init
                 |> andThen (WebSocket.insertHandler
-                    PingResponseMsg
-                    Ping.responseAtom
+                    PingWsResponseMsg
+                    Ping.responseId
                     Ping.responseDecoder)
     in
     save Model
@@ -86,9 +86,9 @@ update msg callbacks =
             WebSocket.updateExtendedModel update callbacks ws
 
         SendPing ->
-            WebSocket.sendMessage "ping" (Encode.object [])
+            Ping.send
 
-        PingResponseMsg { message } ->
+        PingWsResponseMsg { message } ->
             Debug.log message save
 
 
