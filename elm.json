@@ -15,7 +15,9 @@
         "Recipes.Switch",
         "Recipes.Switch.Extended",
         "Recipes.Session.LocalStorage.Ports",
-        "Recipes.Session.LocalStorage"
+        "Recipes.Session.LocalStorage",
+        "Recipes.WebSocket",
+        "Recipes.WebSocket.Ports"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {
