@@ -1,4 +1,4 @@
-module Data.Websocket.UsernameAvailableResponse exposing (..)
+module Data.WebSocket.UsernameAvailableResponse exposing (..)
 
 import Json.Decode as Json exposing (bool, field, string)
 

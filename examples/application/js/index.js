@@ -24,7 +24,14 @@ if (app.ports && app.ports.websocketOut && app.ports.websocketIn) {
   app.ports.websocketOut.subscribe(function(data) {
     var envelope = JSON.parse(data),
         message = envelope.payload;
-    if ('username_available_query' === envelope.type) {
+    if ('ping' === envelope.type) {
+      app.ports.websocketIn.send(JSON.stringify({ 
+        type: 'ping_response',
+        payload: {
+          message: 'pong'
+        }
+      }));
+    } else if ('username_available_query' === envelope.type) {
       setTimeout(function() {
         var response = {
           type: 'username_available_response',
@@ -34,7 +41,7 @@ if (app.ports && app.ports.websocketOut && app.ports.websocketIn) {
           }
         };
         app.ports.websocketIn.send(JSON.stringify(response));
-      }, 200);
+      }, 150);
     }
   });
 }
