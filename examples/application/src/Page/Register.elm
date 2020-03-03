@@ -13,10 +13,10 @@ import Json.Encode as Encode
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, insertAsApiIn)
 import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
+import Recipes.WebSocket as WebSocket
 import Set exposing (Set)
 import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, mapCmd, save, using, when)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, choosing, lift, runStack, runStackE)
-import WebSocket
 
 
 type Msg

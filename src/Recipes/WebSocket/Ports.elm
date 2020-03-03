@@ -1,4 +1,4 @@
-port module WebSocket.Ports exposing (websocketIn, websocketOut)
+port module Recipes.WebSocket.Ports exposing (websocketIn, websocketOut)
 
 
 port websocketIn : (String -> msg) -> Sub msg

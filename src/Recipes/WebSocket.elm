@@ -1,10 +1,10 @@
-module WebSocket exposing (..)
+module Recipes.WebSocket exposing (..)
 
 import Dict exposing (Dict)
 import Json.Decode as Json exposing (decodeString, field)
 import Json.Encode as Encode
 import Update.Pipeline exposing (addCmd, andMap, save)
-import WebSocket.Ports as Ports
+import Recipes.WebSocket.Ports as Ports
 
 
 type Error
