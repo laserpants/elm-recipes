@@ -600,3 +600,11 @@ type alias Item5 a b =
 
 type alias Item6 a b =
     Recipes.Switch.Item6 a b
+
+
+option6 :
+    (Bool -> Bool -> Bool -> Bool -> Bool -> Bool -> a)
+    -> OneOf6 a1 a2 a3 a4 a5 a6
+    -> a
+option6 =
+    Recipes.Switch.option6

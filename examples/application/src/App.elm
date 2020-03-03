@@ -2,6 +2,9 @@ module App exposing (..)
 
 import Browser exposing (Document)
 import Browser.Navigation as Navigation
+import Bulma.Layout exposing (SectionSpacing(..))
+import Bulma.Modifiers exposing (..)
+import Data.Comment exposing (Comment)
 import Data.Post exposing (Post)
 import Data.Session as Session exposing (Session)
 import Data.User exposing (User)
@@ -12,11 +15,11 @@ import Maybe.Extra as Maybe
 import Page as Page exposing (Pages, index, pages)
 import Recipes.Router as Router exposing (Router)
 import Recipes.Session.LocalStorage as LocalStorage exposing (setSession)
-import Recipes.Switch.Extended as Switch exposing (Info, RunSwitch)
+import Recipes.Switch.Extended as Switch exposing (RunSwitch)
 import Route as Route exposing (Route(..))
 import Ui
 import Update.Pipeline exposing (andMap, andThen, andThenIf, mapCmd, save, using, when, with)
-import Update.Pipeline.Extended exposing (Run)
+import Update.Pipeline.Extended exposing (Run, lift, runStack)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
 
@@ -67,16 +70,35 @@ inPage =
     Page.run PageMsg pages
 
 
+inUi : Run Model Ui.Model Msg Ui.Msg a
+inUi =
+    Ui.run UiMsg
+
+
 redirectTo : String -> Model -> ( Model, Cmd Msg )
 redirectTo =
     inRouter << Router.redirect
 
 
-loadPage :
-    (Pages a -> Info arg Page.Model Page.Msg m msg h a)
-    -> arg
+showToast :
+    { a
+        | message : String
+        , color : Color
+    }
     -> Model
     -> ( Model, Cmd Msg )
+showToast =
+    inUi << lift << Ui.showToast
+
+
+
+--loadPage :
+--    (Pages a -> Info arg Page.Model Page.Msg m msg h a)
+--    -> arg
+--    -> Model
+--    -> ( Model, Cmd Msg )
+
+
 loadPage page =
     inPage << Switch.to page
 
@@ -112,12 +134,12 @@ handleRouteChange url maybeRoute =
                         -- Set URL to redirect back to after successful login
                         setRestrictedUrl url
                             >> andThen (redirectTo "/login")
-                        -->> andThen
-                        --    (showToast
-                        --        { message = "You must log in to access that page."
-                        --        , color = Warning
-                        --        }
-                        --    )
+                            >> andThen
+                                (showToast
+                                    { message = "You must log in to access that page."
+                                    , color = Warning
+                                    }
+                                )
 
                     else
                         doLoadPage
@@ -166,10 +188,7 @@ handleRouteChange url maybeRoute =
                 resetRestrictedUrl
         )
         >> andThen changePage
-
-
-
--->> andThen (inUi Ui.closeMenu)
+        >> andThen (inUi (lift Ui.closeMenu))
 
 
 handleAuthResponse : Maybe Session -> Model -> ( Model, Cmd Msg )
@@ -189,26 +208,26 @@ handleAuthResponse maybeSession =
 handlePostAdded : Post -> Model -> ( Model, Cmd Msg )
 handlePostAdded _ =
     redirectTo "/"
+        >> andThen
+            (inUi
+                (lift
+                    (Ui.showToast
+                        { message = "Your post was published.", color = Info }
+                    )
+                )
+            )
 
 
-
---        >> andThen
---            (inUi
---                (Ui.showToast
---                    { message = "Your post was published.", color = Info }
---                )
---            )
-
-
+handleCommentCreated : Comment -> Model -> ( Model, Cmd Msg )
 handleCommentCreated _ =
-    save
-
-
-
---    inUi
---        (Ui.showToast
---            { message = "Your comment has been received.", color = Info }
---        )
+    inUi
+        (lift
+            (Ui.showToast
+                { message = "Your comment has been received."
+                , color = Info
+                }
+            )
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -233,21 +252,18 @@ update msg =
             inPage (Switch.update pageMsg handlers)
 
         UiMsg uiMsg ->
-            Debug.todo ""
+            inUi (Ui.update uiMsg)
 
         Logout ->
             setSession Nothing
                 >> andThen LocalStorage.clearStorage
                 >> andThen (redirectTo "/")
-
-
-
---                >> andThen
---                    (showToast
---                        { message = "You have been logged out."
---                        , color = Info
---                        }
---                    )
+                >> andThen
+                    (showToast
+                        { message = "You have been logged out."
+                        , color = Info
+                        }
+                    )
 
 
 subscriptions : Model -> Sub Msg
@@ -259,9 +275,12 @@ view : Model -> Document Msg
 view { page, session, ui } =
     { title = "Welcome to Facepalm"
     , body =
-        [ -- toast
-          Ui.navbar ui session
-        , Html.map PageMsg (Page.view page)
+        [ div [] [] -- toast
+        , Bulma.Layout.section NotSpaced
+            []
+            [ Html.map UiMsg (Ui.navbar ui page session)
+            , Html.map PageMsg (Page.view page)
+            ]
         ]
 
     --        [ div []

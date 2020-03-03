@@ -8,10 +8,12 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Maybe.Extra as Maybe
+import Page
 import Process
 import Task
 import Ui.Toast
 import Update.Pipeline exposing (andAddCmd, andThen, save, using, when)
+import Update.Pipeline.Extended exposing (Extended, Run, choosing, lift, runStack)
 
 
 type Msg
@@ -87,6 +89,22 @@ dismissToast model =
     save { model | toast = Nothing }
 
 
+type alias HasUi a =
+    { a | ui : Model }
+
+
+insertAsUiIn : HasUi a -> Model -> ( HasUi a, Cmd msg )
+insertAsUiIn model ui =
+    save { model | ui = ui }
+
+
+run :
+    (msg2 -> msg1)
+    -> Run (HasUi a) Model msg1 msg2 b
+run =
+    runStack .ui insertAsUiIn
+
+
 init : ( Model, Cmd Msg )
 init =
     save
@@ -96,21 +114,21 @@ init =
         }
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Extended Model a -> ( Extended Model a, Cmd Msg )
 update msg =
     case msg of
         ToggleMenu ->
-            toggleMenu
+            lift toggleMenu
 
         DismissToast dismissId ->
-            using
+            choosing
                 (\{ toast } ->
                     case toast of
                         Nothing ->
                             save
 
                         Just { id } ->
-                            when (dismissId == id) dismissToast
+                            when (dismissId == id) (lift dismissToast)
                 )
 
 
@@ -142,8 +160,8 @@ spinner =
         ]
 
 
-navbar : Model -> Maybe Session -> Html msg
-navbar { menuIsOpen } maybeSession =
+navbar : Model -> Page.Model -> Maybe Session -> Html Msg
+navbar { menuIsOpen } page maybeSession =
     let
         isAuthenticated =
             Maybe.isJust maybeSession
@@ -151,8 +169,7 @@ navbar { menuIsOpen } maybeSession =
         burger =
             navbarBurger menuIsOpen
                 [ class "has-text-white"
-
-                --                , onClick ToggleMenu
+                , onClick ToggleMenu
                 ]
                 [ span [] []
                 , span [] []
@@ -187,8 +204,51 @@ navbar { menuIsOpen } maybeSession =
                 [ p [ class "control" ]
                     [ a [ class "button is-primary", href "/logout" ] [ text "Log out" ] ]
                 ]
+
+        { isHomePage, isAboutPage, isNewPostPage } =
+            page
+                |> Page.option
     in
     fixedNavbar Top
         { navbarModifiers | color = Info }
         []
-        []
+        [ navbarBrand []
+            burger
+            [ navbarItem False
+                []
+                [ h5 [ class "title is-5" ]
+                    [ a
+                        [ class "has-text-white"
+                        , href "/"
+                        ]
+                        [ text "Facepalm" ]
+                    ]
+                ]
+            , navbarMenu menuIsOpen
+                []
+                [ navbarStart [ class "is-unselectable" ]
+                    [ navbarItemLink isHomePage
+                        [ href "/"
+                        ]
+                        [ text "Home"
+                        ]
+                    , navbarItemLink isAboutPage
+                        [ href "/about"
+                        ]
+                        [ text "About"
+                        ]
+                    , navbarItemLink isNewPostPage
+                        [ href "/posts/new"
+                        ]
+                        [ text "New post"
+                        ]
+                    ]
+                , navbarEnd []
+                    [ navbarItem False
+                        []
+                        [ div [ class "field is-grouped" ] buttons
+                        ]
+                    ]
+                ]
+            ]
+        ]

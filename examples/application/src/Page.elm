@@ -12,7 +12,7 @@ import Page.NewPost
 import Page.Register
 import Page.ShowPost
 import Recipes.Switch exposing (Switch(..))
-import Recipes.Switch.Extended as Switch exposing (Item1, Item2, Item3, Item4, Item5, Item6, Layout6, OneOf6, RunSwitch, index6, layout6, runStack)
+import Recipes.Switch.Extended as Switch exposing (Item1, Item2, Item3, Item4, Item5, Item6, Layout6, OneOf6, RunSwitch, index6, layout6, option6, runStack)
 import Update.Pipeline exposing (save)
 import Update.Pipeline.Extended exposing (Extended)
 
@@ -143,6 +143,21 @@ index :
     }
 index =
     index6 Index
+
+
+type alias Option =
+    { isHomePage : Bool
+    , isNewPostPage : Bool
+    , isShowPostPage : Bool
+    , isLoginPage : Bool
+    , isRegisterPage : Bool
+    , isAboutPage : Bool
+    }
+
+
+option : Model -> Option
+option =
+    option6 Option
 
 
 subscriptions : Model -> Sub Msg
