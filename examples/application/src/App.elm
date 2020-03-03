@@ -14,6 +14,7 @@ import Recipes.Router as Router exposing (Router)
 import Recipes.Session.LocalStorage as LocalStorage exposing (setSession)
 import Recipes.Switch.Extended as Switch exposing (Info, RunSwitch)
 import Route as Route exposing (Route(..))
+import Ui
 import Update.Pipeline exposing (andMap, andThen, andThenIf, mapCmd, save, using, when, with)
 import Update.Pipeline.Extended exposing (Run)
 import Url exposing (Url)
@@ -29,6 +30,7 @@ type alias Flags =
 type Msg
     = RouterMsg Router.Msg
     | PageMsg Page.Msg
+    | UiMsg Ui.Msg
     | Logout
 
 
@@ -37,6 +39,7 @@ type alias Model =
     , page : Page.Model
     , session : Maybe Session
     , restrictedUrl : Maybe String
+    , ui : Ui.Model
     }
 
 
@@ -86,12 +89,16 @@ init { session, basePath } url key =
 
         page =
             save Switch.initial
+
+        ui =
+            Ui.init
     in
     save Model
         |> andMap (mapCmd RouterMsg router)
         |> andMap (mapCmd PageMsg page)
         |> andMap (save Nothing)
         |> andMap (save Nothing)
+        |> andMap (mapCmd UiMsg ui)
         |> andThen (update (Router.onUrlChange RouterMsg url))
 
 
@@ -225,6 +232,9 @@ update msg =
             in
             inPage (Switch.update pageMsg handlers)
 
+        UiMsg uiMsg ->
+            Debug.todo ""
+
         Logout ->
             setSession Nothing
                 >> andThen LocalStorage.clearStorage
@@ -246,27 +256,32 @@ subscriptions { page } =
 
 
 view : Model -> Document Msg
-view { page, session } =
-    { title = ""
+view { page, session, ui } =
+    { title = "Welcome to Facepalm"
     , body =
-        [ div []
-            [ ul []
-                ([ li [] [ a [ href "/" ] [ text "Home" ] ]
-                 , li [] [ a [ href "/about" ] [ text "About" ] ]
-                 , li [] [ a [ href "/posts/new" ] [ text "New post" ] ]
-                 , li [] [ a [ href "/login" ] [ text "Login" ] ]
-                 , li [] [ a [ href "/register" ] [ text "Register" ] ]
-                 ]
-                    ++ (if Maybe.isJust session then
-                            [ li [] [ a [ onClick Logout ] [ text "Log out" ] ] ]
-
-                        else
-                            []
-                       )
-                )
-            ]
-        , div []
-            [ Html.map PageMsg (Page.view page)
-            ]
+        [ -- toast
+          Ui.navbar ui session
+        , Html.map PageMsg (Page.view page)
         ]
+
+    --        [ div []
+    --            [ ul []
+    --                ([ li [] [ a [ href "/" ] [ text "Home" ] ]
+    --                 , li [] [ a [ href "/about" ] [ text "About" ] ]
+    --                 , li [] [ a [ href "/posts/new" ] [ text "New post" ] ]
+    --                 , li [] [ a [ href "/login" ] [ text "Login" ] ]
+    --                 , li [] [ a [ href "/register" ] [ text "Register" ] ]
+    --                 ]
+    --                    ++ (if Maybe.isJust session then
+    --                            [ li [] [ a [ onClick Logout ] [ text "Log out" ] ] ]
+    --
+    --                        else
+    --                            []
+    --                       )
+    --                )
+    --            ]
+    --        , div []
+    --            [ Html.map PageMsg (Page.view page)
+    --            ]
+    --        ]
     }
