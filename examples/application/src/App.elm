@@ -80,6 +80,12 @@ redirectTo =
     inRouter << Router.redirect
 
 
+returnToRestrictedUrl : Model -> ( Model, Cmd Msg )
+returnToRestrictedUrl =
+    with .restrictedUrl
+        (Maybe.withDefault "/" >> redirectTo)
+
+
 showToast :
     { a
         | message : String
@@ -194,36 +200,31 @@ handleRouteChange url maybeRoute =
 handleAuthResponse : Maybe Session -> Model -> ( Model, Cmd Msg )
 handleAuthResponse maybeSession =
     let
-        authenticated =
+        isAuthenticated =
             Maybe.isJust maybeSession
-
-        returnToRestrictedUrl =
-            with .restrictedUrl (redirectTo << Maybe.withDefault "/")
     in
     setSession maybeSession
         >> andThen (LocalStorage.updateStorage Session.encoder maybeSession)
-        >> andThenIf authenticated returnToRestrictedUrl
+        >> andThenIf isAuthenticated returnToRestrictedUrl
 
 
 handlePostAdded : Post -> Model -> ( Model, Cmd Msg )
 handlePostAdded _ =
     redirectTo "/"
         >> andThen
-            (inUi
-                (Ui.showToast
-                    { message = "Your post was published.", color = Info }
-                )
+            (showToast
+                { message = "Your post was published."
+                , color = Info
+                }
             )
 
 
 handleCommentCreated : Comment -> Model -> ( Model, Cmd Msg )
 handleCommentCreated _ =
-    inUi
-        (Ui.showToast
-            { message = "Your comment has been received."
-            , color = Info
-            }
-        )
+    showToast
+        { message = "Your comment has been received."
+        , color = Info
+        }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

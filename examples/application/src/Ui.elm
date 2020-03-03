@@ -229,30 +229,30 @@ navbar { menuIsOpen } page maybeSession =
                         [ text "Facepalm" ]
                     ]
                 ]
-            , navbarMenu menuIsOpen
-                []
-                [ navbarStart [ class "is-unselectable" ]
-                    [ navbarItemLink isHomePage
-                        [ href "/"
-                        ]
-                        [ text "Home"
-                        ]
-                    , navbarItemLink isAboutPage
-                        [ href "/about"
-                        ]
-                        [ text "About"
-                        ]
-                    , navbarItemLink isNewPostPage
-                        [ href "/posts/new"
-                        ]
-                        [ text "New post"
-                        ]
+            ]
+        , navbarMenu menuIsOpen
+            []
+            [ navbarStart [ class "is-unselectable" ]
+                [ navbarItemLink isHomePage
+                    [ href "/"
                     ]
-                , navbarEnd []
-                    [ navbarItem False
-                        []
-                        [ div [ class "field is-grouped" ] buttons
-                        ]
+                    [ text "Home"
+                    ]
+                , navbarItemLink isAboutPage
+                    [ href "/about"
+                    ]
+                    [ text "About"
+                    ]
+                , navbarItemLink isNewPostPage
+                    [ href "/posts/new"
+                    ]
+                    [ text "New post"
+                    ]
+                ]
+            , navbarEnd []
+                [ navbarItem False
+                    []
+                    [ div [ class "field is-grouped" ] buttons
                     ]
                 ]
             ]
