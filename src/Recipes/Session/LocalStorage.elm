@@ -25,5 +25,5 @@ updateStorage sessionEncoder maybeSession =
 
 
 clearStorage : m -> ( m, Cmd msg )
-clearStorage = 
+clearStorage =
     updateStorage (always null) Nothing

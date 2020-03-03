@@ -1,4 +1,4 @@
-module Recipes.Form exposing (Field, FieldDict, FieldList, Model, ModelState, Msg(..), Status(..), Validate, Variant(..), asBool, asString, checkbox, checkboxAttrs, fieldError, init, initState, inputAttrs, inputField, insertAsFormIn, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, field, reset, run, setFieldDirty, setState, update, validateField, stringValue, boolValue)
+module Recipes.Form exposing (Field, FieldDict, FieldList, Model, ModelState, Msg(..), Status(..), Validate, Variant(..), asBool, asString, boolValue, checkbox, checkboxAttrs, field, fieldError, init, initState, inputAttrs, inputField, insertAsFormIn, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, reset, run, setFieldDirty, setState, stringValue, update, validateField)
 
 import AssocList as Dict exposing (Dict)
 import Html exposing (Html)
@@ -28,8 +28,10 @@ asString var =
         _ ->
             ""
 
+
 stringValue : Field err -> String
-stringValue = asString << .value
+stringValue =
+    asString << .value
 
 
 asBool : Variant -> Bool
@@ -43,7 +45,8 @@ asBool var =
 
 
 boolValue : Field err -> Bool
-boolValue = asBool << .value
+boolValue =
+    asBool << .value
 
 
 type Msg field

@@ -2,7 +2,7 @@ module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
 import Update.Pipeline exposing (andAddCmd, andThen, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, extend, lift, runStack, sequenceCalls, choosing)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, choosing, extend, lift, runStack, sequenceCalls)
 
 
 type Msg resource

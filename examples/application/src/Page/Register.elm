@@ -2,6 +2,7 @@ module Page.Register exposing (..)
 
 import Data.User as User exposing (User)
 import Data.Websocket.UsernameAvailableResponse as UsernameAvailableResponse exposing (UsernameAvailableResponse)
+import Dict
 import Form.Error exposing (Error(..))
 import Form.Register exposing (Field(..), UsernameStatus(..))
 import Html exposing (..)
@@ -9,44 +10,27 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
 import Json.Encode as Encode
-import Page.Register.Ports as Ports
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, insertAsApiIn)
 import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
 import Set exposing (Set)
 import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, mapCmd, save, using, when)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, choosing, lift, runStack, runStackE)
-
-
-type WebSocketMessage
-    = WsUsernameAvailable UsernameAvailableResponse
-
-
-websocketMessageDecoder : Json.Decoder WebSocketMessage
-websocketMessageDecoder =
-    let
-        payloadDecoder messageType =
-            case messageType of
-                "username_available_response" ->
-                    Json.map WsUsernameAvailable UsernameAvailableResponse.decoder
-
-                _ ->
-                    Json.fail "Unrecognized message type"
-    in
-    Json.field "type" Json.string
-        |> Json.andThen payloadDecoder
+import WebSocket
 
 
 type Msg
     = ApiMsg (Api.Msg User)
     | FormMsg Form.Register.Msg
-    | WebsocketMsg String
+    | WebSocketMsg (Result WebSocket.Error Msg)
+    | UsernameAvailable UsernameAvailableResponse
 
 
 type alias Model =
     { api : Api.Model User
     , form : Form.Register.Model
     , unavailableNames : Set String
+    , websocket : WebSocket.MessageHandler Msg
     }
 
 
@@ -88,16 +72,25 @@ init () =
                 , decoder = Json.field "user" User.decoder
                 , headers = []
                 }
+
+        websocket =
+            []
+                |> WebSocket.addHandler
+                    UsernameAvailable
+                    UsernameAvailableResponse.atom
+                    UsernameAvailableResponse.decoder
+                |> WebSocket.init
     in
     save Model
         |> andMap (mapCmd ApiMsg api)
         |> andMap (mapCmd FormMsg form)
         |> andMap (save Set.empty)
+        |> andMap websocket
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Ports.websocketIn WebsocketMsg
+subscriptions { websocket } =
+    Sub.map WebSocketMsg (WebSocket.subscriptions websocket)
 
 
 handleSubmit :
@@ -108,22 +101,12 @@ handleSubmit =
     Form.Register.toJson >> JsonApi.sendJson "" >> inApi
 
 
-usernameIsAvailableQuery : String -> Json.Value
-usernameIsAvailableQuery username =
-    Encode.object
-        [ ( "type", Encode.string "username_available_query" )
-        , ( "username", Encode.string username )
-        ]
-
-
 validateUsernameField :
-    Extended Model a
-    -> ( Extended Model a, Cmd Msg )
+    Extended (Form.ModelState Form.Register.Field e d s) a
+    -> ( Extended (Form.ModelState Form.Register.Field e d s) a, Cmd Form.Register.Msg )
 validateUsernameField =
-    inFormE
-        (Form.validateField Username
-            >> andThen (Form.setFieldDirty Username False)
-        )
+    Form.validateField Username
+        >> andThen (Form.setFieldDirty Username False)
 
 
 checkIfUsernameAvailable :
@@ -142,15 +125,17 @@ checkIfUsernameAvailable name =
 
             else if Set.member name unavailableNames then
                 setStatus (IsAvailable False)
-                    >> andThen validateUsernameField
+                    >> andThen (inFormE validateUsernameField)
 
             else
                 let
-                    encodedMsg =
-                        Encode.encode 0 (usernameIsAvailableQuery name)
+                    message =
+                        Encode.object
+                            [ ( "username", Encode.string name )
+                            ]
                 in
                 setStatus Unknown
-                    >> andAddCmd (Ports.websocketOut encodedMsg)
+                    >> andThen (WebSocket.sendMessage "username_available_query" message)
         )
 
 
@@ -159,7 +144,7 @@ update :
     -> { b | onRegistrationComplete : User -> a }
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
-update msg { onRegistrationComplete } =
+update msg ({ onRegistrationComplete } as callbacks) =
     case msg of
         ApiMsg apiMsg ->
             let
@@ -182,26 +167,24 @@ update msg { onRegistrationComplete } =
                             save
                     )
 
-        WebsocketMsg wsMsg ->
-            case Json.decodeString websocketMessageDecoder wsMsg of
-                Ok (WsUsernameAvailable { username, available }) ->
-                    choosing
-                        (\{ form } ->
-                            let
-                                fieldValue =
-                                    form.fields
-                                        |> Form.field Username
-                                        |> Form.stringValue
-                            in
-                            when (username == fieldValue)
-                                (lift (setUsernameStatus (IsAvailable available)))
-                        )
-                        >> andThenIf (not available)
-                            (lift (setUsernameUnavailable username))
-                        >> andThen validateUsernameField
+        WebSocketMsg ws ->
+            WebSocket.updateExtendedModel update callbacks ws
 
-                _ ->
-                    save
+        UsernameAvailable { username, isAvailable } ->
+            choosing
+                (\{ form } ->
+                    let
+                        fieldValue =
+                            form.fields
+                                |> Form.field Username
+                                |> Form.stringValue
+                    in
+                    when (username == fieldValue)
+                        (lift (setUsernameStatus (IsAvailable isAvailable)))
+                )
+                >> andThenIf (not isAvailable)
+                    (lift (setUsernameUnavailable username))
+                >> andThen (inFormE validateUsernameField)
 
 
 view : Model -> Html Msg
