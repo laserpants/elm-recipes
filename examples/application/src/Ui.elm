@@ -10,6 +10,7 @@ import Html.Events exposing (..)
 import Maybe.Extra as Maybe
 import Process
 import Task
+import Ui.Toast
 import Update.Pipeline exposing (andAddCmd, andThen, save, using, when)
 
 
@@ -128,11 +129,7 @@ toastMessage { toast } =
                         [ text message
                         ]
             in
-            Debug.todo ""
-
-
-
---            Ui.Toast.container notification
+            Ui.Toast.container notification
 
 
 spinner : Html msg
