@@ -1,21 +1,21 @@
-module Data.WebSocket.UsernameAvailableResponse exposing (..)
+module Data.WebSocket.UsernameAvailable exposing (..)
 
 import Json.Decode as Json exposing (bool, field, string)
 
 
-atom : String
-atom =
+responseAtom : String
+responseAtom =
     "username_available_response"
 
 
-type alias UsernameAvailableResponse =
+type alias Response =
     { username : String
     , isAvailable : Bool
     }
 
 
-decoder : Json.Decoder UsernameAvailableResponse
-decoder =
+responseDecoder : Json.Decoder Response
+responseDecoder =
     Json.map2 UsernameAvailableResponse
         (field "username" string)
         (field "is_available" bool)

@@ -1,7 +1,7 @@
 module Page.Register exposing (..)
 
 import Data.User as User exposing (User)
-import Data.WebSocket.UsernameAvailableResponse as UsernameAvailableResponse exposing (UsernameAvailableResponse)
+import Data.WebSocket.UsernameAvailable as UsernameAvailable
 import Dict
 import Form.Error exposing (Error(..))
 import Form.Register exposing (Field(..), UsernameStatus(..))
@@ -23,7 +23,7 @@ type Msg
     = ApiMsg (Api.Msg User)
     | FormMsg Form.Register.Msg
     | WebSocketMsg (Result WebSocket.Error Msg)
-    | UsernameAvailableResponseMsg UsernameAvailableResponse
+    | UsernameAvailableResponseMsg UsernameAvailable.Response
 
 
 type alias Model =
@@ -77,8 +77,8 @@ init () =
             WebSocket.init
                 |> andThen (WebSocket.insertHandler
                       UsernameAvailableResponseMsg
-                      UsernameAvailableResponse.atom
-                      UsernameAvailableResponse.decoder)
+                      UsernameAvailable.responseAtom
+                      UsernameAvailable.responseDecoder)
     in
     save Model
         |> andMap (mapCmd ApiMsg api)
