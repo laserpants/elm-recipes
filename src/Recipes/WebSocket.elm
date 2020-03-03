@@ -3,8 +3,8 @@ module Recipes.WebSocket exposing (..)
 import Dict exposing (Dict)
 import Json.Decode as Json exposing (decodeString, field)
 import Json.Encode as Encode
-import Update.Pipeline exposing (addCmd, andMap, save)
 import Recipes.WebSocket.Ports as Ports
+import Update.Pipeline exposing (addCmd, andMap, save)
 
 
 type Error
@@ -17,33 +17,32 @@ type alias MessageHandler msg =
     }
 
 
-handler :
-    String
-    -> (a -> msg)
-    -> Json.Decoder a
-    -> ( String, Json.Decoder msg )
-handler key toMsg decoder =
-    ( key
-    , decoder
-        |> Json.field "payload"
-        |> Json.andThen (toMsg >> Json.succeed)
-    )
+addParser : String -> Json.Decoder msg -> MessageHandler msg -> ( MessageHandler msg, Cmd msg )
+addParser key decoder model =
+    save { model | parsers = Dict.insert key decoder model.parsers }
 
 
-addHandler :
+insertHandler :
     (a -> msg)
     -> String
     -> Json.Decoder a
-    -> List ( String, Json.Decoder msg )
-    -> List ( String, Json.Decoder msg )
-addHandler toMsg key =
-    (::) << handler key toMsg
+    -> MessageHandler msg
+    -> ( MessageHandler msg, Cmd msg )
+insertHandler toMsg key decoder =
+    let 
+        handler =
+            decoder
+                |> Json.field "payload"
+                |> Json.andThen (toMsg >> Json.succeed)
+    in
+    addParser key handler 
 
 
-init : List ( String, Json.Decoder msg ) -> ( MessageHandler msg, Cmd msg )
-init parsers =
+
+init : ( MessageHandler msg, Cmd msg )
+init =
     save MessageHandler
-        |> andMap (save (Dict.fromList parsers))
+        |> andMap (save Dict.empty)
 
 
 sendMessage : String -> Json.Value -> m -> ( m, Cmd msg )
