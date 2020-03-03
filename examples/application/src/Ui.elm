@@ -40,17 +40,20 @@ incrementCounter model =
     save { model | counter = model.counter + 1 }
 
 
-toggleMenu : Model -> ( Model, Cmd Msg )
-toggleMenu model =
-    save { model | menuIsOpen = not model.menuIsOpen }
+toggleMenu : Extended Model a -> ( Extended Model a, Cmd msg )
+toggleMenu ( model, calls ) =
+    save ( { model | menuIsOpen = not model.menuIsOpen }, calls )
 
 
-closeMenu : Model -> ( Model, Cmd Msg )
-closeMenu model =
-    save { model | menuIsOpen = False }
+closeMenu : Extended Model a -> ( Extended Model a, Cmd msg )
+closeMenu ( model, calls ) =
+    save ( { model | menuIsOpen = False }, calls )
 
 
-setToast : { a | message : String, color : Color } -> Model -> ( Model, Cmd Msg )
+setToast :
+    { a | message : String, color : Color }
+    -> Model
+    -> ( Model, Cmd Msg )
 setToast { message, color } model =
     let
         toast =
@@ -62,21 +65,24 @@ setToast { message, color } model =
     save { model | toast = Just toast }
 
 
-showToast : { a | message : String, color : Color } -> Model -> ( Model, Cmd Msg )
+showToast :
+    { a | message : String, color : Color }
+    -> Extended Model b
+    -> ( Extended Model b, Cmd Msg )
 showToast toast =
-    using
+    choosing
         (\{ counter } ->
             let
                 dismissToastTask =
                     always (DismissToast counter)
             in
-            setToast toast
+            lift (setToast toast)
                 >> andAddCmd (Task.perform dismissToastTask (Process.sleep 4000))
-                >> andThen incrementCounter
+                >> andThen (lift incrementCounter)
         )
 
 
-showInfoToast : String -> Model -> ( Model, Cmd Msg )
+showInfoToast : String -> Extended Model a -> ( Extended Model a, Cmd Msg )
 showInfoToast message =
     showToast
         { message = message
@@ -84,9 +90,9 @@ showInfoToast message =
         }
 
 
-dismissToast : Model -> ( Model, Cmd Msg )
-dismissToast model =
-    save { model | toast = Nothing }
+dismissToast : Extended Model a -> ( Extended Model a, Cmd Msg )
+dismissToast ( model, calls ) =
+    save ( { model | toast = Nothing }, calls )
 
 
 type alias HasUi a =
@@ -98,9 +104,7 @@ insertAsUiIn model ui =
     save { model | ui = ui }
 
 
-run :
-    (msg2 -> msg1)
-    -> Run (HasUi a) Model msg1 msg2 b
+run : (msg2 -> msg1) -> Run (HasUi a) Model msg1 msg2 b
 run =
     runStack .ui insertAsUiIn
 
@@ -118,7 +122,7 @@ update : Msg -> Extended Model a -> ( Extended Model a, Cmd Msg )
 update msg =
     case msg of
         ToggleMenu ->
-            lift toggleMenu
+            toggleMenu
 
         DismissToast dismissId ->
             choosing
@@ -128,7 +132,8 @@ update msg =
                             save
 
                         Just { id } ->
-                            when (dismissId == id) (lift dismissToast)
+                            when (dismissId == id)
+                                dismissToast
                 )
 
 

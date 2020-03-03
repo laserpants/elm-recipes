@@ -88,7 +88,7 @@ showToast :
     -> Model
     -> ( Model, Cmd Msg )
 showToast =
-    inUi << lift << Ui.showToast
+    inUi << Ui.showToast
 
 
 
@@ -188,7 +188,7 @@ handleRouteChange url maybeRoute =
                 resetRestrictedUrl
         )
         >> andThen changePage
-        >> andThen (inUi (lift Ui.closeMenu))
+        >> andThen (inUi Ui.closeMenu)
 
 
 handleAuthResponse : Maybe Session -> Model -> ( Model, Cmd Msg )
@@ -210,10 +210,8 @@ handlePostAdded _ =
     redirectTo "/"
         >> andThen
             (inUi
-                (lift
-                    (Ui.showToast
-                        { message = "Your post was published.", color = Info }
-                    )
+                (Ui.showToast
+                    { message = "Your post was published.", color = Info }
                 )
             )
 
@@ -221,12 +219,10 @@ handlePostAdded _ =
 handleCommentCreated : Comment -> Model -> ( Model, Cmd Msg )
 handleCommentCreated _ =
     inUi
-        (lift
-            (Ui.showToast
-                { message = "Your comment has been received."
-                , color = Info
-                }
-            )
+        (Ui.showToast
+            { message = "Your comment has been received."
+            , color = Info
+            }
         )
 
 
