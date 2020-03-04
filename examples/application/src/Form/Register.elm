@@ -1,5 +1,7 @@
 module Form.Register exposing (..)
 
+import Bulma.Form exposing (controlCheckBox, controlHelp, controlInput, controlLabel)
+import Bulma.Modifiers exposing (..)
 import Form.Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -8,6 +10,7 @@ import Json.Decode as Json
 import Json.Encode as Encode
 import Recipes.Form as Form exposing (FieldList, Validate, checkbox, inputField)
 import Recipes.Form.Validate as Validate
+import Util.Form
 
 
 type Field
@@ -123,72 +126,78 @@ view { fields, disabled, state } =
         (\name email username phoneNumber password passwordConfirmation acceptTerms ->
             [ fieldset
                 [ Html.Attributes.disabled disabled ]
-                [ div []
-                    [ label [] [ text "Name" ]
+                [ Bulma.Form.field []
+                    [ controlLabel [] [ text "Name" ]
+                    , Util.Form.controlInput Name name "Name"
+                    , Util.Form.controlErrorHelp name
                     ]
-                , div []
-                    [ input
-                        (Form.inputAttrs Name name)
+                , Bulma.Form.field []
+                    [ controlLabel [] [ text "Email" ]
+                    , Util.Form.controlInput Email email "Email"
+                    , Util.Form.controlErrorHelp email
+                    ]
+                , Bulma.Form.field []
+                    [ controlLabel [] [ text "Username" ]
+                    , Util.Form.control
+                        (if Unknown == state then
+                            [ class "is-loading" ]
+
+                         else
+                            []
+                        )
+                        (if IsAvailable True == state then
+                            [ class "is-success" ]
+
+                         else
+                            []
+                        )
                         []
-                    , div [] [ errorHelper name ]
+                        controlInput
+                        Username
+                        username
+                        "Username"
+                    , Util.Form.controlErrorHelp username
+                    , if Form.Valid == username.status && IsAvailable True == state then
+                        controlHelp Success [] [ text "This username is available" ]
+
+                      else
+                        text ""
                     ]
-                , div []
-                    [ label [] [ text "Email" ]
+                , Bulma.Form.field []
+                    [ controlLabel [] [ text "Phone number" ]
+                    , Util.Form.controlInput PhoneNumber phoneNumber "Phone number"
+                    , Util.Form.controlErrorHelp phoneNumber
                     ]
-                , div []
-                    [ input
-                        (Form.inputAttrs Email email)
+                , Bulma.Form.field []
+                    [ controlLabel [] [ text "Password" ]
+                    , Util.Form.controlPassword Password password "Password"
+                    , Util.Form.controlErrorHelp password
+                    ]
+                , Bulma.Form.field []
+                    [ controlLabel [] [ text "Confirm password" ]
+                    , Util.Form.controlPassword PasswordConfirmation passwordConfirmation "Confirm password"
+                    , Util.Form.controlErrorHelp passwordConfirmation
+                    ]
+                , Bulma.Form.field []
+                    [ controlCheckBox False
                         []
-                    , div [] [ errorHelper email ]
-                    ]
-                , div []
-                    [ label [] [ text "Username" ]
-                    ]
-                , div []
-                    [ input
-                        (Form.inputAttrs Username username)
+                        (Form.checkboxAttrs AcceptTerms acceptTerms)
                         []
-                    , div [] [ errorHelper username ]
-                    , div [] [ text (Debug.toString state) ]
+                        [ text "I accept the terms and conditions" ]
+                    , Util.Form.controlErrorHelp acceptTerms
                     ]
-                , div []
-                    [ label [] [ text "Phone number" ]
-                    ]
-                , div []
-                    [ input
-                        (Form.inputAttrs PhoneNumber phoneNumber)
-                        []
-                    , div [] [ errorHelper phoneNumber ]
-                    ]
-                , div []
-                    [ label [] [ text "Password" ]
-                    ]
-                , div []
-                    [ input
-                        ([ type_ "password" ] ++ Form.inputAttrs Password password)
-                        []
-                    , div [] [ errorHelper password ]
-                    ]
-                , div []
-                    [ label [] [ text "Confirm password" ]
-                    ]
-                , div []
-                    [ input
-                        ([ type_ "password" ] ++ Form.inputAttrs PasswordConfirmation passwordConfirmation)
-                        []
-                    , div [] [ errorHelper passwordConfirmation ]
-                    ]
-                , div []
-                    [ label [] [ text "Accept terms" ]
-                    ]
-                , div []
-                    [ input
-                        ([ type_ "checkbox" ] ++ Form.checkboxAttrs AcceptTerms acceptTerms)
-                        []
-                    ]
-                , div []
-                    [ button []
-                        [ text "Send"
+                , Bulma.Form.field []
+                    [ div [ class "control" ]
+                        [ button
+                            [ class "button is-primary" ]
+                            [ text
+                                (if disabled then
+                                    "Please wait"
+
+                                 else
+                                    "Send"
+                                )
+                            ]
                         ]
                     ]
                 ]
