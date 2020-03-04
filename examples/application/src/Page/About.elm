@@ -3,6 +3,7 @@ module Page.About exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Ui.Page
 import Update.Pipeline exposing (save)
 import Update.Pipeline.Extended exposing (Extended)
 
@@ -36,4 +37,6 @@ update msg _ model =
 
 view : Model -> Html Msg
 view _ =
-    div [] [ text "About" ]
+    Ui.Page.container "About"
+        [ text "Welcome to Facepalm — the place to meet weird people while keeping all your personal data safe."
+        ]

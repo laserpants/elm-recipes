@@ -18,6 +18,7 @@ import Update.Pipeline.Extended exposing (Extended, Run, choosing, lift, runStac
 type Msg
     = ToggleMenu
     | DismissToast Int
+    | Logout
 
 
 type alias Toast =
@@ -135,6 +136,9 @@ update msg =
                                 dismissToast
                 )
 
+        Logout ->
+            save
+
 
 toastMessage : Model -> Html Msg
 toastMessage { toast } =
@@ -215,7 +219,13 @@ navbar { menuIsOpen } { isHomePage, isAboutPage, isNewPostPage } maybeSession =
 
             else
                 [ p [ class "control" ]
-                    [ a [ class "button is-primary", href "/logout" ] [ text "Log out" ] ]
+                    [ Html.button
+                        [ class "button is-primary"
+                        , onClick Logout
+                        ]
+                        [ text "Log out"
+                        ]
+                    ]
                 ]
     in
     fixedNavbar Top

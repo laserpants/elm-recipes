@@ -10,8 +10,10 @@ import Json.Decode as Json
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, insertAsApiIn)
 import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
+import Ui.Page
 import Update.Pipeline exposing (andMap, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, runStackE)
+import Util.Api
 
 
 type Msg
@@ -86,10 +88,10 @@ update msg { onPostAdded } =
 
 view : Model -> Html Msg
 view { api, form } =
-    div []
+    Ui.Page.container "New post"
         [ case api.resource of
             Error error ->
-                text (Debug.toString error)
+                Util.Api.requestErrorMessage error
 
             _ ->
                 text ""

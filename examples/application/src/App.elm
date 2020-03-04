@@ -35,7 +35,6 @@ type Msg
     = RouterMsg Router.Msg
     | PageMsg Page.Msg
     | UiMsg Ui.Msg
-    | Logout
 
 
 type alias Model =
@@ -262,18 +261,20 @@ update msg =
             inPage (Switch.update pageMsg handlers)
 
         UiMsg uiMsg ->
-            inUi (Ui.update uiMsg)
-
-        Logout ->
-            setSession Nothing
-                >> andThen LocalStorage.clearStorage
-                >> andThen (redirectTo "/")
-                >> andThen
-                    (showToast
-                        { message = "You have been logged out."
-                        , color = Info
-                        }
-                    )
+            let
+                logout =
+                    setSession Nothing
+                        >> andThen LocalStorage.clearStorage
+                        >> andThen (redirectTo "/")
+                        >> andThen
+                            (showToast
+                                { message = "You have been logged out."
+                                , color = Info
+                                }
+                            )
+            in
+            when (Ui.Logout == uiMsg) logout
+                >> andThen (inUi (Ui.update uiMsg))
 
 
 subscriptions : Model -> Sub Msg

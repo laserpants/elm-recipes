@@ -1,5 +1,8 @@
 module Page.Login exposing (..)
 
+import Bulma.Columns exposing (columnsModifiers, narrowColumnModifiers)
+import Bulma.Components exposing (..)
+import Bulma.Modifiers exposing (..)
 import Data.Session as Session exposing (Session)
 import Form.Login
 import Html exposing (..)
@@ -12,6 +15,7 @@ import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
 import Update.Pipeline exposing (andMap, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, runStackE)
+import Util.Api
 
 
 type Msg
@@ -99,12 +103,30 @@ update msg { onAuthResponse } =
 
 view : Model -> Html Msg
 view { api, form } =
-    div []
-        [ case api.resource of
-            Error error ->
-                text (Debug.toString error)
+    Bulma.Columns.columns
+        { columnsModifiers | centered = True }
+        [ class "is-mobile"
+        , style "margin" "6em 0"
+        ]
+        [ Bulma.Columns.column
+            narrowColumnModifiers
+            []
+            [ card []
+                [ cardContent []
+                    [ h3 [ class "title is-3" ] [ text "Log in" ]
+                    , message { messageModifiers | color = Info }
+                        [ style "max-width" "360px" ]
+                        [ messageBody []
+                            [ text "This is just a demo. Log in with email address 'test@test.com' and password 'test'." ]
+                        ]
+                    , case api.resource of
+                        Error error ->
+                            Util.Api.requestErrorMessage error
 
-            _ ->
-                text ""
-        , Html.map FormMsg (Form.Login.view form)
+                        _ ->
+                            text ""
+                    , Html.map FormMsg (Form.Login.view form)
+                    ]
+                ]
+            ]
         ]

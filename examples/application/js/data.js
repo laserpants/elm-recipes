@@ -20,7 +20,7 @@ var posts =
        id: 1,
        postId: 1,
        email: 'facepalm@test.com',
-       body: 'Thanks for this information. I would just like to mention here the double facepalm, which is similar to the facepalm but performed with two hands. Keep up the good work!'
+       body: 'Thanks for this information. I would just like to take the opportunity to mention the double facepalm, which is similar to the facepalm but performed with two hands. Keep up the good work!'
      },
      {
        id: 2,

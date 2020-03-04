@@ -1,5 +1,7 @@
 module Form.NewPost exposing (..)
 
+import Bulma.Form exposing (controlLabel)
+import Bulma.Modifiers exposing (..)
 import Form.Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -8,6 +10,7 @@ import Json.Decode as Json
 import Json.Encode as Encode
 import Recipes.Form as Form exposing (FieldList, Validate, checkbox, inputField)
 import Recipes.Form.Validate as Validate
+import Util.Form
 
 
 type Field
@@ -73,27 +76,27 @@ view { fields, disabled } =
         (\title body ->
             [ fieldset
                 [ Html.Attributes.disabled disabled ]
-                [ div []
-                    [ label [] [ text "Title" ]
+                [ Bulma.Form.field []
+                    [ controlLabel [] [ text "Title" ]
+                    , Util.Form.controlInput Title title "Title"
+                    , Util.Form.controlErrorHelp title
                     ]
-                , div []
-                    [ input
-                        (Form.inputAttrs Title title)
-                        []
-                    , div [] [ errorHelper title ]
+                , Bulma.Form.field []
+                    [ controlLabel [] [ text "Body" ]
+                    , Util.Form.controlTextArea Body body "Body"
+                    , Util.Form.controlErrorHelp body
                     ]
-                , div []
-                    [ label [] [ text "Body" ]
-                    ]
-                , div []
-                    [ textarea
-                        (Form.inputAttrs Body body)
-                        []
-                    , div [] [ errorHelper body ]
-                    ]
-                , div []
-                    [ button []
-                        [ text "Publish"
+                , Bulma.Form.field []
+                    [ div [ class "control" ]
+                        [ button [ class "button is-primary" ]
+                            [ text
+                                (if disabled then
+                                    "Please wait"
+
+                                 else
+                                    "Publish"
+                                )
+                            ]
                         ]
                     ]
                 ]

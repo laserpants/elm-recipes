@@ -1,5 +1,8 @@
 module Page.Register exposing (..)
 
+import Bulma.Columns exposing (columnModifiers, columnsModifiers)
+import Bulma.Components exposing (..)
+import Bulma.Modifiers exposing (..)
 import Data.User as User exposing (User)
 import Dict
 import Form.Error exposing (Error(..))
@@ -16,6 +19,7 @@ import Recipes.WebSocket as WebSocket
 import Set exposing (Set)
 import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, mapCmd, save, using, when)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, choosing, lift, runStack, runStackE)
+import Util.Api
 import WebSocket.UsernameAvailable as UsernameAvailable
 
 
@@ -184,12 +188,26 @@ update msg ({ onRegistrationComplete } as callbacks) =
 
 view : Model -> Html Msg
 view { api, form } =
-    div []
-        [ case api.resource of
-            Error error ->
-                text (Debug.toString error)
+    Bulma.Columns.columns
+        { columnsModifiers | centered = True }
+        [ style "margin" "1.5em"
+        ]
+        [ Bulma.Columns.column
+            columnModifiers
+            [ class "is-half" ]
+            [ card []
+                [ cardContent []
+                    [ h3
+                        [ class "title is-3" ]
+                        [ text "Register" ]
+                    , case api.resource of
+                        Error error ->
+                            Util.Api.requestErrorMessage error
 
-            _ ->
-                text ""
-        , Html.map FormMsg (Form.Register.view form)
+                        _ ->
+                            text ""
+                    , Html.map FormMsg (Form.Register.view form)
+                    ]
+                ]
+            ]
         ]
