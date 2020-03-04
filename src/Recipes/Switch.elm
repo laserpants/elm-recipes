@@ -605,6 +605,37 @@ type alias Item12 a b =
     { a | a12 : b } -> b
 
 
+option5 :
+    (Bool -> Bool -> Bool -> Bool -> Bool -> a)
+    -> OneOf5 a1 a2 a3 a4 a5
+    -> a
+option5 a switch =
+    case switch of
+        Opt1 _ ->
+            --||||------------------------
+            a True False False False False
+
+        Opt2 _ ->
+            --------||||------------------
+            a False True False False False
+
+        Opt3 _ ->
+            --------------||||------------
+            a False False True False False
+
+        Opt4 _ ->
+            --------------------||||------
+            a False False False True False
+
+        Opt5 _ ->
+            --------------------------||||
+            a False False False False True
+
+        _ ->
+            -------------------------------
+            a False False False False False
+
+
 option6 :
     (Bool -> Bool -> Bool -> Bool -> Bool -> Bool -> a)
     -> OneOf6 a1 a2 a3 a4 a5 a6

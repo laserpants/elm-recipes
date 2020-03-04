@@ -772,6 +772,14 @@ type alias Item12 a b =
     Recipes.Switch.Item12 a b
 
 
+option5 :
+    (Bool -> Bool -> Bool -> Bool -> Bool -> a)
+    -> OneOf5 a1 a2 a3 a4 a5
+    -> a
+option5 =
+    Recipes.Switch.option5
+
+
 option6 :
     (Bool -> Bool -> Bool -> Bool -> Bool -> Bool -> a)
     -> OneOf6 a1 a2 a3 a4 a5 a6
