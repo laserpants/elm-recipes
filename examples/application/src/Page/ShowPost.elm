@@ -15,6 +15,7 @@ import Ui exposing (spinner)
 import Ui.Page
 import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, runStack, runStackE)
+import Util.Api
 
 
 type Msg
@@ -102,7 +103,10 @@ subscriptions _ =
     Sub.none
 
 
-handleSubmit : Form.Comment.Data -> Extended Model a -> ( Extended Model a, Cmd Msg )
+handleSubmit :
+    Form.Comment.Data
+    -> Extended Model a
+    -> ( Extended Model a, Cmd Msg )
 handleSubmit =
     Form.Comment.toJson >> JsonApi.sendJson "" >> inCommentApiE
 
@@ -113,10 +117,10 @@ insertComment :
     -> ( Extended Model a, Cmd Msg )
 insertComment comment =
     let
-        fun post =
+        insert post =
             { post | comments = comment :: post.comments }
     in
-    inPostApiE (withResource fun)
+    inPostApiE (withResource insert)
 
 
 update :
@@ -155,9 +159,6 @@ update msg { onCommentCreated } =
 view : Model -> Html Msg
 view { postApi, commentApi, commentForm } =
     let
-        requestErrorMessage _ =
-            text "xx"
-
         loading =
             Requested == postApi.resource || commentForm.disabled
 
@@ -191,7 +192,7 @@ view { postApi, commentApi, commentForm } =
                             ]
 
                         _ ->
-                            [ requestErrorMessage error ]
+                            [ Util.Api.requestErrorMessage error ]
 
                 Available { title, body, comments } ->
                     [ h3 [ class "title is-3" ] [ text title ]
@@ -208,7 +209,7 @@ view { postApi, commentApi, commentForm } =
                     , subtitle "Leave a comment"
                     , case commentApi.resource of
                         Error error ->
-                            requestErrorMessage error
+                            Util.Api.requestErrorMessage error
 
                         _ ->
                             text ""

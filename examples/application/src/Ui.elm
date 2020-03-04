@@ -35,9 +35,9 @@ type alias Model =
     }
 
 
-incrementCounter : Model -> ( Model, Cmd Msg )
-incrementCounter model =
-    save { model | counter = model.counter + 1 }
+incrementCounter : Extended Model a -> ( Extended Model a, Cmd Msg )
+incrementCounter ( model, calls ) =
+    save ( { model | counter = model.counter + 1 }, calls )
 
 
 toggleMenu : Extended Model a -> ( Extended Model a, Cmd msg )
@@ -78,7 +78,7 @@ showToast toast =
             in
             lift (setToast toast)
                 >> andAddCmd (Task.perform dismissToastTask (Process.sleep 4000))
-                >> andThen (lift incrementCounter)
+                >> andThen incrementCounter
         )
 
 
@@ -169,20 +169,15 @@ spinner =
 
 
 navbar :
-    Model
-    ->
-        { a
-            | isHomePage : Bool
-            , isAboutPage : Bool
-            , isNewPostPage : Bool
-        }
-    -> Maybe Session
+    { isHomePage : Bool
+    , isAboutPage : Bool
+    , isNewPostPage : Bool
+    , isAuthenticated : Bool
+    , menuIsOpen : Bool
+    }
     -> Html Msg
-navbar { menuIsOpen } { isHomePage, isAboutPage, isNewPostPage } maybeSession =
+navbar { menuIsOpen, isHomePage, isAboutPage, isNewPostPage, isAuthenticated } =
     let
-        isAuthenticated =
-            Maybe.isJust maybeSession
-
         burger =
             navbarBurger menuIsOpen
                 [ class "has-text-white"

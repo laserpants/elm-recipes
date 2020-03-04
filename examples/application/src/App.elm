@@ -285,7 +285,7 @@ subscriptions { page } =
 view : Model -> Document Msg
 view { page, session, ui } =
     let
-        { isLoginPage, isRegisterPage } =
+        { isLoginPage, isRegisterPage, isHomePage, isAboutPage, isNewPostPage } =
             Page.option page
 
         background =
@@ -294,6 +294,14 @@ view { page, session, ui } =
 
             else
                 "transparent"
+
+        navbarInfo =
+            { menuIsOpen = ui.menuIsOpen
+            , isHomePage = isHomePage
+            , isAboutPage = isAboutPage
+            , isNewPostPage = isNewPostPage
+            , isAuthenticated = Maybe.isJust session
+            }
     in
     { title = "Welcome to Facepalm"
     , body =
@@ -304,7 +312,7 @@ view { page, session, ui } =
             ]
             [ Bulma.Layout.section NotSpaced
                 []
-                [ Html.map UiMsg (Ui.navbar ui (Page.option page) session)
+                [ Html.map UiMsg (Ui.navbar navbarInfo)
                 , Html.map PageMsg (Page.view page)
                 ]
             ]
