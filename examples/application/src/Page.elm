@@ -20,7 +20,7 @@ import Update.Pipeline.Extended exposing (Extended)
 
 type alias Msg =
     OneOf7
-        -- \
+        -- elm-format: do not remove line breaks
         Page.NotFound.Msg
         Page.Home.Msg
         Page.NewPost.Msg
@@ -32,7 +32,7 @@ type alias Msg =
 
 type alias Model =
     OneOf7
-        -- \
+        -- elm-format: do not remove line breaks
         Page.NotFound.Model
         Page.Home.Model
         Page.NewPost.Model
@@ -70,7 +70,7 @@ type alias Handlers a =
 type alias Pages a =
     Layout7 a
         (Handlers a)
-        -- \
+        -- elm-format: do not remove line breaks
         Page.NotFound.Model
         Page.NotFound.Msg
         ()

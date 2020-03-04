@@ -1,5 +1,7 @@
 module Page.Home exposing (..)
 
+import Bulma.Elements exposing (..)
+import Bulma.Modifiers exposing (..)
 import Data.Post as Post exposing (Post)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -10,6 +12,8 @@ import Maybe.Extra as Maybe
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, insertAsApiIn, sendEmptyRequest)
 import Recipes.Api.Json as JsonApi
 import Recipes.WebSocket as WebSocket
+import Ui exposing (spinner)
+import Ui.Page
 import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, runStack, runStackE)
 import WebSocket.Ping as Ping
@@ -121,7 +125,8 @@ view { posts } =
                                 )
                             ]
             in
-            div []
+            content Standard
+                []
                 [ h4
                     [ class "title is-4" ]
                     [ a [ href postUrl ]
@@ -138,40 +143,42 @@ view { posts } =
                     ]
                 ]
     in
-    div []
-        [ button
-            [ onClick SendPing ]
-            [ text "Ping"
-            ]
-        , div []
-            (case posts.resource of
-                NotRequested ->
-                    []
+    Ui.Page.container "Posts"
+        (case posts.resource of
+            NotRequested ->
+                []
 
-                Requested ->
-                    [ text "Loading" ]
+            Requested ->
+                [ div
+                    [ style "display" "flex"
+                    , style "flex-direction" "row"
+                    , style "justify-content" "center"
+                    , style "margin" "4em"
+                    ]
+                    [ spinner
+                    ]
+                ]
 
-                Error error ->
-                    [ text (Debug.toString error) ]
+            Error error ->
+                [ text (Debug.toString error) ]
 
-                Available items ->
-                    let
-                        maybeItem { id, title, body, comments } =
-                            case id of
-                                Just id_ ->
-                                    Just
-                                        { id = id_
-                                        , title = title
-                                        , body = body
-                                        , comments = comments
-                                        }
+            Available items ->
+                let
+                    maybeItem { id, title, body, comments } =
+                        case id of
+                            Just id_ ->
+                                Just
+                                    { id = id_
+                                    , title = title
+                                    , body = body
+                                    , comments = comments
+                                    }
 
-                                Nothing ->
-                                    Nothing
-                    in
-                    items
-                        |> List.map maybeItem
-                        |> Maybe.values
-                        |> List.map listItem
-            )
-        ]
+                            Nothing ->
+                                Nothing
+                in
+                items
+                    |> List.map maybeItem
+                    |> Maybe.values
+                    |> List.map listItem
+        )

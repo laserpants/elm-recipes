@@ -1,5 +1,7 @@
 module Form.Login exposing (..)
 
+import Bulma.Form exposing (controlCheckBox, controlHelp, controlInput, controlLabel)
+import Bulma.Modifiers exposing (..)
 import Form.Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -8,6 +10,7 @@ import Json.Decode as Json
 import Json.Encode as Encode
 import Recipes.Form as Form exposing (FieldList, Validate, checkbox, inputField)
 import Recipes.Form.Validate as Validate
+import Util.Form
 
 
 type Field
@@ -79,35 +82,36 @@ view { fields, disabled } =
         (\email password rememberMe ->
             [ fieldset
                 [ Html.Attributes.disabled disabled ]
-                [ div []
-                    [ label [] [ text "Email" ]
+                [ Bulma.Form.field []
+                    [ controlLabel [] [ text "Email address" ]
+                    , Util.Form.controlInput Email email "Email"
+                    , Util.Form.controlErrorHelp email
                     ]
-                , div []
-                    [ input
-                        (Form.inputAttrs Email email)
+                , Bulma.Form.field []
+                    [ controlLabel [] [ text "Password" ]
+                    , Util.Form.controlPassword Password password "Password"
+                    , Util.Form.controlErrorHelp password
+                    ]
+                , Bulma.Form.field []
+                    [ controlCheckBox False
                         []
-                    , div [] [ errorHelper email ]
-                    ]
-                , div []
-                    [ label [] [ text "Password" ]
-                    ]
-                , div []
-                    [ input
-                        ([ type_ "password" ] ++ Form.inputAttrs Password password)
+                        (Form.checkboxAttrs RememberMe rememberMe)
                         []
-                    , div [] [ errorHelper password ]
+                        [ text "Remember me" ]
+                    , Util.Form.controlErrorHelp rememberMe
                     ]
-                , div []
-                    [ label [] [ text "Rememer me" ]
-                    ]
-                , div []
-                    [ input
-                        ([ type_ "checkbox" ] ++ Form.checkboxAttrs RememberMe rememberMe)
-                        []
-                    ]
-                , div []
-                    [ button []
-                        [ text "Log in"
+                , Bulma.Form.field []
+                    [ div [ class "control" ]
+                        [ button
+                            [ class "button is-primary" ]
+                            [ text
+                                (if disabled then
+                                    "Please wait"
+
+                                 else
+                                    "Log in"
+                                )
+                            ]
                         ]
                     ]
                 ]

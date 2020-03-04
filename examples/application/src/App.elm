@@ -283,7 +283,7 @@ view { page, session, ui } =
         [ div [] [] -- toast
         , Bulma.Layout.section NotSpaced
             []
-            [ Html.map UiMsg (Ui.navbar ui page session)
+            [ Html.map UiMsg (Ui.navbar ui (Page.option page) session)
             , Html.map PageMsg (Page.view page)
             ]
         ]

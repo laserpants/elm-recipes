@@ -38,4 +38,4 @@ update msg _ model =
 view : Model -> Html Msg
 view _ =
     Ui.Page.container "Error 404"
-        [ text "That means we couldn’t find that page." ]
+        [ text "It means we couldn’t find that page." ]

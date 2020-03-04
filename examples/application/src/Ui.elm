@@ -8,7 +8,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Maybe.Extra as Maybe
-import Page
 import Process
 import Task
 import Ui.Toast
@@ -158,15 +157,24 @@ toastMessage { toast } =
 spinner : Html msg
 spinner =
     div
-        [ class "sk-three-bounce" ]
-        [ div [ class "sk-child sk-bounce1" ] []
-        , div [ class "sk-child sk-bounce2" ] []
-        , div [ class "sk-child sk-bounce3" ] []
+        [ class "sk-flow" ]
+        [ div [ class "sk-flow-dot" ] []
+        , div [ class "sk-flow-dot" ] []
+        , div [ class "sk-flow-dot" ] []
         ]
 
 
-navbar : Model -> Page.Model -> Maybe Session -> Html Msg
-navbar { menuIsOpen } page maybeSession =
+navbar :
+    Model
+    ->
+        { a
+            | isHomePage : Bool
+            , isAboutPage : Bool
+            , isNewPostPage : Bool
+        }
+    -> Maybe Session
+    -> Html Msg
+navbar { menuIsOpen } { isHomePage, isAboutPage, isNewPostPage } maybeSession =
     let
         isAuthenticated =
             Maybe.isJust maybeSession
@@ -209,10 +217,6 @@ navbar { menuIsOpen } page maybeSession =
                 [ p [ class "control" ]
                     [ a [ class "button is-primary", href "/logout" ] [ text "Log out" ] ]
                 ]
-
-        { isHomePage, isAboutPage, isNewPostPage } =
-            page
-                |> Page.option
     in
     fixedNavbar Top
         { navbarModifiers | color = Info }
