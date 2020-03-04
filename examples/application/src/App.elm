@@ -98,7 +98,7 @@ showToast =
     inUi << Ui.showToast
 
 
-type alias Load m m1 msg msg1 arg a =
+type alias Getter m m1 msg msg1 arg a =
     Pages a
     ->
         { a
@@ -109,7 +109,7 @@ type alias Load m m1 msg msg1 arg a =
 
 
 loadPage :
-    Load page Page.Model msg Page.Msg arg a
+    Getter page Page.Model msg Page.Msg arg a
     -> arg
     -> Model
     -> ( Model, Cmd Msg )
@@ -141,7 +141,7 @@ init { session, basePath } url key =
 handleRouteChange : Url -> Maybe Route -> Model -> ( Model, Cmd Msg )
 handleRouteChange url maybeRoute =
     let
-        whenAuthenticated doLoadPage =
+        whenIsAuthenticated doLoadPage =
             using
                 (\{ session } ->
                     if Nothing == session then
@@ -159,7 +159,7 @@ handleRouteChange url maybeRoute =
                         doLoadPage
                 )
 
-        unlessAuthenticated doLoadPage =
+        unlessIsAuthenticated doLoadPage =
             using
                 (\{ session } ->
                     if Maybe.isJust session then
@@ -188,13 +188,13 @@ handleRouteChange url maybeRoute =
                     loadPage showPostPage postId
 
                 Just NewPost ->
-                    whenAuthenticated (loadPage newPostPage ())
+                    whenIsAuthenticated (loadPage newPostPage ())
 
                 Just Login ->
-                    unlessAuthenticated (loadPage loginPage ())
+                    unlessIsAuthenticated (loadPage loginPage ())
 
                 Just Register ->
-                    unlessAuthenticated (loadPage registerPage ())
+                    unlessIsAuthenticated (loadPage registerPage ())
     in
     using
         (\{ router } ->
