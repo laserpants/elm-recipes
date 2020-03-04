@@ -31,7 +31,7 @@ if (app.ports && app.ports.websocketOut && app.ports.websocketIn) {
           message: 'pong'
         }
       }));
-    } else if ('username_available_query' === envelope.type) {
+    } else if ('username_available_request' === envelope.type) {
       setTimeout(function() {
         var response = {
           type: 'username_available_response',
@@ -41,7 +41,7 @@ if (app.ports && app.ports.websocketOut && app.ports.websocketIn) {
           }
         };
         app.ports.websocketIn.send(JSON.stringify(response));
-      }, 150);
+      }, 450);
     }
   });
 }
