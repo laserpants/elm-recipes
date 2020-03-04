@@ -190,7 +190,7 @@ view : Model -> Html Msg
 view { api, form } =
     Bulma.Columns.columns
         { columnsModifiers | centered = True }
-        [ style "margin" "1.5em"
+        [ style "margin" "3em"
         ]
         [ Bulma.Columns.column
             columnModifiers

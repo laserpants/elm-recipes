@@ -37,4 +37,4 @@ toString error =
             "This username is already taken"
 
         NotAlphanumeric ->
-            "Only alphanumeric characters are allowed"   
+            "Only alphanumeric characters are allowed"

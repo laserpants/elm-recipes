@@ -284,13 +284,29 @@ subscriptions { page } =
 
 view : Model -> Document Msg
 view { page, session, ui } =
+    let
+        { isLoginPage, isRegisterPage } =
+            Page.option page
+
+        background =
+            if isLoginPage || isRegisterPage then
+                "#eef6fc"
+
+            else
+                "transparent"
+    in
     { title = "Welcome to Facepalm"
     , body =
         [ Html.map UiMsg (Ui.toastMessage ui)
-        , Bulma.Layout.section NotSpaced
-            []
-            [ Html.map UiMsg (Ui.navbar ui (Page.option page) session)
-            , Html.map PageMsg (Page.view page)
+        , div
+            [ style "background" background
+            , style "min-height" "100vh"
+            ]
+            [ Bulma.Layout.section NotSpaced
+                []
+                [ Html.map UiMsg (Ui.navbar ui (Page.option page) session)
+                , Html.map PageMsg (Page.view page)
+                ]
             ]
         ]
     }
