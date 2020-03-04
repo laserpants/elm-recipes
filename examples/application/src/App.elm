@@ -14,7 +14,7 @@ import Html.Events exposing (..)
 import Maybe.Extra as Maybe
 import Page as Page exposing (Pages, index, pages)
 import Recipes.Router as Router exposing (Router)
-import Recipes.Session.LocalStorage as LocalStorage exposing (setSession)
+import Recipes.Session.LocalStorage as LocalStorage
 import Recipes.Switch.Extended as Switch exposing (RunSwitch)
 import Route as Route exposing (Route(..))
 import Ui
@@ -45,6 +45,11 @@ type alias Model =
     , restrictedUrl : Maybe String
     , ui : Ui.Model
     }
+
+
+setSession : Maybe Session -> Model -> ( Model, Cmd msg )
+setSession session model =
+    save { model | session = session }
 
 
 setRestrictedUrl : Url -> Model -> ( Model, Cmd msg )

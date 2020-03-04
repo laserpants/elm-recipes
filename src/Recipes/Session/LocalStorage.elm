@@ -5,11 +5,6 @@ import Recipes.Session.LocalStorage.Ports as Ports
 import Update.Pipeline exposing (addCmd, save)
 
 
-setSession : a -> { b | session : a } -> ( { b | session : a }, Cmd msg )
-setSession session model =
-    save { model | session = session }
-
-
 updateStorage : (a -> Value) -> Maybe a -> m -> ( m, Cmd msg )
 updateStorage sessionEncoder maybeSession =
     case maybeSession of
