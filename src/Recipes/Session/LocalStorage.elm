@@ -19,6 +19,6 @@ updateStorage sessionEncoder maybeSession =
             addCmd (Ports.setSession encodedSession)
 
 
-clearStorage : m -> ( m, Cmd msg )
-clearStorage =
+clear : m -> ( m, Cmd msg )
+clear =
     updateStorage (always null) Nothing

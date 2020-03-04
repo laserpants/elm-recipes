@@ -264,7 +264,7 @@ update msg =
             let
                 logout =
                     setSession Nothing
-                        >> andThen LocalStorage.clearStorage
+                        >> andThen LocalStorage.clear
                         >> andThen (redirectTo "/")
                         >> andThen
                             (showToast
