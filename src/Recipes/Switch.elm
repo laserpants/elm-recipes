@@ -585,6 +585,26 @@ type alias Item7 a b =
     { a | a7 : b } -> b
 
 
+type alias Item8 a b =
+    { a | a8 : b } -> b
+
+
+type alias Item9 a b =
+    { a | a9 : b } -> b
+
+
+type alias Item10 a b =
+    { a | a10 : b } -> b
+
+
+type alias Item11 a b =
+    { a | a11 : b } -> b
+
+
+type alias Item12 a b =
+    { a | a12 : b } -> b
+
+
 option6 :
     (Bool -> Bool -> Bool -> Bool -> Bool -> Bool -> a)
     -> OneOf6 a1 a2 a3 a4 a5 a6

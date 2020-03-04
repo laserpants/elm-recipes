@@ -752,6 +752,26 @@ type alias Item7 a b =
     Recipes.Switch.Item7 a b
 
 
+type alias Item8 a b =
+    Recipes.Switch.Item8 a b
+
+
+type alias Item9 a b =
+    Recipes.Switch.Item9 a b
+
+
+type alias Item10 a b =
+    Recipes.Switch.Item10 a b
+
+
+type alias Item11 a b =
+    Recipes.Switch.Item11 a b
+
+
+type alias Item12 a b =
+    Recipes.Switch.Item12 a b
+
+
 option6 :
     (Bool -> Bool -> Bool -> Bool -> Bool -> Bool -> a)
     -> OneOf6 a1 a2 a3 a4 a5 a6
