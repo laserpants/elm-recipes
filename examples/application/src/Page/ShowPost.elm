@@ -68,7 +68,7 @@ inCommentFormE =
 init : Int -> ( Model, Cmd Msg )
 init id =
     let
-        post =
+        postApi =
             JsonApi.init
                 { endpoint = "/posts/" ++ String.fromInt id
                 , method = Api.HttpGet
@@ -76,7 +76,7 @@ init id =
                 , headers = []
                 }
 
-        comment =
+        commentApi =
             JsonApi.init
                 { endpoint = "/posts/" ++ String.fromInt id ++ "/comments"
                 , method = Api.HttpPost
@@ -89,8 +89,8 @@ init id =
     in
     save Model
         |> andMap (save id)
-        |> andMap (mapCmd PostApiMsg post)
-        |> andMap (mapCmd CommentApiMsg comment)
+        |> andMap (mapCmd PostApiMsg postApi)
+        |> andMap (mapCmd CommentApiMsg commentApi)
         |> andMap (mapCmd CommentFormMsg form)
         |> andThen (inPostApi sendEmptyRequest)
 

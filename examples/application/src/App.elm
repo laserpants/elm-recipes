@@ -98,14 +98,21 @@ showToast =
     inUi << Ui.showToast
 
 
+type alias Load m m1 msg msg1 arg a =
+    Pages a
+    ->
+        { a
+            | init : arg -> ( m, Cmd msg )
+            , toMsg : msg -> msg1
+            , toModel : m -> m1
+        }
 
---loadPage :
---    (Pages a -> Info arg Page.Model Page.Msg m msg h a)
---    -> arg
---    -> Model
---    -> ( Model, Cmd Msg )
 
-
+loadPage :
+    Load page Page.Model msg Page.Msg arg a
+    -> arg
+    -> Model
+    -> ( Model, Cmd Msg )
 loadPage page =
     inPage << Switch.to page
 
