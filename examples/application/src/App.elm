@@ -285,7 +285,7 @@ view : Model -> Document Msg
 view { page, session, ui } =
     { title = "Welcome to Facepalm"
     , body =
-        [ div [] [] -- toast
+        [ Html.map UiMsg (Ui.toastMessage ui)
         , Bulma.Layout.section NotSpaced
             []
             [ Html.map UiMsg (Ui.navbar ui (Page.option page) session)

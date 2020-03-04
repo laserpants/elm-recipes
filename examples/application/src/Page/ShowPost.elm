@@ -11,6 +11,8 @@ import Json.Decode as Json
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, insertAsApiIn, sendEmptyRequest, withResource)
 import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form
+import Ui exposing (spinner)
+import Ui.Page
 import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, runStack, runStackE)
 
@@ -156,8 +158,9 @@ view { postApi, commentApi, commentForm } =
         requestErrorMessage _ =
             text "xx"
 
-        --        loading =
-        --            Requested == postApi.resource || commentForm.disabled
+        loading =
+            Requested == postApi.resource || commentForm.disabled
+
         commentItem { email, body } =
             [ p
                 [ style "margin-bottom" ".5em" ]
@@ -215,13 +218,18 @@ view { postApi, commentApi, commentForm } =
                 _ ->
                     []
     in
-    div [] postView
+    Ui.Page.layout
+        (if loading then
+            [ div
+                [ style "display" "flex"
+                , style "flex-direction" "row"
+                , style "justify-content" "center"
+                , style "margin" "4em"
+                ]
+                [ spinner
+                ]
+            ]
 
-
-
---        (if loading then
---            [ text "Loading" ]
---
---         else
---            postView
---        )
+         else
+            postView
+        )
