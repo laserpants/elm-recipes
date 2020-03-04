@@ -114,23 +114,23 @@ checkIfUsernameAvailable :
     String
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
-checkIfUsernameAvailable name =
+checkIfUsernameAvailable username =
     choosing
         (\{ unavailableNames } ->
             let
                 setStatus =
                     lift << setUsernameStatus
             in
-            if String.isEmpty name then
+            if String.isEmpty username then
                 setStatus Blank
 
-            else if Set.member name unavailableNames then
+            else if Set.member username unavailableNames then
                 setStatus (IsAvailable False)
                     >> andThen (inFormE validateUsernameField)
 
             else
                 setStatus Unknown
-                    >> andThen (UsernameAvailable.sendRequest { username = name })
+                    >> andThen (UsernameAvailable.sendRequest { username = username })
         )
 
 

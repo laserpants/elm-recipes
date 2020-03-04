@@ -42,8 +42,7 @@ type alias Model =
 
 
 type alias Pages a =
-    Layout2 { onSomething : Int -> a }
-        a
+    Layout2 a { onSomething : Int -> a }
         --\
         About.Model
         About.Msg

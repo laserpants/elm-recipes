@@ -9,17 +9,19 @@ import Page.About
 import Page.Home
 import Page.Login
 import Page.NewPost
+import Page.NotFound
 import Page.Register
 import Page.ShowPost
 import Recipes.Switch exposing (Switch(..))
-import Recipes.Switch.Extended as Switch exposing (Item1, Item2, Item3, Item4, Item5, Item6, Layout6, OneOf6, RunSwitch, index6, layout6, option6, runStack)
+import Recipes.Switch.Extended as Switch exposing (Item1, Item2, Item3, Item4, Item5, Item6, Item7, Layout7, OneOf7, RunSwitch, index7, layout7, option7, runStack)
 import Update.Pipeline exposing (save)
 import Update.Pipeline.Extended exposing (Extended)
 
 
 type alias Msg =
-    OneOf6
+    OneOf7
         -- \
+        Page.NotFound.Msg
         Page.Home.Msg
         Page.NewPost.Msg
         Page.ShowPost.Msg
@@ -29,8 +31,9 @@ type alias Msg =
 
 
 type alias Model =
-    OneOf6
+    OneOf7
         -- \
+        Page.NotFound.Model
         Page.Home.Model
         Page.NewPost.Model
         Page.ShowPost.Model
@@ -65,9 +68,12 @@ type alias Handlers a =
 
 
 type alias Pages a =
-    Layout6 (Handlers a)
-        a
+    Layout7 a
+        (Handlers a)
         -- \
+        Page.NotFound.Model
+        Page.NotFound.Msg
+        ()
         Page.Home.Model
         Page.Home.Msg
         ()
@@ -90,7 +96,12 @@ type alias Pages a =
 
 pages : Pages a
 pages =
-    layout6
+    layout7
+        { init = Page.NotFound.init
+        , update = Page.NotFound.update
+        , subscriptions = Page.NotFound.subscriptions
+        , view = Page.NotFound.view
+        }
         { init = Page.Home.init
         , update = Page.Home.update
         , subscriptions = Page.Home.subscriptions
@@ -123,30 +134,33 @@ pages =
         }
 
 
-type alias Index a1 a2 a3 a4 a5 a6 =
-    { homePage : a1
-    , newPostPage : a2
-    , showPostPage : a3
-    , loginPage : a4
-    , registerPage : a5
-    , aboutPage : a6
+type alias Index a1 a2 a3 a4 a5 a6 a7 =
+    { notFoundPage : a1
+    , homePage : a2
+    , newPostPage : a3
+    , showPostPage : a4
+    , loginPage : a5
+    , registerPage : a6
+    , aboutPage : a7
     }
 
 
 index :
-    { homePage : Item1 a b
-    , newPostPage : Item2 a b
-    , showPostPage : Item3 a b
-    , loginPage : Item4 a b
-    , registerPage : Item5 a b
-    , aboutPage : Item6 a b
+    { notFoundPage : Item1 a b
+    , homePage : Item2 a b
+    , newPostPage : Item3 a b
+    , showPostPage : Item4 a b
+    , loginPage : Item5 a b
+    , registerPage : Item6 a b
+    , aboutPage : Item7 a b
     }
 index =
-    index6 Index
+    index7 Index
 
 
 type alias Option =
-    { isHomePage : Bool
+    { isNotFoundPage : Bool
+    , isHomePage : Bool
     , isNewPostPage : Bool
     , isShowPostPage : Bool
     , isLoginPage : Bool
@@ -157,7 +171,7 @@ type alias Option =
 
 option : Model -> Option
 option =
-    option6 Option
+    option7 Option
 
 
 subscriptions : Model -> Sub Msg

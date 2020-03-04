@@ -298,7 +298,7 @@ type alias Info arg m msg m1 msg1 h a =
     }
 
 
-type alias Layout2 h a m1 msg1 a1 m2 msg2 a2 =
+type alias Layout2 a h m1 msg1 a1 m2 msg2 a2 =
     { a1 : Info a1 (OneOf2 m1 m2) (OneOf2 msg1 msg2) m1 msg1 h a
     , a2 : Info a2 (OneOf2 m1 m2) (OneOf2 msg1 msg2) m2 msg2 h a
     , a3 : Info {} (OneOf2 m1 m2) (OneOf2 msg1 msg2) () () h a
@@ -314,7 +314,7 @@ type alias Layout2 h a m1 msg1 a1 m2 msg2 a2 =
     }
 
 
-type alias Layout6 h a m1 msg1 a1 m2 msg2 a2 m3 msg3 a3 m4 msg4 a4 m5 msg5 a5 m6 msg6 a6 =
+type alias Layout6 a h m1 msg1 a1 m2 msg2 a2 m3 msg3 a3 m4 msg4 a4 m5 msg5 a5 m6 msg6 a6 =
     { a1 : Info a1 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m1 msg1 h a
     , a2 : Info a2 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m2 msg2 h a
     , a3 : Info a3 (OneOf6 m1 m2 m3 m4 m5 m6) (OneOf6 msg1 msg2 msg3 msg4 msg5 msg6) m3 msg3 h a
@@ -330,6 +330,22 @@ type alias Layout6 h a m1 msg1 a1 m2 msg2 a2 m3 msg3 a3 m4 msg4 a4 m5 msg5 a5 m6
     }
 
 
+type alias Layout7 a h m1 msg1 a1 m2 msg2 a2 m3 msg3 a3 m4 msg4 a4 m5 msg5 a5 m6 msg6 a6 m7 msg7 a7 =
+    { a1 : Info a1 (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) m1 msg1 h a
+    , a2 : Info a2 (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) m2 msg2 h a
+    , a3 : Info a3 (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) m3 msg3 h a
+    , a4 : Info a4 (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) m4 msg4 h a
+    , a5 : Info a5 (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) m5 msg5 h a
+    , a6 : Info a6 (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) m6 msg6 h a
+    , a7 : Info a7 (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) m7 msg7 h a
+    , a8 : Info {} (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) () () h a
+    , a9 : Info {} (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) () () h a
+    , a10 : Info {} (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) () () h a
+    , a11 : Info {} (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) () () h a
+    , a12 : Info {} (OneOf7 m1 m2 m3 m4 m5 m6 m7) (OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7) () () h a
+    }
+
+
 layout2 :
     { init : init1, subscriptions : subs1, update : update1, view : view1 }
     -> { init : init2, subscriptions : subs2, update : update2, view : view2 }
@@ -337,96 +353,96 @@ layout2 :
         { a1 :
             { init : init1
             , subscriptions : subs1
-            , toModel : a1 -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : msg1 -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : a1 -> OneOf2 a1 a2
+            , toMsg : msg1 -> OneOf2 msg1 msg2
             , update : update1
             , view : view1
             }
         , a2 :
             { init : init2
             , subscriptions : subs2
-            , toModel : a2 -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : msg2 -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : a2 -> OneOf2 a1 a2
+            , toMsg : msg2 -> OneOf2 msg1 msg2
             , update : update2
             , view : view2
             }
         , a3 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a4 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a5 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a6 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a7 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a8 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a9 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a10 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a11 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a12 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 () () () () () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 () () () () () () () () () ()
+            , toModel : () -> OneOf2 a1 a2
+            , toMsg : () -> OneOf2 msg1 msg2
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
@@ -458,96 +474,96 @@ layout6 :
         { a1 :
             { init : init1
             , subscriptions : subs1
-            , toModel : a1 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : msg1 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : a1 -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : msg1 -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : update1
             , view : view1
             }
         , a2 :
             { init : init2
             , subscriptions : subs2
-            , toModel : a2 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : msg2 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : a2 -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : msg2 -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : update2
             , view : view2
             }
         , a3 :
             { init : init3
             , subscriptions : subs3
-            , toModel : a3 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : msg3 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : a3 -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : msg3 -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : update3
             , view : view3
             }
         , a4 :
             { init : init4
             , subscriptions : subs4
-            , toModel : a4 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : msg4 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : a4 -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : msg4 -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : update4
             , view : view4
             }
         , a5 :
             { init : init5
             , subscriptions : subs5
-            , toModel : a5 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : msg5 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : a5 -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : msg5 -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : update5
             , view : view5
             }
         , a6 :
             { init : init6
             , subscriptions : subs6
-            , toModel : a6 -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : msg6 -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : a6 -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : msg6 -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : update6
             , view : view6
             }
         , a7 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : () -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : () -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a8 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : () -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : () -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a9 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : () -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : () -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a10 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : () -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : () -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a11 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : () -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : () -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
         , a12 :
             { init : {} -> ( (), Cmd () )
             , subscriptions : () -> Sub ()
-            , toModel : () -> Switch a1 a2 a3 a4 a5 a6 () () () () () ()
-            , toMsg : () -> Switch msg1 msg2 msg3 msg4 msg5 msg6 () () () () () ()
+            , toModel : () -> OneOf6 a1 a2 a3 a4 a5 a6
+            , toMsg : () -> OneOf6 msg1 msg2 msg3 msg4 msg5 msg6
             , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
             , view : () -> Html ()
             }
@@ -568,6 +584,128 @@ layout6 info1 info2 info3 info4 info5 info6 =
     }
 
 
+layout7 :
+    { init : init1, subscriptions : subs1, update : update1, view : view1 }
+    -> { init : init2, subscriptions : subs2, update : update2, view : view2 }
+    -> { init : init3, subscriptions : subs3, update : update3, view : view3 }
+    -> { init : init4, subscriptions : subs4, update : update4, view : view4 }
+    -> { init : init5, subscriptions : subs5, update : update5, view : view5 }
+    -> { init : init6, subscriptions : subs6, update : update6, view : view6 }
+    -> { init : init7, subscriptions : subs7, update : update7, view : view7 }
+    ->
+        { a1 :
+            { init : init1
+            , subscriptions : subs1
+            , toModel : a1 -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : msg1 -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : update1
+            , view : view1
+            }
+        , a2 :
+            { init : init2
+            , subscriptions : subs2
+            , toModel : a2 -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : msg2 -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : update2
+            , view : view2
+            }
+        , a3 :
+            { init : init3
+            , subscriptions : subs3
+            , toModel : a3 -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : msg3 -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : update3
+            , view : view3
+            }
+        , a4 :
+            { init : init4
+            , subscriptions : subs4
+            , toModel : a4 -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : msg4 -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : update4
+            , view : view4
+            }
+        , a5 :
+            { init : init5
+            , subscriptions : subs5
+            , toModel : a5 -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : msg5 -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : update5
+            , view : view5
+            }
+        , a6 :
+            { init : init6
+            , subscriptions : subs6
+            , toModel : a6 -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : msg6 -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : update6
+            , view : view6
+            }
+        , a7 :
+            { init : init7
+            , subscriptions : subs7
+            , toModel : a7 -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : msg7 -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : update7
+            , view : view7
+            }
+        , a8 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : () -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a9 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : () -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a10 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : () -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a11 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : () -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        , a12 :
+            { init : {} -> ( (), Cmd () )
+            , subscriptions : () -> Sub ()
+            , toModel : () -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+            , toMsg : () -> OneOf7 msg1 msg2 msg3 msg4 msg5 msg6 msg7
+            , update : () -> h -> Extended () a -> ( Extended () a, Cmd () )
+            , view : () -> Html ()
+            }
+        }
+layout7 info1 info2 info3 info4 info5 info6 info7 =
+    { a1 = { init = info1.init, update = info1.update, view = info1.view, subscriptions = info1.subscriptions, toMsg = Opt1, toModel = Opt1 }
+    , a2 = { init = info2.init, update = info2.update, view = info2.view, subscriptions = info2.subscriptions, toMsg = Opt2, toModel = Opt2 }
+    , a3 = { init = info3.init, update = info3.update, view = info3.view, subscriptions = info3.subscriptions, toMsg = Opt3, toModel = Opt3 }
+    , a4 = { init = info4.init, update = info4.update, view = info4.view, subscriptions = info4.subscriptions, toMsg = Opt4, toModel = Opt4 }
+    , a5 = { init = info5.init, update = info5.update, view = info5.view, subscriptions = info5.subscriptions, toMsg = Opt5, toModel = Opt5 }
+    , a6 = { init = info6.init, update = info6.update, view = info6.view, subscriptions = info6.subscriptions, toMsg = Opt6, toModel = Opt6 }
+    , a7 = { init = info7.init, update = info7.update, view = info7.view, subscriptions = info7.subscriptions, toMsg = Opt7, toModel = Opt7 }
+    , a8 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt8, toModel = Opt8 }
+    , a9 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt9, toModel = Opt9 }
+    , a10 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt10, toModel = Opt10 }
+    , a11 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt11, toModel = Opt11 }
+    , a12 = { init = always (save ()), update = always (always save), subscriptions = always Sub.none, view = always (text ""), toMsg = Opt12, toModel = Opt12 }
+    }
+
+
 index2 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> e) -> e
 index2 =
     Recipes.Switch.index2
@@ -576,6 +714,14 @@ index2 =
 index6 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> ({ b | a3 : e } -> e) -> ({ b | a4 : g } -> g) -> ({ b | a5 : i } -> i) -> ({ b | a6 : k } -> k) -> m) -> m
 index6 =
     Recipes.Switch.index6
+
+
+
+--index7 : (({ b | a1 : a } -> a) -> ({ b | a2 : c } -> c) -> ({ b | a3 : e } -> e) -> ({ b | a4 : g } -> g) -> ({ b | a5 : i } -> i) -> ({ b | a6 : k } -> k) -> m) -> m
+
+
+index7 =
+    Recipes.Switch.index7
 
 
 type alias Item1 a b =
@@ -602,9 +748,21 @@ type alias Item6 a b =
     Recipes.Switch.Item6 a b
 
 
+type alias Item7 a b =
+    Recipes.Switch.Item7 a b
+
+
 option6 :
     (Bool -> Bool -> Bool -> Bool -> Bool -> Bool -> a)
     -> OneOf6 a1 a2 a3 a4 a5 a6
     -> a
 option6 =
     Recipes.Switch.option6
+
+
+option7 :
+    (Bool -> Bool -> Bool -> Bool -> Bool -> Bool -> Bool -> a)
+    -> OneOf7 a1 a2 a3 a4 a5 a6 a7
+    -> a
+option7 =
+    Recipes.Switch.option7

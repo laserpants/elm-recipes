@@ -18,6 +18,7 @@ import Recipes.Session.LocalStorage as LocalStorage exposing (setSession)
 import Recipes.Switch.Extended as Switch exposing (RunSwitch)
 import Route as Route exposing (Route(..))
 import Ui
+import Ui.Page
 import Update.Pipeline exposing (andMap, andThen, andThenIf, mapCmd, save, using, when, with)
 import Update.Pipeline.Extended exposing (Run, lift, runStack)
 import Url exposing (Url)
@@ -163,12 +164,12 @@ handleRouteChange url maybeRoute =
 
         changePage =
             let
-                { homePage, newPostPage, showPostPage, loginPage, registerPage, aboutPage } =
+                { notFoundPage, homePage, newPostPage, showPostPage, loginPage, registerPage, aboutPage } =
                     index
             in
             case maybeRoute of
                 Nothing ->
-                    save
+                    loadPage notFoundPage ()
 
                 Just About ->
                     loadPage aboutPage ()
@@ -222,7 +223,7 @@ handlePostAdded _ =
 handleCommentCreated : Comment -> Model -> ( Model, Cmd Msg )
 handleCommentCreated _ =
     showToast
-        { message = "Your comment has been received."
+        { message = "Thank you for your comment."
         , color = Info
         }
 
@@ -279,25 +280,4 @@ view { page, session, ui } =
             , Html.map PageMsg (Page.view page)
             ]
         ]
-
-    --        [ div []
-    --            [ ul []
-    --                ([ li [] [ a [ href "/" ] [ text "Home" ] ]
-    --                 , li [] [ a [ href "/about" ] [ text "About" ] ]
-    --                 , li [] [ a [ href "/posts/new" ] [ text "New post" ] ]
-    --                 , li [] [ a [ href "/login" ] [ text "Login" ] ]
-    --                 , li [] [ a [ href "/register" ] [ text "Register" ] ]
-    --                 ]
-    --                    ++ (if Maybe.isJust session then
-    --                            [ li [] [ a [ onClick Logout ] [ text "Log out" ] ] ]
-    --
-    --                        else
-    --                            []
-    --                       )
-    --                )
-    --            ]
-    --        , div []
-    --            [ Html.map PageMsg (Page.view page)
-    --            ]
-    --        ]
     }
