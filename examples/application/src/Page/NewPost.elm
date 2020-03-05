@@ -77,9 +77,13 @@ update :
 update msg { onPostAdded } =
     case msg of
         ApiMsg apiMsg ->
+            let
+                handlePostAdded post =
+                    call (onPostAdded post)
+            in
             inApi
                 (Api.update apiMsg
-                    { apiDefaultHandlers | onSuccess = \post -> call (onPostAdded post) }
+                    { apiDefaultHandlers | onSuccess = handlePostAdded }
                 )
 
         FormMsg formMsg ->
