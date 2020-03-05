@@ -17,7 +17,7 @@ import Recipes.Router as Router exposing (Router)
 import Recipes.Session.LocalStorage as LocalStorage
 import Recipes.Switch.Extended as Switch exposing (RunSwitch)
 import Route as Route exposing (Route(..))
-import Ui
+import Ui exposing (Msg(..))
 import Ui.Page
 import Update.Pipeline exposing (andMap, andThen, andThenIf, mapCmd, save, using, when, with)
 import Update.Pipeline.Extended exposing (Run, lift, runStack)
@@ -273,13 +273,15 @@ update msg =
                                 }
                             )
             in
-            when (Ui.Logout == uiMsg) logout
+            when (Logout == uiMsg) logout
                 >> andThen (inUi (Ui.update uiMsg))
 
 
 subscriptions : Model -> Sub Msg
 subscriptions { page } =
-    Sub.batch [ Sub.map PageMsg (Page.subscriptions page) ]
+    Sub.batch
+        [ Sub.map PageMsg (Page.subscriptions page)
+        ]
 
 
 view : Model -> Document Msg
