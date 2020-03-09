@@ -1,4 +1,4 @@
-module WebSocket.UsernameAvailable exposing (..)
+module WebSocket.UsernameAvailable exposing (WsRequest, WsResponse, requestEncoder, requestId, responseDecoder, responseId, sendRequest)
 
 import Json.Decode as Json exposing (bool, field, string)
 import Json.Encode as Encode
