@@ -48,23 +48,18 @@ insertAsCommentFormIn model commentForm =
     save { model | commentForm = commentForm }
 
 
-inPostApi : Run Model (Api.Model Post) Msg (Api.Msg Post) a
+inPostApi : Run (Extended Model b) (Api.Model Post) Msg (Api.Msg Post) a
 inPostApi =
-    runStack .postApi insertAsPostApiIn PostApiMsg
-
-
-inPostApiE : Run (Extended Model b) (Api.Model Post) Msg (Api.Msg Post) a
-inPostApiE =
     runStackE .postApi insertAsPostApiIn PostApiMsg
 
 
-inCommentApiE : Run (Extended Model b) (Api.Model Comment) Msg (Api.Msg Comment) a
-inCommentApiE =
+inCommentApi : Run (Extended Model b) (Api.Model Comment) Msg (Api.Msg Comment) a
+inCommentApi =
     runStackE .commentApi insertAsCommentApiIn CommentApiMsg
 
 
-inCommentFormE : Run (Extended Model b) Form.Comment.Model Msg Form.Comment.Msg a
-inCommentFormE =
+inCommentForm : Run (Extended Model b) Form.Comment.Model Msg Form.Comment.Msg a
+inCommentForm =
     runStackE .commentForm insertAsCommentFormIn CommentFormMsg
 
 
@@ -89,13 +84,16 @@ init id =
 
         form =
             Form.Comment.init []
+
+        inPost =
+            runStack .postApi insertAsPostApiIn
     in
     save Model
         |> andMap (save id)
         |> andMap (mapCmd PostApiMsg postApi)
         |> andMap (mapCmd CommentApiMsg commentApi)
         |> andMap (mapCmd CommentFormMsg form)
-        |> andThen (inPostApi sendEmptyRequest)
+        |> andThen (inPost PostApiMsg sendEmptyRequest)
 
 
 subscriptions : Model -> Sub Msg
@@ -108,7 +106,7 @@ handleSubmit :
     -> Extended Model a
     -> ( Extended Model a, Cmd Msg )
 handleSubmit =
-    Form.Comment.toJson >> JsonApi.sendJson "" >> inCommentApiE
+    Form.Comment.toJson >> JsonApi.sendJson "" >> inCommentApi
 
 
 insertComment :
@@ -120,7 +118,7 @@ insertComment comment =
         insert post =
             { post | comments = comment :: post.comments }
     in
-    inPostApiE (withResource insert)
+    inPostApi (withResource insert)
 
 
 update :
@@ -131,29 +129,29 @@ update :
 update msg { onCommentCreated } =
     case msg of
         PostApiMsg apiMsg ->
-            inPostApiE (Api.update apiMsg apiDefaultHandlers)
+            inPostApi (Api.update apiMsg apiDefaultHandlers)
 
         CommentApiMsg apiMsg ->
             let
                 commentCreated comment =
-                    inCommentFormE Form.reset
+                    inCommentForm Form.reset
                         >> andThen (insertComment comment)
                         >> andCall (onCommentCreated comment)
             in
-            inCommentApiE
+            inCommentApi
                 (Api.update apiMsg
                     { apiDefaultHandlers | onSuccess = commentCreated }
                 )
 
         CommentFormMsg formMsg ->
-            inCommentFormE
+            inCommentForm
                 (Form.update formMsg
                     { onSubmit = handleSubmit
                     }
                 )
 
         FetchPost ->
-            inPostApiE sendEmptyRequest
+            inPostApi sendEmptyRequest
 
 
 view : Model -> Html Msg
