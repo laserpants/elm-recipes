@@ -15,14 +15,18 @@ import Update.Pipeline exposing (andAddCmd, andThen, save, using, when)
 import Update.Pipeline.Extended exposing (Extended, Run, choosing, lift, runStack)
 
 
+type alias Id =
+    Int
+
+
 type Msg
     = ToggleMenu
-    | DismissToast Int
+    | DismissToast Id
     | Logout
 
 
 type alias Toast =
-    { id : Int
+    { id : Id
     , message : String
     , color : Color
     }
@@ -31,7 +35,7 @@ type alias Toast =
 type alias Model =
     { menuIsOpen : Bool
     , toast : Maybe Toast
-    , counter : Int
+    , counter : Id
     }
 
 

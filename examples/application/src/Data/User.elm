@@ -26,16 +26,16 @@ encoder { id, name, email, rememberMe } =
     let
         maybeId =
             case id of
-                Just id1 ->
-                    [ ( "id", Encode.int id1 ) ]
+                Just id_ ->
+                    [ ( "id", Encode.int id_ ) ]
 
                 Nothing ->
                     []
+
+        payload =
+            [ ( "name", Encode.string name )
+            , ( "email", Encode.string email )
+            , ( "rememberMe", Encode.bool rememberMe )
+            ]
     in
-    object
-        ([ ( "name", Encode.string name )
-         , ( "email", Encode.string email )
-         , ( "rememberMe", Encode.bool rememberMe )
-         ]
-            ++ maybeId
-        )
+    object (maybeId ++ payload)

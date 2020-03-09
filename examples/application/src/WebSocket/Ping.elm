@@ -1,4 +1,4 @@
-module WebSocket.Ping exposing (..)
+module WebSocket.Ping exposing (WsResponse, responseDecoder, responseId, send)
 
 import Json.Decode as Json exposing (field)
 import Json.Encode as Encode

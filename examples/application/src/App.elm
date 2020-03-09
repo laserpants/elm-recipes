@@ -7,7 +7,7 @@ import Bulma.Modifiers exposing (..)
 import Data.Comment exposing (Comment)
 import Data.Post exposing (Post)
 import Data.Session as Session exposing (Session)
-import Data.User exposing (User)
+import Data.User
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -18,9 +18,8 @@ import Recipes.Session.LocalStorage as LocalStorage
 import Recipes.Switch.Extended as Switch exposing (RunSwitch)
 import Route as Route exposing (Route(..))
 import Ui exposing (Msg(..))
-import Ui.Page
 import Update.Pipeline exposing (andMap, andThen, andThenIf, mapCmd, save, using, when, with)
-import Update.Pipeline.Extended exposing (Run, lift, runStack)
+import Update.Pipeline.Extended exposing (Run)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
 
@@ -102,18 +101,15 @@ showToast =
     inUi << Ui.showToast
 
 
-type alias Getter m m1 msg msg1 arg a =
-    Pages a
-    ->
+loadPage :
+    (Pages a
+     ->
         { a
             | init : arg -> ( m, Cmd msg )
-            , toMsg : msg -> msg1
-            , toModel : m -> m1
+            , toMsg : msg -> Page.Msg
+            , toModel : m -> Page.Model
         }
-
-
-loadPage :
-    Getter page Page.Model msg Page.Msg arg a
+    )
     -> arg
     -> Model
     -> ( Model, Cmd Msg )

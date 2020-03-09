@@ -1,7 +1,7 @@
 module Page.Home exposing (..)
 
-import Bulma.Elements exposing (..)
-import Bulma.Modifiers exposing (..)
+import Bulma.Elements exposing (content)
+import Bulma.Modifiers exposing (Size(..))
 import Data.Post as Post exposing (Post)
 import Html exposing (..)
 import Html.Attributes exposing (..)

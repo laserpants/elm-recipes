@@ -1,7 +1,7 @@
 module Form.Register exposing (..)
 
 import Bulma.Form exposing (controlCheckBox, controlHelp, controlInput, controlLabel)
-import Bulma.Modifiers exposing (..)
+import Bulma.Modifiers exposing (Color(..))
 import Form.Error exposing (Error(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)

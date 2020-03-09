@@ -1,4 +1,4 @@
-module Util.Api exposing (..)
+module Util.Api exposing (errorToString, requestErrorMessage)
 
 import Bulma.Components exposing (..)
 import Bulma.Modifiers exposing (..)

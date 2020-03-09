@@ -1,8 +1,7 @@
 module Util.Form exposing (control, controlErrorHelp, controlInput, controlPassword, controlTextArea)
 
-import Bulma.Components exposing (..)
 import Bulma.Form exposing (Control, ControlInputModifiers, controlHelp, controlInput, controlInputModifiers, controlTextAreaModifiers)
-import Bulma.Modifiers exposing (..)
+import Bulma.Modifiers exposing (Color(..))
 import Form.Error as Error exposing (Error)
 import Html exposing (..)
 import Html.Attributes exposing (..)

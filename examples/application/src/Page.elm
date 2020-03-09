@@ -52,9 +52,9 @@ insertAsPageIn model page =
 
 
 run :
-    (msg2 -> msg1)
+    (Msg -> msg)
     -> Pages a
-    -> RunSwitch (Pages a) (HasPageModel b) Model msg1 msg2
+    -> RunSwitch (Pages a) (HasPageModel b) Model msg Msg
 run =
     runStack .page insertAsPageIn
 
