@@ -1,8 +1,8 @@
 module Ui exposing (..)
 
-import Bulma.Components exposing (..)
-import Bulma.Elements exposing (..)
-import Bulma.Modifiers exposing (..)
+import Bulma.Components exposing (fixedNavbar, navbarBrand, navbarBurger, navbarEnd, navbarItem, navbarItemLink, navbarMenu, navbarModifiers, navbarStart)
+import Bulma.Elements exposing (notificationWithDelete)
+import Bulma.Modifiers exposing (Color(..), VerticalAlignment(..))
 import Data.Session exposing (Session)
 import Html exposing (..)
 import Html.Attributes exposing (..)

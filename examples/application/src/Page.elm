@@ -1,4 +1,4 @@
-module Page exposing (..)
+module Page exposing (Model, Msg, Pages, index, option, pages, run, subscriptions, view)
 
 import Data.Comment exposing (Comment)
 import Data.Post exposing (Post)
