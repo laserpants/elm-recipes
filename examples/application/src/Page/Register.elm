@@ -1,8 +1,7 @@
 module Page.Register exposing (..)
 
 import Bulma.Columns exposing (columnModifiers, columnsModifiers)
-import Bulma.Components exposing (..)
-import Bulma.Modifiers exposing (..)
+import Bulma.Components exposing (card, cardContent)
 import Data.User as User exposing (User)
 import Dict
 import Form.Error exposing (Error(..))

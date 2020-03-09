@@ -1,8 +1,8 @@
 module Page.Login exposing (..)
 
 import Bulma.Columns exposing (columnsModifiers, narrowColumnModifiers)
-import Bulma.Components exposing (..)
-import Bulma.Modifiers exposing (..)
+import Bulma.Components exposing (card, cardContent, message, messageBody, messageModifiers)
+import Bulma.Modifiers exposing (Color(..))
 import Data.Session as Session exposing (Session)
 import Form.Login
 import Html exposing (..)

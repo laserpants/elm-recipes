@@ -1,7 +1,7 @@
 module Util.Api exposing (errorToString, requestErrorMessage)
 
-import Bulma.Components exposing (..)
-import Bulma.Modifiers exposing (..)
+import Bulma.Components exposing (message, messageBody, messageModifiers)
+import Bulma.Modifiers exposing (Color(..))
 import Html exposing (Html, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)

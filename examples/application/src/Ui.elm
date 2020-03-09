@@ -1,4 +1,4 @@
-module Ui exposing (..)
+module Ui exposing (Model, Msg(..), closeMenu, init, navbar, run, showToast, spinner, toastMessage, update)
 
 import Bulma.Components exposing (fixedNavbar, navbarBrand, navbarBurger, navbarEnd, navbarItem, navbarItemLink, navbarMenu, navbarModifiers, navbarStart)
 import Bulma.Elements exposing (notificationWithDelete)
