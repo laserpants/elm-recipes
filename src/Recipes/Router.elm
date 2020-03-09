@@ -1,4 +1,4 @@
-module Recipes.Router exposing (..)
+module Recipes.Router exposing (Msg(..), Router, init, onUrlChange, onUrlRequest, redirect, run, runUpdate, update)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation

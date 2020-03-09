@@ -42,24 +42,19 @@ inApi =
     runStackE .api insertAsApiIn ApiMsg
 
 
-inForm : Run Model Form.Register.Model Msg Form.Register.Msg a
+inForm : Run (Extended Model b) Form.Register.Model Msg Form.Register.Msg a
 inForm =
-    runStack .form insertAsFormIn FormMsg
-
-
-inFormE : Run (Extended Model b) Form.Register.Model Msg Form.Register.Msg a
-inFormE =
     runStackE .form insertAsFormIn FormMsg
 
 
-setUsernameStatus : UsernameStatus -> Model -> ( Model, Cmd Msg )
+setUsernameStatus : UsernameStatus -> Extended Model a -> ( Extended Model a, Cmd Msg )
 setUsernameStatus =
     inForm << Form.setState
 
 
-setUsernameUnavailable : String -> Model -> ( Model, Cmd Msg )
-setUsernameUnavailable username state =
-    save { state | unavailableNames = Set.insert username state.unavailableNames }
+setUsernameUnavailable : String -> Extended Model a -> ( Extended Model a, Cmd Msg )
+setUsernameUnavailable username ( state, calls ) =
+    save ( { state | unavailableNames = Set.insert username state.unavailableNames }, calls )
 
 
 init : () -> ( Model, Cmd Msg )
@@ -122,14 +117,14 @@ checkIfUsernameAvailable username =
         (\{ unavailableNames } ->
             let
                 setStatus =
-                    lift << setUsernameStatus
+                    setUsernameStatus
             in
             if String.isEmpty username then
                 setStatus Blank
 
             else if Set.member username unavailableNames then
                 setStatus (IsAvailable False)
-                    >> andThen (inFormE validateUsernameField)
+                    >> andThen (inForm validateUsernameField)
 
             else
                 setStatus Unknown
@@ -155,7 +150,7 @@ update msg ({ onRegistrationComplete } as callbacks) =
             inApi (Api.update apiMsg handlers)
 
         FormMsg formMsg ->
-            inFormE (Form.update formMsg { onSubmit = handleSubmit })
+            inForm (Form.update formMsg { onSubmit = handleSubmit })
                 >> andThen
                     (case formMsg of
                         Form.Input Username username ->
@@ -178,11 +173,11 @@ update msg ({ onRegistrationComplete } as callbacks) =
                                 |> Form.stringValue
                     in
                     when (username == fieldValue)
-                        (lift (setUsernameStatus (IsAvailable isAvailable)))
+                        (setUsernameStatus (IsAvailable isAvailable))
                 )
                 >> andThenIf (not isAvailable)
-                    (lift (setUsernameUnavailable username))
-                >> andThen (inFormE validateUsernameField)
+                    (setUsernameUnavailable username)
+                >> andThen (inForm validateUsernameField)
 
 
 view : Model -> Html Msg
