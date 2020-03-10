@@ -1,4 +1,4 @@
-module Recipes.Api.Collection.Json exposing (..)
+module Recipes.Api.Collection.Json exposing (JsonRequestConfig, envelopeDecoder, init)
 
 import Http
 import Json.Decode as Json

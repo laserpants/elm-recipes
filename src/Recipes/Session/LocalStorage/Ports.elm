@@ -1,4 +1,4 @@
-port module Recipes.Session.LocalStorage.Ports exposing (..)
+port module Recipes.Session.LocalStorage.Ports exposing (clearSession, setSession)
 
 
 port setSession : String -> Cmd msg

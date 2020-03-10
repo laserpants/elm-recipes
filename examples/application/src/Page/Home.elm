@@ -37,13 +37,8 @@ insertAsPostsIn model posts =
     save { model | posts = posts }
 
 
-inPostsApi : Run Model (Api.Model (List Post)) Msg (Api.Msg (List Post)) a
+inPostsApi : Run (Extended Model b) (Api.Model (List Post)) Msg (Api.Msg (List Post)) a
 inPostsApi =
-    runStack .posts insertAsPostsIn ApiMsg
-
-
-inPostsApiE : Run (Extended Model b) (Api.Model (List Post)) Msg (Api.Msg (List Post)) a
-inPostsApiE =
     runStackE .posts insertAsPostsIn ApiMsg
 
 
@@ -66,11 +61,14 @@ init () =
                         Ping.responseId
                         Ping.responseDecoder
                     )
+
+        inPosts =
+            runStack .posts insertAsPostsIn
     in
     save Model
         |> andMap (mapCmd ApiMsg api)
         |> andMap websocket
-        |> andThen (inPostsApi sendEmptyRequest)
+        |> andThen (inPosts ApiMsg sendEmptyRequest)
 
 
 subscriptions : Model -> Sub Msg
@@ -86,7 +84,7 @@ update :
 update msg callbacks =
     case msg of
         ApiMsg apiMsg ->
-            inPostsApiE (Api.update apiMsg apiDefaultHandlers)
+            inPostsApi (Api.update apiMsg apiDefaultHandlers)
 
         WebSocketMsg ws ->
             WebSocket.updateExtendedModel update callbacks ws

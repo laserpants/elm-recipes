@@ -1,6 +1,6 @@
 module Route exposing (Route(..), parser)
 
-import Url.Parser as Parser exposing ((</>), Parser, oneOf, top)
+import Url.Parser as Parser exposing ((</>), Parser, int, map, oneOf, s, top)
 
 
 type Route
@@ -15,10 +15,10 @@ type Route
 parser : Parser (Route -> a) a
 parser =
     oneOf
-        [ Parser.map Home top
-        , Parser.map NewPost (Parser.s "posts" </> Parser.s "new")
-        , Parser.map ShowPost (Parser.s "posts" </> Parser.int)
-        , Parser.map Login (Parser.s "login")
-        , Parser.map Register (Parser.s "register")
-        , Parser.map About (Parser.s "about")
+        [ map Home top
+        , map NewPost (s "posts" </> s "new")
+        , map ShowPost (s "posts" </> int)
+        , map Login (s "login")
+        , map Register (s "register")
+        , map About (s "about")
         ]

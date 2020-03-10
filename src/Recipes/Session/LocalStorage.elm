@@ -1,4 +1,4 @@
-module Recipes.Session.LocalStorage exposing (..)
+module Recipes.Session.LocalStorage exposing (clear, updateStorage)
 
 import Json.Encode exposing (Value, encode, null)
 import Recipes.Session.LocalStorage.Ports as Ports
