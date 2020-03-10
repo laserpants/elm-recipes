@@ -1,24 +1,24 @@
 module Main exposing (..)
 
 import Browser exposing (Document, document)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (a, div, text)
+import Html.Attributes exposing (class, href, placeholder, style, value)
+import Html.Events exposing (onClick, onInput)
 import Json.Decode as Json
 import Json.Encode as Encode
 import Recipes.WebSocket as WebSocket
-import Update.Pipeline exposing (..)
+import Update.Pipeline exposing (andMap, andThen, save, when)
 
 
 wsMessageEncoder : { a | query : String } -> Json.Value
 wsMessageEncoder { query } =
     Encode.object
-        [ ( "query", Encode.string query)
+        [ ( "query", Encode.string query )
         ]
 
 
 type alias WsResponse =
-    { query : String 
+    { query : String
     , suggestions : List String
     }
 
@@ -53,7 +53,7 @@ type alias Model =
 
 
 setInput : String -> Model -> ( Model, Cmd Msg )
-setInput input model = 
+setInput input model =
     save { model | input = input }
 
 
@@ -87,23 +87,25 @@ update msg model =
     case msg of
         WebSocketMsg ws ->
             model
-                |> WebSocket.updateModel (Just WsError) update ws 
+                |> WebSocket.updateModel (Just WsError) update ws
 
         WsReponseMsg { query, suggestions } ->
             model
                 |> when (model.input == query)
-                      (setSuggestions suggestions 
-                          >> andThen (setStatus Results)
-                      )
+                    (setSuggestions suggestions
+                        >> andThen (setStatus Results)
+                    )
 
         WsError error ->
             case error of
                 WebSocket.UnknownMessageType message ->
-                    save model
+                    model
+                        |> save 
                         |> Debug.log ("Websocket: Ignoring unknown message type `" ++ message ++ "`.")
 
                 WebSocket.JsonError jsonError ->
-                    save model
+                    model
+                        |> save 
                         |> Debug.log ("Websocket JSON error: " ++ Debug.toString jsonError)
 
         OnInput input ->
@@ -116,7 +118,6 @@ update msg model =
                 let
                     encodedMsg =
                         wsMessageEncoder { query = input }
-
                 in
                 model
                     |> setInput input
@@ -139,30 +140,30 @@ view { input, suggestions, status } =
     { title = "Websocket recipe example"
     , body =
         [ div
-            [ class "wrapper" 
+            [ class "wrapper"
             ]
             [ Html.input
-                  [ onInput OnInput 
-                  , value input 
-                  , placeholder "Type the name of a state in the U.S."
-                  ]
-                  []
-
+                [ onInput OnInput
+                , value input
+                , placeholder "Type the name of a state in the U.S."
+                ]
+                [
+                ]
             , case status of
                 Freeze ->
                     text ""
 
                 Pending ->
                     div
-                        [ style "flex" "1" 
+                        [ style "flex" "1"
                         ]
                         [ text "..."
                         ]
 
                 Results ->
                     let
-                        item res = 
-                            a 
+                        item res =
+                            a
                                 [ href "#"
                                 , onClick (Select res)
                                 ]
