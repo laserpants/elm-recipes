@@ -51,10 +51,10 @@ setSession session model =
 
 
 setRestrictedUrl : Url -> Model -> ( Model, Cmd msg )
-setRestrictedUrl { path } model =
+setRestrictedUrl { path } ({ router } as model) =
     let
         url =
-            String.dropLeft (String.length model.router.basePath) path
+            String.dropLeft (String.length router.basePath) path
     in
     save { model | restrictedUrl = Just url }
 
@@ -150,7 +150,7 @@ handleRouteChange url maybeRoute =
                             >> andThen (redirectTo "/login")
                             >> andThen
                                 (showToast
-                                    { message = "You must log in to access that page."
+                                    { message = "You must be logged in to access that page."
                                     , color = Warning
                                     }
                                 )
