@@ -87,7 +87,7 @@ update msg callbacks =
             inPostsApi (Api.update apiMsg apiDefaultHandlers)
 
         WebSocketMsg ws ->
-            WebSocket.updateExtendedModel update callbacks ws
+            WebSocket.updateExtendedModel Nothing update callbacks ws
 
         SendPing ->
             Ping.send

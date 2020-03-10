@@ -161,7 +161,7 @@ update msg ({ onRegistrationComplete } as callbacks) =
                     )
 
         WebSocketMsg ws ->
-            WebSocket.updateExtendedModel update callbacks ws
+            WebSocket.updateExtendedModel Nothing update callbacks ws
 
         UsernameAvailableWsResponseMsg { username, isAvailable } ->
             choosing

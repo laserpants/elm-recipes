@@ -88,31 +88,31 @@ subscriptions { parsers } =
 
 
 updateModel :
-    (msg -> a -> ( a, Cmd msg ))
+    Maybe (Error -> msg)
+    -> (msg -> a -> ( a, Cmd msg ))
     -> Result Error msg
     -> a
     -> ( a, Cmd msg )
-updateModel update result =
+updateModel maybeToError update result =
     case result of
         Err error ->
-            case error of
-                UnknownMessageType message ->
-                    save
-                        |> Debug.log ("Websocket: Ignoring unknown message type `" ++ message ++ "`.")
+            case maybeToError of
+                Just toErrorMsg ->
+                    update (toErrorMsg error)
 
-                JsonError jsonError ->
+                Nothing ->
                     save
-                        |> Debug.log ("Websocket JSON error: " ++ Debug.toString jsonError)
 
         Ok msg ->
             update msg
 
 
 updateExtendedModel :
-    (msg -> b -> a -> ( a, Cmd msg ))
+    Maybe (Error -> msg)
+    -> (msg -> b -> a -> ( a, Cmd msg ))
     -> b
     -> Result Error msg
     -> a
     -> ( a, Cmd msg )
-updateExtendedModel update callbacks =
-    updateModel (\msg -> update msg callbacks)
+updateExtendedModel maybeToError update callbacks =
+    updateModel maybeToError (\msg -> update msg callbacks)

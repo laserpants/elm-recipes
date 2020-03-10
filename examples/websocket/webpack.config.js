@@ -6,7 +6,7 @@ module.exports = function() {
 
   return {
     mode: 'development',
-    entry: './index.js',
+    entry: './js/index.js',
     output: {
       path: __dirname + '/dist',
       filename: 'main.js'
