@@ -22,7 +22,7 @@ if (app.ports && app.ports.websocketOut && app.ports.websocketIn) {
           payload: { query: message.query, suggestions }
         };
         app.ports.websocketIn.send(JSON.stringify(response));
-      }, 350);
+      }, 300);
     }
   });
 }
