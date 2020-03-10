@@ -17,7 +17,11 @@ type alias MessageHandler msg =
     }
 
 
-addParser : String -> Json.Decoder msg -> MessageHandler msg -> ( MessageHandler msg, Cmd msg )
+addParser :
+    String
+    -> Json.Decoder msg
+    -> MessageHandler msg
+    -> ( MessageHandler msg, Cmd msg )
 addParser key decoder model =
     save { model | parsers = Dict.insert key decoder model.parsers }
 

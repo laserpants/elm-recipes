@@ -1,9 +1,9 @@
-module Recipes.Router exposing (Msg(..), Router, init, onUrlChange, onUrlRequest, redirect, run, runUpdate, update)
+module Recipes.Router exposing (Msg(..), Router, init, onUrlChange, onUrlRequest, redirect, run, runE, runUpdate, update)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
 import Update.Pipeline exposing (addCmd, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack, runStackE)
 import Url exposing (Url)
 
 
@@ -108,6 +108,13 @@ run :
     -> Run (HasRouter route a) (Router route) msg Msg b
 run =
     runStack .router insertAsRouterIn
+
+
+runE :
+    (Msg -> msg)
+    -> Run (Extended (HasRouter route a) c) (Router route) msg Msg b
+runE =
+    runStackE .router insertAsRouterIn
 
 
 runUpdate :

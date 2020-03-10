@@ -47,7 +47,7 @@ init () =
                 , endpoint = "/books"
                 , decoder = Json.field "books" (JsonApi.envelopeDecoder "page" Book.decoder)
                 , headers = []
-                , queryString = Api.defaultQueryFormat
+                , queryString = Api.standardQueryFormat
                 }
     in
     save Model

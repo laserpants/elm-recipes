@@ -30,9 +30,9 @@ type alias Collection item =
 
 
 insertAsApiIn :
-    Collection item
-    -> Api.Model (Envelope item)
-    -> ( Collection item, Cmd (Msg item) )
+    { b | api : a }
+    -> a
+    -> ( { b | api : a }, Cmd msg )
 insertAsApiIn model api =
     save { model | api = api }
 
@@ -62,8 +62,8 @@ type alias RequestConfig item =
     }
 
 
-defaultQueryFormat : Int -> Int -> String
-defaultQueryFormat offset limit =
+standardQueryFormat : Int -> Int -> String
+standardQueryFormat offset limit =
     Builder.relative []
         [ Builder.int "offset" offset
         , Builder.int "limit" limit
@@ -173,7 +173,12 @@ type alias HasCollection item a =
 
 run : (msg1 -> msg) -> Run (HasCollection item a) (Collection item) msg msg1 b
 run =
-    runStack .api (\model api -> save { model | api = api })
+    runStack .api insertAsApiIn
+
+
+runE : (msg1 -> msg) -> Run (Extended (HasCollection item a) c) (Collection item) msg msg1 b
+runE =
+    runStackE .api insertAsApiIn
 
 
 runUpdate :

@@ -1,4 +1,4 @@
-module Recipes.Form exposing (Field, FieldDict, FieldList, Model, ModelState, Msg(..), Status(..), Validate, Variant(..), asBool, asString, boolValue, checkbox, checkboxAttrs, field, fieldError, init, initState, inputAttrs, inputField, insertAsFormIn, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, reset, run, setFieldDirty, setState, stringValue, update, validateField)
+module Recipes.Form exposing (Field, FieldDict, FieldList, Model, ModelState, Msg(..), Status(..), Validate, Variant(..), asBool, asString, boolValue, checkbox, checkboxAttrs, field, fieldError, init, initState, inputAttrs, inputField, insertAsFormIn, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, reset, run, runE, setFieldDirty, setState, stringValue, update, validateField)
 
 import AssocList as Dict exposing (Dict)
 import Html exposing (Html)
@@ -6,7 +6,7 @@ import Html.Attributes as Attributes
 import Html.Events exposing (onBlur, onCheck, onFocus, onInput)
 import Maybe.Extra as Maybe
 import Update.Pipeline exposing (andThen, andThenIf, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack, runStackE)
 
 
 type Variant
@@ -361,6 +361,11 @@ insertAsFormIn model form =
 run : (msg1 -> msg) -> Run (HasForm f e d s a) (ModelState f e d s) msg msg1 b
 run =
     runStack .form insertAsFormIn
+
+
+runE : (msg1 -> msg) -> Run (Extended (HasForm f e d s a) c) (ModelState f e d s) msg msg1 b
+runE =
+    runStackE .form insertAsFormIn
 
 
 lookup2 :
