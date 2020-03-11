@@ -1,4 +1,4 @@
-module Recipes.WebSocket exposing (Error(..), MessageHandler, createHandler, init, sendMessage, subscriptions, updateExtendedModel, updateModel)
+module Recipes.WebSocket exposing (Error(..), MessageHandler, createHandler, init, sendMessage, subscriptions, updateModel, updateModelExtended)
 
 import Dict exposing (Dict)
 import Json.Decode as Json exposing (decodeString, field)
@@ -107,12 +107,12 @@ updateModel maybeToError update result =
             update msg
 
 
-updateExtendedModel :
+updateModelExtended :
     Maybe (Error -> msg)
     -> (msg -> b -> a -> ( a, Cmd msg ))
     -> b
     -> Result Error msg
     -> a
     -> ( a, Cmd msg )
-updateExtendedModel maybeToError update callbacks =
+updateModelExtended maybeToError update callbacks =
     updateModel maybeToError (\msg -> update msg callbacks)
