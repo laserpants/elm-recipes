@@ -39,12 +39,12 @@ type alias Model =
 
 inApi : Run (Extended Model b) (Api.Model User) Msg (Api.Msg User) a
 inApi =
-    Api.runE ApiMsg
+    Api.runExtended ApiMsg
 
 
 inForm : Run (Extended Model b) Form.Register.Model Msg Form.Register.Msg a
 inForm =
-    Form.runE FormMsg
+    Form.runExtended FormMsg
 
 
 setUsernameStatus : UsernameStatus -> Extended Model a -> ( Extended Model a, Cmd Msg )

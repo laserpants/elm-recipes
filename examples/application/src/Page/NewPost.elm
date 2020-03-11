@@ -29,12 +29,12 @@ type alias Model =
 
 inForm : Run (Extended Model c) Form.NewPost.Model Msg Form.NewPost.Msg f
 inForm =
-    Form.runE FormMsg
+    Form.runExtended FormMsg
 
 
 inApi : Run (Extended Model c) (Api.Model Post) Msg (Api.Msg Post) f
 inApi =
-    Api.runE ApiMsg
+    Api.runExtended ApiMsg
 
 
 init : () -> ( Model, Cmd Msg )

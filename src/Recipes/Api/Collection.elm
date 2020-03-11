@@ -176,8 +176,8 @@ run =
     runStack .api insertAsApiIn
 
 
-runE : (msg1 -> msg) -> Run (Extended (HasCollection item a) c) (Collection item) msg msg1 b
-runE =
+runExtended : (msg1 -> msg) -> Run (Extended (HasCollection item a) c) (Collection item) msg msg1 b
+runExtended =
     runStackE .api insertAsApiIn
 
 

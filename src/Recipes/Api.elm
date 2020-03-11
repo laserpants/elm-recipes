@@ -181,10 +181,10 @@ run =
     runStack .api insertAsApiIn
 
 
-runE :
+runExtended :
     (Msg resource -> msg)
     -> Run (Extended (HasApi resource a) b) (Model resource) msg (Msg resource) c
-runE =
+runExtended =
     runStackE .api insertAsApiIn
 
 

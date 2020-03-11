@@ -1,4 +1,4 @@
-module Recipes.Form exposing (Field, FieldDict, FieldList, Model, ModelState, Msg(..), Status(..), Validate, Variant(..), asBool, asString, boolValue, checkbox, checkboxAttrs, field, fieldError, init, initState, inputAttrs, inputField, insertAsFormIn, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, reset, run, runE, setFieldDirty, setState, stringValue, update, validateField)
+module Recipes.Form exposing (Field, FieldDict, FieldList, Model, ModelState, Msg(..), Status(..), Validate, Variant(..), asBool, asString, boolValue, checkbox, checkboxAttrs, field, fieldError, init, initState, inputAttrs, inputField, insertAsFormIn, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, reset, run, runExtended, setFieldDirty, setState, stringValue, update, validateField)
 
 import AssocList as Dict exposing (Dict)
 import Html exposing (Html)
@@ -363,8 +363,8 @@ run =
     runStack .form insertAsFormIn
 
 
-runE : (msg1 -> msg) -> Run (Extended (HasForm f e d s a) c) (ModelState f e d s) msg msg1 b
-runE =
+runExtended : (msg1 -> msg) -> Run (Extended (HasForm f e d s a) c) (ModelState f e d s) msg msg1 b
+runExtended =
     runStackE .form insertAsFormIn
 
 

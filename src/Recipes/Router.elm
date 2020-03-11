@@ -1,4 +1,4 @@
-module Recipes.Router exposing (Msg(..), Router, init, onUrlChange, onUrlRequest, redirect, run, runE, runUpdate, update)
+module Recipes.Router exposing (Msg(..), Router, init, onUrlChange, onUrlRequest, redirect, run, runExtended, runUpdate, update)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
@@ -110,10 +110,10 @@ run =
     runStack .router insertAsRouterIn
 
 
-runE :
+runExtended :
     (Msg -> msg)
     -> Run (Extended (HasRouter route a) c) (Router route) msg Msg b
-runE =
+runExtended =
     runStackE .router insertAsRouterIn
 
 
