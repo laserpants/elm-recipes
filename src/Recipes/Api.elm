@@ -86,8 +86,8 @@ init { endpoint, method, expect, headers } =
 initAndRequest :
     RequestConfig resource
     -> ( Model resource, Cmd (Msg resource) )
-initAndRequest req =
-    init req
+initAndRequest config =
+    init config
         |> andThen (sendEmptyRequest << extend)
         |> andThen sequenceCalls
 

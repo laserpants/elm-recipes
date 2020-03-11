@@ -31,11 +31,11 @@ encoder { id, title, author, synopsis } =
 
                 Just theId ->
                     [ ( "id", Encode.int theId ) ]
+
+        props =
+            [ ( "title", Encode.string title )
+            , ( "author", Encode.string author )
+            , ( "synopsis", Encode.string synopsis )
+            ]
     in
-    Encode.object
-        ([ ( "title", Encode.string title )
-         , ( "author", Encode.string author )
-         , ( "synopsis", Encode.string synopsis )
-         ]
-            ++ maybeId
-        )
+    Encode.object (maybeId ++ props)

@@ -32,10 +32,10 @@ encoder { id, name, email, rememberMe } =
                 Nothing ->
                     []
 
-        payload =
+        props =
             [ ( "name", Encode.string name )
             , ( "email", Encode.string email )
             , ( "rememberMe", Encode.bool rememberMe )
             ]
     in
-    object (maybeId ++ payload)
+    object (maybeId ++ props)
