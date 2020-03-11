@@ -93,7 +93,7 @@ validate usernameStatus =
         |> Validate.inputField Name (Validate.stringNotEmpty IsEmpty)
         |> Validate.inputField Email validateEmail
         |> Validate.inputField Username validateUsername
-        |> Validate.inputField PhoneNumber (Validate.stringNotEmpty IsEmpty)
+        |> Validate.inputField PhoneNumber (always << Ok)
         |> Validate.inputField Password validatePassword
         |> Validate.inputField PasswordConfirmation validatePasswordConfirmation
         |> Validate.checkbox AcceptTerms (Validate.mustBeChecked TermsNotAccepted)

@@ -39,9 +39,9 @@ type Msg
 
 
 type Status
-    = Freeze
-    | Pending
-    | Results
+    = Stopped
+    | Searching
+    | HasResults
 
 
 type alias Model =
@@ -79,7 +79,7 @@ init () =
         |> andMap websocket
         |> andMap (save "")
         |> andMap (save [])
-        |> andMap (save Freeze)
+        |> andMap (save Stopped)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -93,7 +93,7 @@ update msg model =
             model
                 |> when (model.input == query)
                     (setSuggestions suggestions
-                        >> andThen (setStatus Results)
+                        >> andThen (setStatus HasResults)
                     )
 
         WsError error ->
@@ -112,7 +112,7 @@ update msg model =
             if "" == input then
                 model
                     |> setInput ""
-                    |> andThen (setStatus Freeze)
+                    |> andThen (setStatus Stopped)
 
             else
                 let
@@ -122,12 +122,12 @@ update msg model =
                 model
                     |> setInput input
                     |> andThen (WebSocket.sendMessage "search" encodedMsg)
-                    |> andThen (setStatus Pending)
+                    |> andThen (setStatus Searching)
 
         Select string ->
             model
                 |> setInput string
-                |> andThen (setStatus Freeze)
+                |> andThen (setStatus Stopped)
 
 
 subscriptions : Model -> Sub Msg
@@ -150,17 +150,17 @@ view { input, suggestions, status } =
                 [
                 ]
             , case status of
-                Freeze ->
+                Stopped ->
                     text ""
 
-                Pending ->
+                Searching ->
                     div
                         [ style "flex" "1"
                         ]
                         [ text "..."
                         ]
 
-                Results ->
+                HasResults ->
                     let
                         item res =
                             a

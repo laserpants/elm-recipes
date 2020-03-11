@@ -3,10 +3,9 @@
   "scripts": {
     "dev": "npx webpack-dev-server"
   },
-  "dependencies": {
-    "fuzzyset.js": "0.0.91"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "fuzzyset.js": "0.0.91",
     "elm-webpack-loader": "^6.0.1",
     "file-loader": "^5.0.2",
     "webpack": "^4.41.5",
