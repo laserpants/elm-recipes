@@ -45,7 +45,7 @@ init () =
             JsonApi.init
                 { limit = 2
                 , endpoint = "/books"
-                , decoder = Json.field "books" (JsonApi.envelopeDecoder "page" Book.decoder)
+                , decoder = Json.field "books" (JsonApi.envelopeDecoder "collection" Book.decoder)
                 , headers = []
                 , queryString = Api.standardQueryFormat
                 }

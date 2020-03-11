@@ -55,7 +55,7 @@ xhook.before(function(request, callback) {
       callback({
         status: 200,
         data: JSON.stringify({
-          books: getPage(books, 'page', request)
+          books: getPage(books, 'collection', request)
         }),
         headers: { 'Content-Type': 'application/json' }
       });
