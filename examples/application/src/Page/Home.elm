@@ -15,7 +15,7 @@ import Recipes.WebSocket as WebSocket
 import Ui exposing (spinner)
 import Ui.Page
 import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
-import Update.Pipeline.Extended exposing (Extended, Run, runStack, runStackE)
+import Update.Pipeline.Extended exposing (Extended, Run, runStack, runStackExtended)
 import WebSocket.Ping as Ping
 
 
@@ -39,7 +39,7 @@ insertAsPostsIn model posts =
 
 inPostsApi : Run (Extended Model b) (Api.Model (List Post)) Msg (Api.Msg (List Post)) a
 inPostsApi =
-    runStackE .posts insertAsPostsIn ApiMsg
+    runStackExtended .posts insertAsPostsIn ApiMsg
 
 
 init : () -> ( Model, Cmd Msg )

@@ -12,7 +12,7 @@ import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
 import Ui.Page
 import Update.Pipeline exposing (andMap, mapCmd, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, runStackE)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, call)
 import Util.Api
 
 

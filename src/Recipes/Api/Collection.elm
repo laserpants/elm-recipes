@@ -3,7 +3,7 @@ module Recipes.Api.Collection exposing (..)
 import Http exposing (Expect)
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers)
 import Update.Pipeline exposing (andMap, andThen, save, with)
-import Update.Pipeline.Extended exposing (Extended, Run, andLift, choosing, lift, runStack, runStackE)
+import Update.Pipeline.Extended exposing (Extended, Run, andLift, choosing, lift, runStack, runStackExtended)
 import Url.Builder as Builder
 
 
@@ -72,7 +72,7 @@ standardQueryFormat offset limit =
 
 inApi : Run (Extended (Collection item) e) (Api.Model (Envelope item)) (Msg item) (Api.Msg (Envelope item)) a
 inApi =
-    runStackE .api insertAsApiIn ApiMsg
+    runStackExtended .api insertAsApiIn ApiMsg
 
 
 init : RequestConfig item -> ( Collection item, Cmd (Msg item) )
@@ -178,7 +178,7 @@ run =
 
 runExtended : (msg1 -> msg) -> Run (Extended (HasCollection item a) c) (Collection item) msg msg1 b
 runExtended =
-    runStackE .api insertAsApiIn
+    runStackExtended .api insertAsApiIn
 
 
 runUpdate :

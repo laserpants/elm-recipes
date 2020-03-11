@@ -2,7 +2,7 @@ module Recipes.Api exposing (..)
 
 import Http exposing (Expect, emptyBody)
 import Update.Pipeline exposing (andAddCmd, andThen, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, choosing, extend, lift, runStack, runStackE, sequenceCalls)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, choosing, extend, lift, runStack, runStackExtended, sequenceCalls)
 
 
 type Msg resource
@@ -185,7 +185,7 @@ runExtended :
     (Msg resource -> msg)
     -> Run (Extended (HasApi resource a) b) (Model resource) msg (Msg resource) c
 runExtended =
-    runStackE .api insertAsApiIn
+    runStackExtended .api insertAsApiIn
 
 
 runUpdate :

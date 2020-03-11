@@ -100,12 +100,12 @@ update msg model =
             case error of
                 WebSocket.UnknownMessageType message ->
                     model
-                        |> save 
+                        |> save
                         |> Debug.log ("Websocket: Ignoring unknown message type `" ++ message ++ "`.")
 
                 WebSocket.JsonError jsonError ->
                     model
-                        |> save 
+                        |> save
                         |> Debug.log ("Websocket JSON error: " ++ Debug.toString jsonError)
 
         OnInput input ->
@@ -147,8 +147,7 @@ view { input, suggestions, status } =
                 , value input
                 , placeholder "Type the name of a state in the U.S."
                 ]
-                [
-                ]
+                []
             , case status of
                 Stopped ->
                     text ""

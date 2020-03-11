@@ -3,7 +3,7 @@ module Recipes.Router exposing (Msg(..), Router, init, onUrlChange, onUrlRequest
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
 import Update.Pipeline exposing (addCmd, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack, runStackE)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack, runStackExtended)
 import Url exposing (Url)
 
 
@@ -114,7 +114,7 @@ runExtended :
     (Msg -> msg)
     -> Run (Extended (HasRouter route a) c) (Router route) msg Msg b
 runExtended =
-    runStackE .router insertAsRouterIn
+    runStackExtended .router insertAsRouterIn
 
 
 runUpdate :

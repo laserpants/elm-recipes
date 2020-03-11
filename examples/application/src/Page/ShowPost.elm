@@ -14,7 +14,7 @@ import Recipes.Form as Form
 import Ui exposing (spinner)
 import Ui.Page
 import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, runStack, runStackE)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, runStack, runStackExtended)
 import Util.Api
 
 
@@ -50,17 +50,17 @@ insertAsCommentFormIn model commentForm =
 
 inPostApi : Run (Extended Model b) (Api.Model Post) Msg (Api.Msg Post) a
 inPostApi =
-    runStackE .postApi insertAsPostApiIn PostApiMsg
+    runStackExtended .postApi insertAsPostApiIn PostApiMsg
 
 
 inCommentApi : Run (Extended Model b) (Api.Model Comment) Msg (Api.Msg Comment) a
 inCommentApi =
-    runStackE .commentApi insertAsCommentApiIn CommentApiMsg
+    runStackExtended .commentApi insertAsCommentApiIn CommentApiMsg
 
 
 inCommentForm : Run (Extended Model b) Form.Comment.Model Msg Form.Comment.Msg a
 inCommentForm =
-    runStackE .commentForm insertAsCommentFormIn CommentFormMsg
+    runStackExtended .commentForm insertAsCommentFormIn CommentFormMsg
 
 
 init : Int -> ( Model, Cmd Msg )

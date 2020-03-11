@@ -6,7 +6,7 @@ import Html.Attributes as Attributes
 import Html.Events exposing (onBlur, onCheck, onFocus, onInput)
 import Maybe.Extra as Maybe
 import Update.Pipeline exposing (andThen, andThenIf, save)
-import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack, runStackE)
+import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack, runStackExtended)
 
 
 type Variant
@@ -365,7 +365,7 @@ run =
 
 runExtended : (msg1 -> msg) -> Run (Extended (HasForm f e d s a) c) (ModelState f e d s) msg msg1 b
 runExtended =
-    runStackE .form insertAsFormIn
+    runStackExtended .form insertAsFormIn
 
 
 lookup2 :
