@@ -1,6 +1,6 @@
 module Recipes.Api exposing (..)
 
-{-| Use the Api recipe to manage the lifecycle of resources that are available to your application via Restful web services.
+{-| Use the Api recipe for lifecycle management of resources that are available to your application via Restful web services.
 -}
 
 import Http exposing (Expect, emptyBody)

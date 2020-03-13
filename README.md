@@ -6,7 +6,7 @@
 
 ### A note about pipelines
 
-The implementation of this library, as well as many of the examples shown here, rely on the [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) package. This implies a style of code in which the pipe operator is used rather heavily to achieve monadic chaining of updates:
+The implementation of this library, as well as many of the examples on this page, rely on the [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) package. This implies a style of code where the pipe operator is used rather heavily, to achieve monadic chaining of updates:
 
 ```elm
 update msg model =
@@ -27,17 +27,39 @@ See `examples/application` for an example of all the recipes used together.
 
 ### Api
 
-Use the Api recipe to manage the lifecycle of resources that are available to your application via Restful web services.
+Use the Api recipe for lifecycle management of resources that are available to your application via Restful web services.
 
-##### Msg
+1. import
 
-##### Model
+        import Recipes.Api as Api
 
-##### Init
+2. Add a constructor to your `Msg` type:
 
-##### Update
+        type Msg
+            = ...
+            | ApiMsg (Api.Msg MyResource)
 
-##### Subscriptions
+   You can use a different name than `ApiMsg` but make sure to
+
+3. Add an `api` field to your `Model`:
+
+        type alias Model =
+            { ...
+            , api : Api.Model MyResource
+            }
+
+
+4. init
+
+5. In your `update` function, add a case for the `Msg` constructor introduced in step 1.
+
+        update msg model =
+            case msg of
+                ApiMsg apiMsg ->
+                    model
+                        |> Api.runUpdate ApiMsg apiMsg apiDefaultHandlers
+
+                ...
 
 #### Example
 
