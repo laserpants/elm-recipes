@@ -28,15 +28,15 @@ type alias Model resource =
 
 setResource :
     Resource resource
-    -> Model resource
-    -> ( Model resource, Cmd (Msg resource) )
-setResource resource model =
-    save { model | resource = resource }
+    -> Extended (Model resource) a
+    -> ( Extended (Model resource) a, Cmd (Msg resource) )
+setResource resource ( model, calls ) =
+    save ( { model | resource = resource }, calls )
 
 
 resetResource :
-    Model resource
-    -> ( Model resource, Cmd (Msg resource) )
+    Extended (Model resource) a
+    -> ( Extended (Model resource) a, Cmd (Msg resource) )
 resetResource =
     setResource NotRequested
 
@@ -114,7 +114,7 @@ sendRequest :
     -> ( Extended (Model resource) a, Cmd (Msg resource) )
 sendRequest suffix maybeBody (( { request }, _ ) as model) =
     model
-        |> lift (setResource Requested)
+        |> setResource Requested
         |> andAddCmd (request suffix maybeBody)
 
 
@@ -134,7 +134,7 @@ withResource fun =
         (\{ resource } ->
             case resource of
                 Available item ->
-                    lift (setResource (Available (fun item)))
+                    setResource (Available (fun item))
 
                 _ ->
                     save
@@ -153,12 +153,12 @@ update msg { onSuccess, onError } model =
     case msg of
         Response (Ok resource) ->
             model
-                |> lift (setResource (Available resource))
+                |> setResource (Available resource)
                 |> andCall (onSuccess resource)
 
         Response (Err error) ->
             model
-                |> lift (setResource (Error error))
+                |> setResource (Error error)
                 |> andCall (onError error)
 
 

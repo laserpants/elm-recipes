@@ -9,7 +9,6 @@ import Json.Decode as Json exposing (field)
 import Recipes.Api as Api exposing (..)
 import Recipes.Api.Json as JsonApi
 import Update.Pipeline exposing (andMap, mapCmd, save)
-import Update.Pipeline.Extended exposing (lift)
 
 
 type alias Book =
@@ -62,7 +61,7 @@ fetchBook =
 
 resetBook : Model -> ( Model, Cmd Msg )
 resetBook =
-    Api.run ApiMsg (lift Api.resetResource)
+    Api.run ApiMsg Api.resetResource
 
 
 
