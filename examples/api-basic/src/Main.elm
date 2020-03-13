@@ -64,7 +64,6 @@ resetBook =
     Api.run ApiMsg Api.resetResource
 
 
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg =
     case msg of
@@ -111,7 +110,7 @@ view { api } =
                         ]
                     ]
 
-            Error error ->
+            Error _ ->
                 text "That didn't work as expected."
         ]
     }
