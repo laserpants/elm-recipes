@@ -1,5 +1,8 @@
 module Recipes.Form exposing (Field, FieldDict, FieldList, Model, ModelState, Msg(..), Status(..), Validate, Variant(..), asBool, asString, boolValue, checkbox, checkboxAttrs, field, fieldError, init, initState, inputAttrs, inputField, insertAsFormIn, lookup2, lookup3, lookup4, lookup5, lookup6, lookup7, reset, run, runExtended, setFieldDirty, setState, stringValue, update, validateField)
 
+{-| Use the Form recipe to build forms and handle form validation.
+-}
+
 import AssocList as Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as Attributes

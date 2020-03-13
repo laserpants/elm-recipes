@@ -1,5 +1,8 @@
 module Recipes.WebSocket exposing (Error(..), MessageHandler, createHandler, init, sendMessage, subscriptions, updateModel, updateModelExtended)
 
+{-| Use this recipe to implement WebSocket functionality.
+-}
+
 import Dict exposing (Dict)
 import Json.Decode as Json exposing (decodeString, field)
 import Json.Encode as Encode

@@ -6,6 +6,8 @@ import Update.Pipeline exposing (addCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack, runStackExtended)
 import Url exposing (Url)
 
+{-| Use the Router recipe to implement URL routing in single-page applications.
+-}
 
 type Msg
     = UrlChange Url

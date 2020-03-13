@@ -1,5 +1,8 @@
 module Recipes.Api exposing (..)
 
+{-| Use the Api recipe to manage the lifecycle of resources that are available to your application via Restful web services.
+-}
+
 import Http exposing (Expect, emptyBody)
 import Update.Pipeline exposing (andAddCmd, andThen, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, choosing, extend, lift, runStack, runStackExtended, sequenceCalls)

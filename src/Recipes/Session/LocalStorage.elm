@@ -1,5 +1,8 @@
 module Recipes.Session.LocalStorage exposing (clear, updateStorage)
 
+{-| The Session recipe allows you to store and persist data using the browser's Storage objects.
+-}
+
 import Json.Encode exposing (Value, encode, null)
 import Recipes.Session.LocalStorage.Ports as Ports
 import Update.Pipeline exposing (addCmd, save)

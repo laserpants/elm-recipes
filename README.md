@@ -2,7 +2,26 @@
 
 ## About
 
-### Pipelines
+## How to use
+
+### A note about pipelines
+
+The implementation of this library, as well as many of the examples shown here, rely on the [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) package. This implies a style of code in which the pipe operator is used rather heavily to achieve monadic chaining of updates:
+
+```elm
+update msg model =
+    case msg of
+        SomeMsg someMsg ->
+            save model
+                |> andThen (setPower 100)
+                |> andAddCmd someCmd
+```
+
+Note however that this is not required for using `elm-recipes`, and I have tried to present code examples also using a more conventional approach.
+
+### Examples
+
+See `examples/application` for an example of all the recipes used together.
 
 ## Recipes
 
@@ -21,6 +40,21 @@ Use the Api recipe to manage the lifecycle of resources that are available to yo
 ##### Subscriptions
 
 #### Example
+
+```
+GET /posts/1
+```
+
+```json
+{
+    "book": {
+        "id": 1,
+        "title": "Moby Dick",
+        "author": "Herman Melville",
+        "synopsis": "Sailor Ishmael's narrative of the obsessive quest of Ahab, captain of the whaling ship Pequod, for revenge on Moby Dick, the giant white sperm whale that on the ship's previous voyage bit off Ahab's leg at the knee."
+    }
+}
+```
 
 ```elm
 module Main exposing (..)
@@ -153,7 +187,7 @@ main =
 
 ### Form
 
-About
+Use the Form recipe to build forms and handle form validation.
 
 ##### Msg
 
@@ -166,10 +200,32 @@ About
 ##### Subscriptions
 
 #### Example
+
+TODO
+
+### Router
+
+Use the Router recipe to implement URL routing in single-page applications.
+
+##### Msg
+
+##### Model
+
+##### Init
+
+##### Update
+
+##### Subscriptions
+
+##### Main
+
+#### Example
+
+TODO
 
 ### Session
 
-About
+The Session recipe allows you to store and persist data using the browser's Storage objects.
 
 ##### Msg
 
@@ -182,10 +238,12 @@ About
 ##### Subscriptions
 
 #### Example
+
+TODO
 
 ### Switch
 
-About
+Use the Switch recipe to address the need for switching between page contexts in applications.
 
 ##### Msg
 
@@ -199,9 +257,11 @@ About
 
 #### Example
 
+TODO
+
 ### WebSocket
 
-About
+Use this recipe to implement WebSocket functionality.
 
 ##### Msg
 

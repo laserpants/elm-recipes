@@ -1,5 +1,8 @@
 module Recipes.Switch exposing (..)
 
+{-| Use the Switch recipe to address the need for switching between page contexts in applications.
+-}
+
 import Html exposing (Html, text)
 import Update.Pipeline exposing (andThen, map, mapCmd, save)
 
