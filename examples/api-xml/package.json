@@ -10,7 +10,6 @@
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.10.2",
-    "xhook": "^1.4.9",
-    "xml-loader": "^1.2.1"
+    "xhook": "^1.4.9"
   }
 }

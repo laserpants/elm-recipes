@@ -25,10 +25,6 @@ module.exports = function() {
           options: {
             debug: true
           }
-        },
-        {
-          test: /\.xml$/, 
-          loader: 'xml-loader'
         }
       ]
     },
