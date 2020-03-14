@@ -1,0 +1,42 @@
+<collection>
+  <book>
+    <id>1</id>
+    <title>Moby Dick</title>
+    <author>Herman Melville</author>
+    <synopsis>
+      Sailor Ishmael's narrative of the obsessive quest of Ahab, captain of the whaling ship Pequod, for revenge on Moby Dick, the giant white sperm whale that on the ship's previous voyage bit off Ahab's leg at the knee.
+    </synopsis>
+  </book>
+  <book>
+    <id>2</id>
+    <title>War and Peace</title>
+    <author>Leo Tolstoy</author>
+    <synopsis>
+      The novel chronicles the French invasion of Russia and the impact of the Napoleonic era on Tsarist society through the stories of five Russian aristocratic families.
+    </synopsis>
+  </book>
+  <book>
+    <id>3</id>
+    <title>The Three Musketeers</title>
+    <author>Alexandre Dumas</author>
+    <synopsis>
+      Situated between 1625 and 1628, it recounts the adventures of a young man named d'Artagnan (based on Charles de Batz-Castelmore d'Artagnan) after he leaves home to travel to Paris, to join the Musketeers of the Guard.
+    </synopsis>
+  </book>
+  <book>
+    <id>4</id>
+    <title>Ulysses</title>
+    <author>James Joyce</author>
+    <synopsis>
+      Ulysses chronicles the peripatetic appointments and encounters of Leopold Bloom in Dublin in the course of an ordinary day, 16 June 1904.
+    </synopsis>
+  </book>
+  <book>
+    <id>5</id>
+    <title>Frankenstein</title>
+    <author>Mary Shelley</author>
+    <synopsis>
+      The story of Victor Frankenstein, a young scientist who creates a hideous sapient creature in an unorthodox scientific experiment.
+    </synopsis>
+  </book>
+</collection>

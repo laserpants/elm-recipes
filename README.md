@@ -7,7 +7,7 @@
 ### A note about pipelines
 
 The [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) library is used throughout the various modules of this package, as well as in many of the following examples.
-It builds on a style of code where the pipe operator is used to express monadic chaining of updates:
+It relies on a style of code where the pipe operator is used to express monadic chaining of updates:
 
 ```elm
 update : Msg -> Model -> ( Model, Cmd Msg )
