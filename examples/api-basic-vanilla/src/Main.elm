@@ -49,10 +49,7 @@ init () =
                 , headers = []
                 }
     in
-    ( { api = apiModel
-      }
-    , Cmd.map ApiMsg apiMsg
-    )
+    ( { api = apiModel }, apiMsg )
 
 
 fetchBook : Model -> ( Model, Cmd Msg )

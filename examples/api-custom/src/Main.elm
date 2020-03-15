@@ -60,7 +60,7 @@ update msg model =
                     , headers = []
                     }
             in
-            JsonApi.initAndRequest request
+            JsonApi.makeRequest request
                 |> mapCmd BooksApiMsg
                 |> map BookList
 

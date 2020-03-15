@@ -1,4 +1,4 @@
-module Recipes.Api.Json exposing (JsonRequestConfig, init, initAndRequest, sendJson)
+module Recipes.Api.Json exposing (JsonRequestConfig, init, makeRequest, sendJson)
 
 import Http
 import Json.Decode as Json
@@ -38,6 +38,6 @@ init =
     Api.init << requestConfig
 
 
-initAndRequest : JsonRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
-initAndRequest =
-    Api.initAndRequest << requestConfig
+makeRequest : JsonRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
+makeRequest =
+    Api.makeRequest << requestConfig

@@ -86,10 +86,10 @@ init { endpoint, method, expect, headers } =
     save { resource = NotRequested, request = request }
 
 
-initAndRequest :
+makeRequest :
     RequestConfig resource
     -> ( Model resource, Cmd (Msg resource) )
-initAndRequest config =
+makeRequest config =
     init config
         |> andThen (sendEmptyRequest << extend)
         |> andThen sequenceCalls
