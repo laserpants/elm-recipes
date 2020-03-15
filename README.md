@@ -6,8 +6,8 @@
 
 ### A note about pipelines
 
-The [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) library appears in the implementation of this package, as well as in many of the following examples.
-It relies on a style of code where the pipe operator is used to express monadic chaining of updates:
+The [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) library is used in the implementation of this package, as well as in many of the following examples.
+It relies on a style of code where the pipe operator serves to express monadic chaining of updates:
 
 ```elm
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -37,7 +37,7 @@ Note however that none of this is required for using `elm-recipes`, and I have t
 
 ### Examples
 
-See `examples/application` for an example of most of these recipes used together.
+See `examples/application` for an example of many of these recipes used together.
 
 ## Recipes
 
@@ -45,19 +45,29 @@ See `examples/application` for an example of most of these recipes used together
 
 Use the Api recipe for lifecycle management of resources that are available to your application via Restful web services.
 
+Here is how to use this recipe in your program:
+
 1. Import the `Recipes.Api` module:
 
         import Recipes.Api as Api
 
-2. Add a constructor to your `Msg` type:
+2. Create a data type that represents the server resource.
+
+        type alias MyResource =
+            { ...
+            }
+
+   It is a sensible choice to place this record in a serparate module, e.g,. `Data.MyResource`.
+
+3. Add a constructor to your `Msg` type with a single field of type `Api.Msg MyResource`: 
 
         type Msg
             = ...
             | ApiMsg (Api.Msg MyResource)
 
-   You can use a different name than `ApiMsg`, but make sure to adjust the code accordingly in the following steps.
+   You can use a different name than `ApiMsg` here, but make sure to adjust the code accordingly in the following steps.
 
-3. Add an `api` field to your `Model`:
+4. Add an `api` field to your `Model`. It should have the type `Api.Model MyResource`:
 
         type alias Model =
             { ...
@@ -66,9 +76,9 @@ Use the Api recipe for lifecycle management of resources that are available to y
 
    If you name this field to ...
 
-4. init
+5. init
 
-5. In your `update` function, add a case for the `Msg` constructor introduced in step 1:
+6. In your `update` function, add a case for the `Msg` constructor introduced in step 1:
 
         update msg model =
             case msg of
@@ -78,7 +88,7 @@ Use the Api recipe for lifecycle management of resources that are available to y
 
                 ...
 
-6. Implement your view to respond to 
+7. Implement your view to respond to 
 
         view { api } =
             case api.resource of
@@ -238,6 +248,12 @@ main =
 
 Use the Form recipe to build forms and handle form validation.
 
+Here is how to use this recipe in your program:
+
+1. Import the `Recipes.Form` module:
+
+        import Recipes.Form as Form
+
 ##### Msg
 
 ##### Model
@@ -255,6 +271,13 @@ TODO
 ### Router
 
 Use the Router recipe to implement URL routing in single-page applications.
+
+Here is how to use this recipe in your program:
+
+1. Import the `Recipes.Router` module:
+
+        import Recipes.Router as Router exposing (Router)
+
 
 ##### Msg
 
@@ -397,6 +420,13 @@ main =
 
 The Session recipe allows you to store and persist data using the browser's Storage objects.
 
+Here is how to use this recipe in your program:
+
+1. Import the `Recipes.Session.LocalStorage` module:
+
+        import Recipes.Session.LocalStorage as LocalStorage
+
+
 ##### Msg
 
 ##### Model
@@ -415,6 +445,13 @@ TODO
 
 Use the Switch recipe to address the need for switching between page contexts in applications.
 
+Here is how to use this recipe in your program:
+
+1. Import the `Recipes.Switch` module:
+
+        import Recipes.Switch as Switch
+
+
 ##### Msg
 
 ##### Model
@@ -432,6 +469,13 @@ TODO
 ### WebSocket
 
 Use this recipe to implement WebSocket functionality.
+
+Here is how to use this recipe in your program:
+
+1. Import the `Recipes.WebSocket` module:
+
+        import Recipes.WebSocket as WebSocket
+
 
 ##### Msg
 

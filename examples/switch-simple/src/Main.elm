@@ -9,14 +9,10 @@ import Html.Events exposing (..)
 import Maybe.Extra as Maybe
 import Page.About as About
 import Page.Login as Login
-import Recipes.Switch as Switch exposing (Item1, Item2, Layout2, OneOf2, RunSwitch, index2, layout2)
+import Recipes.Switch as Switch exposing (Layout2, OneOf2, RunSwitch, index2, layout2)
 import Update.Pipeline exposing (andMap, andThen, map, map2, mapCmd, save)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, parse)
-
-
-type alias Flags =
-    ()
 
 
 type alias Index a1 a2 =
@@ -81,7 +77,7 @@ inSwitch =
     Switch.run SwitchMsg pages
 
 
-init : Flags -> ( Model, Cmd Msg )
+init : () -> ( Model, Cmd Msg )
 init () =
     let
         switch =
@@ -148,7 +144,7 @@ view { switch } =
     }
 
 
-main : Program Flags Model Msg
+main : Program () Model Msg
 main =
     document
         { init = init
