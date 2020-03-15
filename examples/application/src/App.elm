@@ -119,22 +119,12 @@ loadPage page =
 
 init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
 init { session, basePath } url key =
-    let
-        router =
-            Router.initMsg RouterMsg (parse Route.parser) basePath key
-
-        page =
-            save Switch.initial
-
-        ui =
-            Ui.init
-    in
     save Model
-        |> andMap router
-        |> andMap page
+        |> andMap (Router.initMsg RouterMsg (parse Route.parser) basePath key)
+        |> andMap (save Switch.initial)
         |> andMap (save Nothing)
         |> andMap (save Nothing)
-        |> andMap ui
+        |> andMap Ui.init
         |> andThen (update (Router.onUrlChange RouterMsg url))
 
 

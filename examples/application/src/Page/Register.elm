@@ -60,9 +60,6 @@ setUsernameUnavailable username ( state, calls ) =
 init : () -> ( Model, Cmd Msg )
 init () =
     let
-        form =
-            Form.Register.init []
-
         api =
             JsonApi.init
                 { endpoint = "/auth/register"
@@ -82,7 +79,7 @@ init () =
     in
     save Model
         |> andMap api
-        |> andMap form
+        |> andMap (Form.Register.init [])
         |> andMap (save Set.empty)
         |> andMap websocket
 

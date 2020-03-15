@@ -82,9 +82,6 @@ init id =
                 , headers = []
                 }
 
-        form =
-            Form.Comment.init []
-
         inPost =
             runStack .postApi insertAsPostApiIn
     in
@@ -92,7 +89,7 @@ init id =
         |> andMap (save id)
         |> andMap postApi
         |> andMap commentApi
-        |> andMap form
+        |> andMap (Form.Comment.init [])
         |> andThen (inPost PostApiMsg sendEmptyRequest)
 
 

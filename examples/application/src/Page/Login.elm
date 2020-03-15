@@ -49,13 +49,10 @@ init () =
                 , decoder = Json.field "session" Session.decoder
                 , headers = []
                 }
-
-        form =
-            Form.Login.init []
     in
     save Model
         |> andMap api
-        |> andMap form
+        |> andMap (Form.Login.init [])
 
 
 subscriptions : Model -> Sub Msg

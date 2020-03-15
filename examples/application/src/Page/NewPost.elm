@@ -22,8 +22,8 @@ type Msg
 
 
 type alias Model =
-    { form : Form.NewPost.Model
-    , api : Api.Model Post
+    { api : Api.Model Post
+    , form : Form.NewPost.Model
     }
 
 
@@ -40,9 +40,6 @@ inApi =
 init : () -> ( Model, Cmd Msg )
 init () =
     let
-        form =
-            Form.NewPost.init []
-
         api =
             JsonApi.init
                 { endpoint = "/posts"
@@ -52,8 +49,8 @@ init () =
                 }
     in
     save Model
-        |> andMap form
         |> andMap api
+        |> andMap (Form.NewPost.init [])
 
 
 subscriptions : Model -> Sub Msg
