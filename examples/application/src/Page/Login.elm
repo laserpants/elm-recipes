@@ -80,17 +80,11 @@ update msg { onAuthResponse } =
                 respondWith response =
                     inForm Form.reset
                         >> andCall (onAuthResponse response)
-
-                handleSuccess session =
-                    respondWith (Just session)
-
-                handleError _ =
-                    respondWith Nothing
             in
             inApi
                 (Api.update apiMsg
-                    { onSuccess = handleSuccess
-                    , onError = handleError
+                    { onSuccess = \session -> respondWith (Just session)
+                    , onError = always (respondWith Nothing)
                     }
                 )
 
