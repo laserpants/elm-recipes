@@ -6,7 +6,7 @@
 
 ### A note about pipelines
 
-The [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) library is used throughout the various modules of this package, as well as in many of the following examples.
+The [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) library appears in the implementation of this package, as well as in many of the following examples.
 It relies on a style of code where the pipe operator is used to express monadic chaining of updates:
 
 ```elm
@@ -19,7 +19,10 @@ update msg model =
                 |> andAddCmd someCmd
 ```
 
-Similarly, the [applicative](https://wiki.haskell.org/Applicative_functor) pattern and `andMap` is typically used to implement the `init` function:
+The `save` function turns a `model` value into a `( model, Cmd msg )` pair without adding any commands, 
+and `andThen` extracts the model from a result and passes it as input to the next function in a pipeline.
+
+Similarly, the [applicative](https://wiki.haskell.org/Applicative_functor) pattern and `andMap` from the same library are used to implement the `init` function:
 
 ```elm
 init : Flags -> ( Model, Cmd Msg )
