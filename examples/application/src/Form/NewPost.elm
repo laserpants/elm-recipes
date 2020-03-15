@@ -54,7 +54,7 @@ validate =
         |> Validate.inputField Body validateBody
 
 
-init : FieldList Field Error -> ( Model, Cmd Msg )
+init : FieldList Field Error -> ( Model, Cmd msg )
 init =
     Form.init validate
 

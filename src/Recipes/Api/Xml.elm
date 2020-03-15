@@ -33,7 +33,7 @@ requestConfig { endpoint, method, decoder, headers } =
     }
 
 
-init : XmlRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
+init : XmlRequestConfig resource -> ( Model resource, Cmd msg )
 init =
     Api.init << requestConfig
 

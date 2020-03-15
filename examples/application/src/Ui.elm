@@ -113,7 +113,7 @@ run =
     runStack .ui insertAsUiIn
 
 
-init : ( Model, Cmd Msg )
+init : ( Model, Cmd msg )
 init =
     save
         { menuIsOpen = False

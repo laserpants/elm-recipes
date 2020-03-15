@@ -13,7 +13,7 @@ import Json.Decode as Json
 import Recipes.Api as Api exposing (Resource(..), apiDefaultHandlers, insertAsApiIn)
 import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
-import Update.Pipeline exposing (andMap, mapCmd, save)
+import Update.Pipeline exposing (andMap, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call)
 import Util.Api
 
@@ -54,8 +54,8 @@ init () =
             Form.Login.init []
     in
     save Model
-        |> andMap (mapCmd ApiMsg api)
-        |> andMap (mapCmd FormMsg form)
+        |> andMap api
+        |> andMap form
 
 
 subscriptions : Model -> Sub Msg

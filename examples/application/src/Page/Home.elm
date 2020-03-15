@@ -14,7 +14,7 @@ import Recipes.Api.Json as JsonApi
 import Recipes.WebSocket as WebSocket
 import Ui exposing (spinner)
 import Ui.Page
-import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
+import Update.Pipeline exposing (andMap, andThen, save)
 import Update.Pipeline.Extended exposing (Extended, Run, runStack, runStackExtended)
 import WebSocket.Ping as Ping
 
@@ -66,7 +66,7 @@ init () =
             runStack .posts insertAsPostsIn
     in
     save Model
-        |> andMap (mapCmd ApiMsg api)
+        |> andMap api
         |> andMap websocket
         |> andThen (inPosts ApiMsg sendEmptyRequest)
 

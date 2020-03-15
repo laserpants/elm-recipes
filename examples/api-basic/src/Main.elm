@@ -8,7 +8,7 @@ import Http
 import Json.Decode as Json exposing (field)
 import Recipes.Api as Api exposing (..)
 import Recipes.Api.Json as JsonApi
-import Update.Pipeline exposing (andMap, mapCmd, save)
+import Update.Pipeline exposing (andMap, save)
 
 
 type alias Book =
@@ -51,7 +51,7 @@ init () =
                 }
     in
     save Model
-        |> andMap (mapCmd ApiMsg api)
+        |> andMap api
 
 
 fetchBook : Model -> ( Model, Cmd Msg )

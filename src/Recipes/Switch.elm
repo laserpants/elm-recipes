@@ -383,6 +383,10 @@ init get arg pages =
         |> mapCmd toMsg
 
 
+initMsg toMsg get arg pages =
+    mapCmd toMsg (init get arg pages)
+
+
 to :
     (c -> { e | init : arg -> ( a, Cmd msg ), toModel : a -> b, toMsg : msg -> msg2 })
     -> arg

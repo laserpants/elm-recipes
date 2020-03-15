@@ -8,7 +8,7 @@ import Html.Events exposing (..)
 import Json.Decode as Json
 import Recipes.Api exposing (HttpMethod(..), Resource(..))
 import Recipes.Api.Collection as Api exposing (..)
-import Recipes.Api.Collection.Json as JsonApi exposing (..)
+import Recipes.Api.Collection.Json as JsonCollectionApi exposing (..)
 import Update.Pipeline exposing (..)
 import Update.Pipeline.Extended exposing (..)
 
@@ -42,16 +42,16 @@ init : Flags -> ( Model, Cmd Msg )
 init () =
     let
         collectionApi =
-            JsonApi.init
+            JsonCollectionApi.init
                 { limit = 2
                 , endpoint = "/books"
-                , decoder = Json.field "books" (JsonApi.envelopeDecoder "collection" Book.decoder)
+                , decoder = Json.field "books" (envelopeDecoder "collection" Book.decoder)
                 , headers = []
                 , queryString = Api.standardQueryFormat
                 }
     in
     save Model
-        |> andMap (mapCmd BookCollectionMsg collectionApi)
+        |> andMap collectionApi
         |> andThen (inApi Api.fetchPage)
 
 

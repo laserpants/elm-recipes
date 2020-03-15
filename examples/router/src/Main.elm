@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Recipes.Router as Router exposing (Router)
-import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
+import Update.Pipeline exposing (andMap, andThen, save)
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, parse)
 
@@ -48,10 +48,10 @@ init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
 init () url key =
     let
         router =
-            Router.init (parse routeParser) "" key
+            Router.initMsg RouterMsg (parse routeParser) "" key
     in
     save Model
-        |> andMap (mapCmd RouterMsg router)
+        |> andMap router
         |> andMap (save HomePage)
         |> andThen (update (Router.onUrlChange RouterMsg url))
 

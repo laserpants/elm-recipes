@@ -242,7 +242,7 @@ initState :
     (s -> Validate f e d)
     -> List ( f, Field e )
     -> s
-    -> ( ModelState f e d s, Cmd (Msg f) )
+    -> ( ModelState f e d s, Cmd msg )
 initState validate fields state =
     let
         fieldsDict =
@@ -258,7 +258,7 @@ initState validate fields state =
         }
 
 
-init : Validate f e d -> List ( f, Field e ) -> ( Model f e d, Cmd (Msg f) )
+init : Validate f e d -> List ( f, Field e ) -> ( Model f e d, Cmd msg )
 init validate fields =
     initState (always validate) fields ()
 

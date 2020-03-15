@@ -3,6 +3,7 @@ module Recipes.Api.Json exposing (JsonRequestConfig, init, initAndRequest, sendJ
 import Http
 import Json.Decode as Json
 import Recipes.Api as Api exposing (HttpMethod, Model, Msg(..))
+import Update.Pipeline exposing (mapCmd)
 import Update.Pipeline.Extended exposing (Extended)
 
 
@@ -32,7 +33,7 @@ requestConfig { endpoint, method, decoder, headers } =
     }
 
 
-init : JsonRequestConfig resource -> ( Model resource, Cmd (Msg resource) )
+init : JsonRequestConfig resource -> ( Model resource, Cmd msg )
 init =
     Api.init << requestConfig
 

@@ -1,14 +1,14 @@
-module Recipes.Router exposing (Msg(..), Router, init, onUrlChange, onUrlRequest, redirect, run, runExtended, runUpdate, update)
+module Recipes.Router exposing (Msg(..), Router, init, initMsg, onUrlChange, onUrlRequest, redirect, run, runExtended, runUpdate, update)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation as Navigation
-import Update.Pipeline exposing (addCmd, save)
+import Update.Pipeline exposing (addCmd, mapCmd, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, lift, runStack, runStackExtended)
 import Url exposing (Url)
 
+
 {-| Use the Router recipe to implement URL routing in single-page applications.
 -}
-
 type Msg
     = UrlChange Url
     | UrlRequest UrlRequest
@@ -42,6 +42,16 @@ init fromUrl basePath key =
         , fromUrl = fromUrl
         , basePath = basePath
         }
+
+
+initMsg :
+    (Msg -> msg)
+    -> (Url -> Maybe route)
+    -> String
+    -> Navigation.Key
+    -> ( Router route, Cmd msg )
+initMsg toMsg fromUrl basePath key =
+    mapCmd toMsg (init fromUrl basePath key)
 
 
 redirect :

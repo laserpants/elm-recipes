@@ -99,7 +99,7 @@ validate usernameStatus =
         |> Validate.checkbox AcceptTerms (Validate.mustBeChecked TermsNotAccepted)
 
 
-init : FieldList Field Error -> ( Model, Cmd Msg )
+init : FieldList Field Error -> ( Model, Cmd msg )
 init fields =
     Form.initState validate fields Blank
 

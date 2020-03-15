@@ -278,6 +278,10 @@ init =
     Recipes.Switch.init
 
 
+initMsg =
+    Recipes.Switch.initMsg
+
+
 to :
     (c1 -> { e | init : arg -> ( a2, Cmd msg1 ), toModel : a2 -> a, toMsg : msg1 -> msg })
     -> arg

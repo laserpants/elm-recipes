@@ -26,7 +26,7 @@ type alias Model =
     Form.Model Fields Error Data
 
 
-init : ( Model, Cmd Msg )
+init : ( Model, Cmd msg )
 init =
     Form.init validate []
 

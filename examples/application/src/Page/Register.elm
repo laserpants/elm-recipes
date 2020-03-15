@@ -16,7 +16,7 @@ import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form exposing (insertAsFormIn)
 import Recipes.WebSocket as WebSocket
 import Set exposing (Set)
-import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, mapCmd, save, using, when)
+import Update.Pipeline exposing (andAddCmd, andMap, andThen, andThenIf, save, using, when)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, call, choosing, lift, runStack)
 import Util.Api
 import WebSocket.UsernameAvailable as UsernameAvailable
@@ -81,8 +81,8 @@ init () =
                     )
     in
     save Model
-        |> andMap (mapCmd ApiMsg api)
-        |> andMap (mapCmd FormMsg form)
+        |> andMap api
+        |> andMap form
         |> andMap (save Set.empty)
         |> andMap websocket
 

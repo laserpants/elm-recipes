@@ -38,7 +38,7 @@ inForm =
 init : Flags -> ( Model, Cmd Msg )
 init () =
     save Model
-        |> andMap (mapCmd FormMsg RegisterForm.init)
+        |> andMap RegisterForm.init
         |> andMap (save Nothing)
 
 

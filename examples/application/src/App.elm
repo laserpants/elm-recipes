@@ -18,7 +18,7 @@ import Recipes.Session.LocalStorage as LocalStorage
 import Recipes.Switch.Extended as Switch exposing (RunSwitch)
 import Route as Route exposing (Route(..))
 import Ui exposing (Msg(..))
-import Update.Pipeline exposing (andMap, andThen, andThenIf, mapCmd, save, using, when, with)
+import Update.Pipeline exposing (andMap, andThen, andThenIf, save, using, when, with)
 import Update.Pipeline.Extended exposing (Run)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
@@ -121,7 +121,7 @@ init : Flags -> Url -> Navigation.Key -> ( Model, Cmd Msg )
 init { session, basePath } url key =
     let
         router =
-            Router.init (parse Route.parser) basePath key
+            Router.initMsg RouterMsg (parse Route.parser) basePath key
 
         page =
             save Switch.initial
@@ -130,11 +130,11 @@ init { session, basePath } url key =
             Ui.init
     in
     save Model
-        |> andMap (mapCmd RouterMsg router)
-        |> andMap (mapCmd PageMsg page)
+        |> andMap router
+        |> andMap page
         |> andMap (save Nothing)
         |> andMap (save Nothing)
-        |> andMap (mapCmd UiMsg ui)
+        |> andMap ui
         |> andThen (update (Router.onUrlChange RouterMsg url))
 
 

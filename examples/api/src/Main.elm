@@ -9,7 +9,7 @@ import Http
 import Json.Decode as Json
 import Recipes.Api as Api exposing (..)
 import Recipes.Api.Json as JsonApi
-import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
+import Update.Pipeline exposing (andMap, andThen, save)
 import Update.Pipeline.Extended exposing (Run, runStack)
 
 
@@ -115,8 +115,8 @@ init () =
             }
     in
     save Model
-        |> andMap (mapCmd BookListMsg bookListApi)
-        |> andMap (mapCmd BookMsg bookApi)
+        |> andMap bookListApi
+        |> andMap bookApi
         |> andMap (save fields)
         |> andThen (inBookListApi sendEmptyRequest)
 

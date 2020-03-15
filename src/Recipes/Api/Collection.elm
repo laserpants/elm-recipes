@@ -75,7 +75,7 @@ inApi =
     runStackExtended .api insertAsApiIn ApiMsg
 
 
-init : RequestConfig item -> ( Collection item, Cmd (Msg item) )
+init : RequestConfig item -> ( Collection item, Cmd msg )
 init { limit, endpoint, expect, headers, queryString } =
     let
         api =

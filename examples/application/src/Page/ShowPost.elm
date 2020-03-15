@@ -13,7 +13,7 @@ import Recipes.Api.Json as JsonApi
 import Recipes.Form as Form
 import Ui exposing (spinner)
 import Ui.Page
-import Update.Pipeline exposing (andMap, andThen, mapCmd, save)
+import Update.Pipeline exposing (andMap, andThen, save)
 import Update.Pipeline.Extended exposing (Extended, Run, andCall, runStack, runStackExtended)
 import Util.Api
 
@@ -90,9 +90,9 @@ init id =
     in
     save Model
         |> andMap (save id)
-        |> andMap (mapCmd PostApiMsg postApi)
-        |> andMap (mapCmd CommentApiMsg commentApi)
-        |> andMap (mapCmd CommentFormMsg form)
+        |> andMap postApi
+        |> andMap commentApi
+        |> andMap form
         |> andThen (inPost PostApiMsg sendEmptyRequest)
 
 

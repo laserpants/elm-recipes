@@ -91,10 +91,10 @@ init () =
                 { aboutPage } =
                     index2 Index
             in
-            Switch.init aboutPage {} pages
+            Switch.initMsg SwitchMsg aboutPage {} pages
     in
     save Model
-        |> andMap (mapCmd SwitchMsg switch)
+        |> andMap switch
 
 
 handleSomething : Int -> Model -> ( Model, Cmd Msg )

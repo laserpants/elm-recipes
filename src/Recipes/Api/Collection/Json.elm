@@ -22,7 +22,7 @@ envelopeDecoder key itemDecoder =
         (Json.field "total" Json.int)
 
 
-init : JsonRequestConfig item -> ( Collection item, Cmd (Msg item) )
+init : JsonRequestConfig item -> ( Collection item, Cmd msg )
 init { limit, endpoint, decoder, headers, queryString } =
     Collection.init
         { limit = limit
