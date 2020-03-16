@@ -7,7 +7,7 @@
 ### A note about pipelines
 
 The [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) library is used in the implementation of this package, as well as in many of the following examples.
-It is based on a style of code in which the pipe operator facilitates monadic *chaining* of updates:
+It is based on monadic style of programming, and a common pattern in which the pipe operator is used to chain updates together:
 
 ```elm
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -21,8 +21,30 @@ update msg model =
 
 The `save` function turns a `model` value into a `( model, Cmd msg )` pair without adding any commands, 
 and it is used together with `andThen`, which extracts the model from a result and passes it as input to the next function in a pipeline.
+The latter is like the bind (`>>=`) operator in Haskell, whereas `save` corresponds to `pure` (or `return`).
 
-Similarly, the [applicative](https://wiki.haskell.org/Applicative_functor) pattern and `andMap` from the same library are used to implement the `init` function:
+Together, these satisfy the monad laws;
+
+```elm
+{- Left identity -}  
+save >> andThen f  <==>  f
+
+{- Right identity -} 
+f >> andThen save  <==>  f
+
+{- Associativity -}  
+(f >> andThen g) >> andThen h  <==>  f >> andThen (g >> andThen h)
+```
+
+&hellip; where we have the types:
+
+```elm
+f : a -> ( b, Cmd msg )
+g : b -> ( c, Cmd msg )
+h : c -> ( d, Cmd msg )
+```
+
+Similarly, the [applicative](https://wiki.haskell.org/Applicative_functor) pattern and `andMap` from the same library are used throughout the examples to implement the `init` function:
 
 ```elm
 init : Flags -> ( Model, Cmd Msg )
@@ -34,6 +56,8 @@ init flags =
 ```
 
 Note however that none of this is required for using `elm-recipes`, and I have tried to present code examples also using a more conventional approach.
+
+### Callbacks
 
 ### Examples
 
@@ -57,7 +81,7 @@ Here is how to use this recipe in your program:
             { ...
             }
 
-   It is usually a better choice to place this record in a serparate module, e.g., `Data.MyResource`.
+   In the following steps, we will use the name `MyResource` to refer to this type. It is usually a better choice to place this record in a serparate module, e.g., `Data.MyResource`.
 
 3. Add a constructor to your `Msg` type with a single field of type `Api.Msg MyResource`: 
 
@@ -65,7 +89,7 @@ Here is how to use this recipe in your program:
             = ...
             | ApiMsg (Api.Msg MyResource)
 
-   You can use a different name than `ApiMsg` here, but make sure to adjust the code accordingly in the following steps.
+   You can choose a different name than `ApiMsg` here, but this is what I will use in the following steps.
 
 4. Add an `api` field to your `Model`. It should have the type `Api.Model MyResource`:
 
