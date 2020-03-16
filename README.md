@@ -7,7 +7,7 @@
 ### A note about pipelines
 
 The [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) library is used in the implementation of this package, as well as in many of the following examples.
-It is based on monadic style of programming, and a common pattern is one where the pipe operator is used to chain updates together:
+It is based on monadic style of programming, and a common pattern is to use the pipe operator, together with `andThen`, to chain updates together:
 
 ```elm
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -20,7 +20,7 @@ update msg model =
 ```
 
 The `save` function turns a `model` value into a `( model, Cmd msg )` pair without adding any commands, 
-and it is used together with `andThen`, which extracts the model from a result and passes it as input to the next function in a pipeline.
+and it is used with `andThen`, which extracts the model from a result and passes it as input to the next function in a pipeline.
 The latter is like the bind (`>>=`) operator in Haskell, whereas `save` corresponds to `pure` (or `return`).
 
 Together, these satisfy the monad laws;
@@ -83,7 +83,7 @@ Here is how to use this recipe in your program:
             { ...
             }
 
-   In the following steps, we will use the name `MyResource` to refer to this type. It is usually a better choice to place this record in a separate module, e.g., `Data.MyResource`.
+   In the following steps, we will use the name `MyResource` to refer to this type. It is usually better to place this record in a separate module, e.g., `Data.MyResource`.
 
 3. Add a constructor to your `Msg` type with a single field of type `Api.Msg MyResource`: 
 
