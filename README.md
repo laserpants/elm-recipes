@@ -7,7 +7,7 @@
 ### A note about pipelines
 
 The [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) library is used in the implementation of this package, as well as in many of the following examples.
-It is based on monadic style of programming, and a common pattern in which the pipe operator is used to chain updates together:
+It is based on monadic style of programming, and a common pattern is one where the pipe operator is used to chain updates together:
 
 ```elm
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -104,7 +104,40 @@ Here is how to use this recipe in your program:
 
 5. init
 
-6. In your `update` function, add a case for the `Msg` constructor introduced in step one:
+        init flags =
+            let
+                ( apiModel, _ ) =
+                    Api.init
+                        { endpoint = "/books/1"
+                        , method = HttpGet
+                        , expect = ...
+                        , headers = []
+                        }
+            in
+            ( { api = apiModel 
+              , ...
+              }
+            , Cmd.batch [ ... ] )
+
+    or using [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/):
+
+        init flags =
+            let
+                api =
+                    Api.init
+                        { endpoint = "/books/1"
+                        , method = HttpGet
+                        , expect = ...
+                        , headers = []
+                        }
+            in
+            save Model
+                |> andMap api
+                |> andMap ...
+
+
+
+6. In your `update` function, add a case for the `Msg` constructor introduced in step three:
 
         update msg model =
             case msg of
@@ -114,15 +147,31 @@ Here is how to use this recipe in your program:
 
                 ...
 
-7. Implement your view to respond to 
+   The `apiDefaultHandlers` argument is explained 
 
-        view { api } =
-            case api.resource of
-                NotRequested ->
-                    ...
+7. Implement your view to respond to the different stages of the request:
 
-                Available myResource ->
-                    ...
+   * `NotRequested`
+   * `Requested`
+   * `Available MyResource`
+   * `Error Http.Error`
+   <br /><br />
+
+   For example;
+
+          view { api } =
+              case api.resource of
+                  Api.NotRequested ->
+                      ...
+
+                  Api.Requested ->
+                      ...
+
+                  Api.Available myResource ->
+                      ...
+
+                  Api.Error error ->
+                      ...
 
 #### Example
 
