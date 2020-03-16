@@ -155,7 +155,6 @@ Here is how to use this recipe in your program:
    * `Requested`
    * `Available MyResource`
    * `Error Http.Error`
-   <br />
 
    For example;
 
