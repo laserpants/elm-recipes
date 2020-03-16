@@ -7,7 +7,7 @@
 ### A note about pipelines
 
 The [`elm-update-pipeline`](https://package.elm-lang.org/packages/laserpants/elm-update-pipeline/latest/) library is used in the implementation of this package, as well as in many of the following examples.
-It relies on a style of code where the pipe operator serves to express monadic chaining of updates:
+It is based on a style of code in which the pipe operator facilitates monadic *chaining* of updates:
 
 ```elm
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -20,7 +20,7 @@ update msg model =
 ```
 
 The `save` function turns a `model` value into a `( model, Cmd msg )` pair without adding any commands, 
-and `andThen` extracts the model from a result and passes it as input to the next function in a pipeline.
+and it is used together with `andThen`, which extracts the model from a result and passes it as input to the next function in a pipeline.
 
 Similarly, the [applicative](https://wiki.haskell.org/Applicative_functor) pattern and `andMap` from the same library are used to implement the `init` function:
 
@@ -43,7 +43,7 @@ See `examples/application` for an example of many of these recipes used together
 
 ### Api
 
-Use the Api recipe for lifecycle management of resources that are available to your application via Restful web services.
+> Use the Api recipe for lifecycle management of resources that are available to your application via Restful web services.
 
 Here is how to use this recipe in your program:
 
@@ -57,7 +57,7 @@ Here is how to use this recipe in your program:
             { ...
             }
 
-   It is a sensible choice to place this record in a serparate module, e.g,. `Data.MyResource`.
+   It is usually a better choice to place this record in a serparate module, e.g., `Data.MyResource`.
 
 3. Add a constructor to your `Msg` type with a single field of type `Api.Msg MyResource`: 
 
@@ -246,7 +246,7 @@ main =
 
 ### Form
 
-Use the Form recipe to build forms and handle form validation.
+> Use the Form recipe to build forms and handle form validation.
 
 Here is how to use this recipe in your program:
 
@@ -254,23 +254,13 @@ Here is how to use this recipe in your program:
 
         import Recipes.Form as Form
 
-##### Msg
-
-##### Model
-
-##### Init
-
-##### Update
-
-##### Subscriptions
-
 #### Example
 
 TODO
 
 ### Router
 
-Use the Router recipe to implement URL routing in single-page applications.
+> Use the Router recipe to implement URL routing in single-page applications.
 
 Here is how to use this recipe in your program:
 
@@ -278,18 +268,6 @@ Here is how to use this recipe in your program:
 
         import Recipes.Router as Router exposing (Router)
 
-
-##### Msg
-
-##### Model
-
-##### Init
-
-##### Update
-
-##### Subscriptions
-
-##### Main
 
 #### Example
 
@@ -418,7 +396,7 @@ main =
 
 ### Session
 
-The Session recipe allows you to store and persist data using the browser's Storage objects.
+> The Session recipe allows you to store and persist data using the browser's Storage objects.
 
 Here is how to use this recipe in your program:
 
@@ -426,24 +404,13 @@ Here is how to use this recipe in your program:
 
         import Recipes.Session.LocalStorage as LocalStorage
 
-
-##### Msg
-
-##### Model
-
-##### Init
-
-##### Update
-
-##### Subscriptions
-
 #### Example
 
 TODO
 
 ### Switch
 
-Use the Switch recipe to address the need for switching between page contexts in applications.
+> Use the Switch recipe to address the need for switching between page contexts in applications.
 
 Here is how to use this recipe in your program:
 
@@ -451,40 +418,18 @@ Here is how to use this recipe in your program:
 
         import Recipes.Switch as Switch
 
-
-##### Msg
-
-##### Model
-
-##### Init
-
-##### Update
-
-##### Subscriptions
-
 #### Example
 
 TODO
 
 ### WebSocket
 
-Use this recipe to implement WebSocket functionality.
+> Use this recipe to implement WebSocket functionality.
 
 Here is how to use this recipe in your program:
 
 1. Import the `Recipes.WebSocket` module:
 
         import Recipes.WebSocket as WebSocket
-
-
-##### Msg
-
-##### Model
-
-##### Init
-
-##### Update
-
-##### Subscriptions
 
 #### Example
