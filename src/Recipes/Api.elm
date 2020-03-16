@@ -48,6 +48,8 @@ type HttpMethod
     = HttpGet
     | HttpPost
     | HttpPut
+    | HttpPatch
+    | HttpDelete
 
 
 type alias RequestConfig resource =
@@ -71,6 +73,12 @@ init { endpoint, method, expect, headers } =
 
                 HttpPut ->
                     "PUT"
+
+                HttpPatch ->
+                    "PATCH"
+
+                HttpDelete ->
+                    "DELETE"
 
         request suffix body =
             Http.request
