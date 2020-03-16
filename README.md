@@ -36,7 +36,7 @@ f >> andThen save  <==>  f
 (f >> andThen g) >> andThen h  <==>  f >> andThen (g >> andThen h)
 ```
 
-&hellip; where we have the types:
+&hellip; where we have types:
 
 ```elm
 f : a -> ( b, Cmd msg )
@@ -58,6 +58,8 @@ init flags =
 Note however that none of this is required for using `elm-recipes`, and I have tried to present code examples also using a more conventional approach.
 
 ### Callbacks
+
+Another idea that 
 
 ### Examples
 
@@ -81,7 +83,7 @@ Here is how to use this recipe in your program:
             { ...
             }
 
-   In the following steps, we will use the name `MyResource` to refer to this type. It is usually a better choice to place this record in a serparate module, e.g., `Data.MyResource`.
+   In the following steps, we will use the name `MyResource` to refer to this type. It is usually a better choice to place this record in a separate module, e.g., `Data.MyResource`.
 
 3. Add a constructor to your `Msg` type with a single field of type `Api.Msg MyResource`: 
 
@@ -89,7 +91,7 @@ Here is how to use this recipe in your program:
             = ...
             | ApiMsg (Api.Msg MyResource)
 
-   You can choose a different name than `ApiMsg` here, but this is what I will use in the following steps.
+   (I am using the name `ApiMsg` here, but you can choose anything you like.)
 
 4. Add an `api` field to your `Model`. It should have the type `Api.Model MyResource`:
 
@@ -102,7 +104,7 @@ Here is how to use this recipe in your program:
 
 5. init
 
-6. In your `update` function, add a case for the `Msg` constructor introduced in step 1:
+6. In your `update` function, add a case for the `Msg` constructor introduced in step one:
 
         update msg model =
             case msg of
