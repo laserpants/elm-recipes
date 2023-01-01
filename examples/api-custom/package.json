@@ -5,10 +5,10 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "elm-webpack-loader": "^6.0.1",
-    "file-loader": "^5.0.2",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
+    "elm-webpack-loader": "^8.0.0",
+    "file-loader": "^6.2.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^3.10.2",
     "xhook": "^1.4.9"
   }
